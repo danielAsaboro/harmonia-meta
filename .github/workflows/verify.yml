@@ -1,0 +1,46 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      INTERNAL_API_TOKEN: ci-only-not-a-live-secret
+      AGENT_SERVICE_URL: http://127.0.0.1:8080
+      GOOGLE_CLOUD_PROJECT: harmonia-ci
+      HARMONIA_CONNECTION_ENVELOPE_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: agent/requirements.lock
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          install_components: beta,cloud-firestore-emulator
+
+      - run: npm ci
+      - run: python -m pip install --disable-pip-version-check -r agent/requirements.lock
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run test:agent
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run build
