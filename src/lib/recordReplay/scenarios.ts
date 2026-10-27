@@ -1,0 +1,2 @@
+import type { ReplayScenario } from "./schema";
+export const GOLDEN_SCENARIOS: ReadonlyArray<{ scenario: ReplayScenario; status: "not_captured" }> = ["success", "awaiting_approval", "rejection", "transient_recovery", "permanent_failure", "duplicate_effect_suppression", "scheduled_autonomy", "memory_bank_retrieval", "telegram_approval"].map((scenario) => ({ scenario: scenario as ReplayScenario, status: "not_captured" }));
