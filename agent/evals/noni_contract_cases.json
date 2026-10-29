@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {"id":"grounded-copy","expected":"pass"},
+    {"id":"missing-evidence","expected":"reject"},
+    {"id":"invented-evidence","expected":"reject"},
+    {"id":"unsupported-claim","expected":"reject"},
+    {"id":"invented-metric","expected":"reject"},
+    {"id":"invented-trend","expected":"reject"},
+    {"id":"invented-testimonial","expected":"reject"},
+    {"id":"brief-deviation","expected":"reject"},
+    {"id":"cta-failure","expected":"reject"},
+    {"id":"safety-exclusion","expected":"reject"},
+    {"id":"platform-limit","expected":"reject"},
+    {"id":"authority-overreach","expected":"reject"},
+    {"id":"incomplete-claims","expected":"reject"},
+    {"id":"memory-as-fact","expected":"reject"},
+    {"id":"accepted-original","expected":"pass"},
+    {"id":"successful-revision","expected":"pass"},
+    {"id":"invalid-revision-lineage","expected":"reject"},
+    {"id":"ignored-review-issues","expected":"reject"},
+    {"id":"attempted-third-pass","expected":"reject"}
+  ]
+}

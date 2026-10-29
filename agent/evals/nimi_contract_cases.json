@@ -1,0 +1,12 @@
+{
+  "cases": [
+    {"id": "grounded-analysis", "expect": "pass"},
+    {"id": "missing-evidence", "expect": "missing_evidence"},
+    {"id": "invented-reference", "expect": "invented_reference"},
+    {"id": "authority-overreach", "expect": "authority_overreach"},
+    {"id": "incomplete-analysis", "expect": "incomplete_analysis"},
+    {"id": "memory-with-provenance", "expect": "pass"},
+    {"id": "memory-as-authorization", "expect": "authority_overreach"},
+    {"id": "uncertain-analysis", "expect": "pass"}
+  ]
+}

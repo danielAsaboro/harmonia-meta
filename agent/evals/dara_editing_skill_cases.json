@@ -1,0 +1,24 @@
+{
+  "description": "Dara editing-method routing and deterministic assessment boundaries.",
+  "cases": [
+    {"id":"editorial-triage","reference":"references/editorial-triage.md","expected":"pass"},
+    {"id":"grounding-and-claims","reference":"references/grounding-and-claims.md","expected":"pass"},
+    {"id":"structure-and-clarity","reference":"references/structure-and-clarity.md","expected":"pass"},
+    {"id":"brief-voice-and-audience","reference":"references/brief-voice-and-audience.md","expected":"pass"},
+    {"id":"platform-cta-and-usability","reference":"references/platform-cta-and-usability.md","expected":"pass"},
+    {"id":"safety-and-inclusive-editing","reference":"references/safety-and-inclusive-editing.md","expected":"pass"},
+    {"id":"feedback-and-revision","reference":"references/feedback-and-revision.md","expected":"pass"},
+    {"id":"missing-reference","expected":"invalid_skill_trace"},
+    {"id":"unapproved-resource","expected":"invalid_skill_trace"},
+    {"id":"duplicate-resource","expected":"invalid_skill_trace"},
+    {"id":"invalid-trace-order","expected":"invalid_skill_trace"},
+    {"id":"skill-as-evidence","expected":"invented_reference"},
+    {"id":"skill-as-constraint","expected":"invented_reference"},
+    {"id":"vague-feedback","expected":"invalid_editorial_assessment"},
+    {"id":"grounding-issue-without-evidence","expected":"missing_grounding"},
+    {"id":"safety-issue-without-constraint","expected":"missing_constraint"},
+    {"id":"replacement-copy","expected":"authority_overreach"},
+    {"id":"authority-overreach","expected":"authority_overreach"},
+    {"id":"complete-revision-resolution","expected":"pass"}
+  ]
+}

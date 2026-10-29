@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {"id":"complete-acceptance","expected":"pass"},
+    {"id":"grounding-defect","expected":"revise"},
+    {"id":"brief-alignment-defect","expected":"revise"},
+    {"id":"brand-voice-defect","expected":"revise"},
+    {"id":"platform-defect","expected":"revise"},
+    {"id":"cta-defect","expected":"revise"},
+    {"id":"safety-defect","expected":"revise"},
+    {"id":"clarity-defect","expected":"revise"},
+    {"id":"false-acceptance","expected":"reject"},
+    {"id":"missing-rubric","expected":"reject"},
+    {"id":"invented-reference","expected":"reject"},
+    {"id":"invalid-field-path","expected":"reject"},
+    {"id":"replacement-copy","expected":"reject"},
+    {"id":"authority-overreach","expected":"reject"},
+    {"id":"complete-revision-resolution","expected":"pass"},
+    {"id":"ignored-prior-issue","expected":"reject"},
+    {"id":"invented-resolved-issue","expected":"reject"},
+    {"id":"attempted-third-pass","expected":"reject"}
+  ]
+}

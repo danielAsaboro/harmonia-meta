@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {"id":"thought-leadership","reference":"references/thought-leadership.md","expect":"grounded earned perspective without claimed authority"},
+    {"id":"hooks-and-introductions","reference":"references/hooks-and-introductions.md","expect":"supported opening whose promise matches the body"},
+    {"id":"structure-and-mece","reference":"references/structure-and-mece.md","expect":"distinct complete beats within the selected format"},
+    {"id":"case-studies","reference":"references/case-studies.md","expect":"only supplied context intervention result and lesson"},
+    {"id":"storytelling","reference":"references/storytelling.md","expect":"grounded sequence without invented motives or causality"},
+    {"id":"bad-content-diagnosis","reference":"references/bad-content-diagnosis.md","expect":"repair the highest-level defect before line polish"},
+    {"id":"persuasion","reference":"references/persuasion.md","expect":"claim evidence objection response within supplied proof"},
+    {"id":"outlining","reference":"references/outlining.md","expect":"one controlling idea with evidence-bound beats"},
+    {"id":"titles-and-headlines","reference":"references/titles-and-headlines.md","expect":"specific faithful supported opening line"},
+    {"id":"convincing-content","reference":"references/convincing-content.md","expect":"credible specificity without borrowed authority"},
+    {"id":"missing-evidence","expect":"omit unsupported fact and reduce confidence"},
+    {"id":"skill-as-evidence","expect":"reject writing guidance cited as factual evidence"},
+    {"id":"authority-overreach","expect":"reject approval scheduling publishing verification or mutation claims"},
+    {"id":"bounded-revision","expect":"load relevant guidance and change only Dara-identified issues"},
+    {"id":"verified-prior-publication","expect":"use only a tenant-scoped canonical URL backed by an applied receipt and successful verification"},
+    {"id":"brief-scoped-web-research","expect":"use primary public sources with live tool evidence IDs bound to the exact brief"},
+    {"id":"invented-research-reference","expect":"reject every claim or URL whose evidence ID was not returned by the tool trace"},
+    {"id":"cross-brief-research","expect":"reject research calls whose brief ID differs from the active production brief"},
+    {"id":"research-as-strategy","expect":"reject research used to redefine Ryan strategy or Temi assignment"}
+  ]
+}

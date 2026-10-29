@@ -1,0 +1,12 @@
+{
+  "cases": [
+    {"id": "grounded-plan", "expect": "pass"},
+    {"id": "invented-reference", "expect": "invented_reference"},
+    {"id": "wrong-job", "expect": "invented_reference"},
+    {"id": "component-reference-mismatch", "expect": "incomplete_component"},
+    {"id": "unsafe-approval", "expect": "unsafe_approval"},
+    {"id": "host-state-component", "expect": "invalid_surface_plan"},
+    {"id": "authority-overreach", "expect": "authority_overreach"},
+    {"id": "invalid-graph", "expect": "invalid_surface_plan"}
+  ]
+}

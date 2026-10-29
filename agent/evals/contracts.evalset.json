@@ -1,0 +1,31 @@
+{
+  "eval_set_id": "harmonia-contracts-v1",
+  "name": "Harmonia public contract evals",
+  "description": "Source-neutral typed specialist fixtures. No real source material.",
+  "eval_cases": [
+    {
+      "evalId": "route-analyst",
+      "fixture": "public:route:nimi_analyst",
+      "sessionInput": {"appName":"harmonia","userId":"public-eval-user","sessionId":"public-route-analyst","state":{"requested_specialist":"nimi_analyst"}},
+      "conversation": [{"invocationId":"route-analyst-1","userContent":{"role":"user","parts":[{"text":"Delegate the public synthetic source to nimi_analyst exactly once."}]},"finalResponse":{"role":"model","parts":[{"text":"{\"sourceDigest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"summary\":\"Public synthetic source.\",\"moments\":[{\"id\":\"moment-1\",\"title\":\"Public proof\",\"startSec\":0,\"endSec\":2,\"hook\":\"bounded proof\",\"quote\":\"public synthetic source bounded proof\",\"sourceSegmentRefs\":[\"segment-1\"],\"visualEvidenceIds\":[],\"assumptions\":[],\"confidence\":\"high\"}],\"angles\":[{\"id\":\"angle-1\",\"angleType\":\"source_insight\",\"evidenceKind\":\"source\",\"title\":\"Bounded proof\",\"rationale\":\"The source contains bounded proof.\",\"evidenceRefs\":[\"moment-1\"],\"assumptions\":[],\"confidence\":\"high\"}],\"assumptions\":[],\"confidence\":\"high\"}"}]},"intermediateData":{"toolUses":[{"name":"transfer_to_agent","args":{"agent_name":"nimi_analyst"}}]},"rubrics":[{"rubricId":"harmonia_contract","rubricContent":{"textProperty":"{\"kind\":\"analysis\"}"}}]}]
+    },
+    {
+      "evalId": "liaison-read-only",
+      "fixture": "public:authority:liaison-read-only",
+      "sessionInput": {"appName":"harmonia","userId":"public-eval-user","sessionId":"public-liaison","state":{"requested_specialist":"nova_liaison"}},
+      "conversation": [{"invocationId":"liaison-read-only-1","userContent":{"role":"user","parts":[{"text":"Delegate the synthetic status question to nova_liaison exactly once."}]},"finalResponse":{"role":"model","parts":[{"text":"The synthetic job status is available read-only."}]},"intermediateData":{"toolUses":[{"name":"transfer_to_agent","args":{"agent_name":"nova_liaison"}}]},"rubrics":[{"rubricId":"harmonia_contract","rubricContent":{"textProperty":"{\"kind\":\"read_only\"}"}}]}]
+    },
+    {
+      "evalId": "copywriter-references",
+      "fixture": "public:contract:copywriter-references",
+      "sessionInput": {"appName":"harmonia","userId":"public-eval-user","sessionId":"public-copywriter","state":{"requested_specialist":"noni_copywriter"}},
+      "conversation": [{"invocationId":"copywriter-references-1","userContent":{"role":"user","parts":[{"text":"Delegate the typed public fixture to noni_copywriter exactly once."}]},"finalResponse":{"role":"model","parts":[{"text":"done"}]},"intermediateData":{"toolUses":[{"name":"transfer_to_agent","args":{"agent_name":"noni_copywriter"}}],"intermediateResponses":[["noni_copywriter",[{"text":"{\"id\":\"draft-1\",\"planId\":\"plan-1\",\"planDigest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"strategyDigest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"editorialItemId\":\"item-1\",\"briefId\":\"brief-1\",\"revision\":1,\"platform\":\"x\",\"format\":\"text_post\",\"audienceId\":\"founders\",\"objective\":\"Show verified operating proof\",\"funnelStage\":\"consideration\",\"ctaIntent\":\"request a demo\",\"text\":\"We cut nine days to forty hours. Request a demo.\",\"ctaTreatment\":\"Request a demo.\",\"intendedConversion\":\"qualified demo request\",\"evidenceRefs\":[\"moment-1\"],\"claims\":[{\"text\":\"We cut nine days to forty hours.\",\"evidenceRefs\":[\"moment-1\"]}],\"assumptions\":[],\"confidence\":\"high\",\"appliedConstraints\":[\"Use an evidence-led voice\"],\"priorDraftId\":null,\"addressedIssueIds\":[]}"}]]]},"rubrics":[{"rubricId":"harmonia_contract","rubricContent":{"textProperty":"{\"kind\":\"draft\"}"}}]}]
+    },
+    {
+      "evalId": "editor-preservation",
+      "fixture": "public:contract:editor-preservation",
+      "sessionInput": {"appName":"harmonia","userId":"public-eval-user","sessionId":"public-editor","state":{"requested_specialist":"dara_editor"}},
+      "conversation": [{"invocationId":"editor-preservation-1","userContent":{"role":"user","parts":[{"text":"Delegate the typed public fixture to dara_editor exactly once."}]},"finalResponse":{"role":"model","parts":[{"text":"done"}]},"intermediateData":{"toolUses":[{"name":"transfer_to_agent","args":{"agent_name":"dara_editor"}}],"intermediateResponses":[["dara_editor",[{"text":"{\"verdict\":\"accepted\",\"checks\":[{\"dimension\":\"grounding\",\"status\":\"pass\",\"rationale\":\"Grounded in supplied proof.\",\"evidenceRefs\":[\"moment-1\"],\"constraintRefs\":[]},{\"dimension\":\"brief_alignment\",\"status\":\"pass\",\"rationale\":\"Aligned to the brief.\",\"evidenceRefs\":[\"moment-1\"],\"constraintRefs\":[]},{\"dimension\":\"brand_voice\",\"status\":\"pass\",\"rationale\":\"Matches the supplied voice.\",\"evidenceRefs\":[],\"constraintRefs\":[\"Use an evidence-led voice\"]},{\"dimension\":\"platform_constraints\",\"status\":\"pass\",\"rationale\":\"Fits the selected format.\",\"evidenceRefs\":[],\"constraintRefs\":[]},{\"dimension\":\"cta\",\"status\":\"pass\",\"rationale\":\"Uses the exact CTA intent.\",\"evidenceRefs\":[],\"constraintRefs\":[]},{\"dimension\":\"safety\",\"status\":\"pass\",\"rationale\":\"Observes supplied constraints.\",\"evidenceRefs\":[],\"constraintRefs\":[\"Use an evidence-led voice\"]},{\"dimension\":\"clarity\",\"status\":\"pass\",\"rationale\":\"One clear candidate.\",\"evidenceRefs\":[],\"constraintRefs\":[]}],\"issues\":[],\"resolvedIssueIds\":[]}"}]]]},"rubrics":[{"rubricId":"harmonia_contract","rubricContent":{"textProperty":"{\"kind\":\"review\"}"}}]}]
+    }
+  ]
+}

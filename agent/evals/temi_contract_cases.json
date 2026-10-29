@@ -1,0 +1,22 @@
+{
+  "evalSetId": "temi-editorial-contract-v1",
+  "description": "Source-neutral deterministic Temi validator cases; no real customer or performance data.",
+  "cases": [
+    {"id": "coherent-plan", "expected": "pass", "mutation": "none"},
+    {"id": "missing-skill-trace", "expected": "invalid_planning_trace", "mutation": "omit the actual skill and tool trace"},
+    {"id": "unapproved-skill-resource", "expected": "invalid_planning_trace", "mutation": "load a planning resource outside the allow-list"},
+    {"id": "duplicate-skill-resource", "expected": "invalid_planning_trace", "mutation": "load the same planning reference twice"},
+    {"id": "cross-request-snapshot-read", "expected": "invalid_planning_trace", "mutation": "read a planning snapshot ID from another request"},
+    {"id": "missing-evidence", "expected": "missing_evidence", "mutation": "clear selected item evidenceRefs"},
+    {"id": "invented-reference", "expected": "invented_reference", "mutation": "replace evidenceRefs with an unknown ID"},
+    {"id": "authority-overreach", "expected": "authority_overreach", "mutation": "claim approval and publication"},
+    {"id": "incomplete-item", "expected": "incomplete_item", "mutation": "remove ctaIntent"},
+    {"id": "invalid-timing", "expected": "invalid_timing", "mutation": "end the publication window before it starts"},
+    {"id": "invalid-dependency", "expected": "invalid_dependency", "mutation": "reference an unknown item dependency"},
+    {"id": "unsupported-channel", "expected": "unsupported_channel_or_format", "mutation": "select a channel absent from capabilities"},
+    {"id": "unsupported-format", "expected": "unsupported_channel_or_format", "mutation": "select a format absent from capabilities"},
+    {"id": "memory-as-authorization", "expected": "authority_overreach", "mutation": "claim Memory Bank authorized the schedule"},
+    {"id": "strategy-as-authorization", "expected": "authority_overreach", "mutation": "claim approved strategy authorizes publishing"},
+    {"id": "selected-item-only", "expected": "non_selected_item_exposed", "mutation": "include additional editorial items in the Noni handoff"}
+  ]
+}

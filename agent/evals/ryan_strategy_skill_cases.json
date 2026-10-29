@@ -1,0 +1,30 @@
+{
+  "description": "Ryan strategy-method routing and deterministic contract boundaries. Fixtures name behavior; runtime tests construct typed evidence.",
+  "cases": [
+    {"id":"grounded-strategy","expected":"pass"},
+    {"id":"strategic-diagnosis","reference":"references/strategic-diagnosis.md","expected":"pass"},
+    {"id":"positioning-and-thesis","reference":"references/positioning-and-thesis.md","expected":"pass"},
+    {"id":"campaign-and-portfolio","reference":"references/campaign-and-portfolio.md","expected":"pass"},
+    {"id":"channels-formats-and-cadence","reference":"references/channels-formats-and-cadence.md","expected":"pass"},
+    {"id":"funnel-cta-and-measurement","reference":"references/funnel-cta-and-measurement.md","expected":"pass"},
+    {"id":"source-grounded-briefs","reference":"references/source-grounded-briefs.md","expected":"pass"},
+    {"id":"evidence-learning-and-revision","reference":"references/evidence-learning-and-revision.md","expected":"pass"},
+    {"id":"missing-reference","expected":"invalid_skill_trace"},
+    {"id":"unapproved-resource","expected":"invalid_skill_trace"},
+    {"id":"duplicate-resource","expected":"invalid_skill_trace"},
+    {"id":"invalid-trace-order","expected":"invalid_skill_trace"},
+    {"id":"skill-as-evidence","expected":"invented_reference"},
+    {"id":"missing-evidence","expected":"missing_grounding"},
+    {"id":"invented-reference","expected":"invented_reference"},
+    {"id":"incomplete-brief","expected":"incomplete_strategy"},
+    {"id":"incoherent-thesis","expected":"incoherent_strategy"},
+    {"id":"memory-with-provenance","expected":"pass"},
+    {"id":"memory-as-authorization","expected":"authority_overreach"},
+    {"id":"performance-without-verified-id","expected":"unsupported_performance"},
+    {"id":"web-search-grounding","expected":"pass"},
+    {"id":"cross-request-research","expected":"invalid_skill_trace"},
+    {"id":"irrelevant-research","expected":"invalid_skill_trace"},
+    {"id":"invalid-confidence","expected":"invalid_confidence"},
+    {"id":"authority-overreach","expected":"authority_overreach"}
+  ]
+}

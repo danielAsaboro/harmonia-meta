@@ -1,0 +1,33 @@
+{
+  "description": "Nimi analysis-method routing, evidence provenance, grounded research, and authority boundaries.",
+  "cases": [
+    {"id":"grounded-analysis","expected":"pass"},
+    {"id":"evidence-provenance","reference":"references/evidence-observation-and-provenance.md","expected":"pass"},
+    {"id":"moment-extraction","reference":"references/moment-and-quote-extraction.md","expected":"pass"},
+    {"id":"visual-analysis","reference":"references/visual-and-clip-analysis.md","expected":"pass"},
+    {"id":"themes-and-tensions","reference":"references/themes-tensions-and-patterns.md","expected":"pass"},
+    {"id":"angle-development","reference":"references/angle-development.md","expected":"pass"},
+    {"id":"performance-and-memory","reference":"references/performance-and-memory-interpretation.md","expected":"pass"},
+    {"id":"uncertainty-and-critique","reference":"references/uncertainty-and-analysis-critique.md","expected":"pass"},
+    {"id":"missing-reference","expected":"invalid_skill_trace"},
+    {"id":"unapproved-resource","expected":"invalid_skill_trace"},
+    {"id":"duplicate-resource","expected":"invalid_skill_trace"},
+    {"id":"invalid-trace-order","expected":"invalid_skill_trace"},
+    {"id":"skill-as-evidence","expected":"invented_reference"},
+    {"id":"missing-evidence","expected":"missing_evidence"},
+    {"id":"invented-reference","expected":"invented_reference"},
+    {"id":"incomplete-analysis","expected":"incomplete_analysis"},
+    {"id":"source-insight-wrong-kind","expected":"invalid_evidence_kind"},
+    {"id":"trend-without-search","expected":"invalid_evidence_kind"},
+    {"id":"web-search-grounding","capability":"research_tool","expected":"pass"},
+    {"id":"cross-request-research","capability":"research_tool","expected":"invalid_research_trace"},
+    {"id":"irrelevant-research","capability":"research_tool","expected":"invalid_research_trace"},
+    {"id":"missing-search-provenance","capability":"research_tool","expected":"invalid_research_trace"},
+    {"id":"memory-with-provenance","expected":"pass"},
+    {"id":"memory-as-authorization","expected":"authority_overreach"},
+    {"id":"performance-without-verified-id","expected":"invalid_evidence_kind"},
+    {"id":"visual-claim-without-frame","expected":"missing_evidence"},
+    {"id":"bounded-assumption-low-confidence","expected":"pass"},
+    {"id":"authority-overreach","expected":"authority_overreach"}
+  ]
+}

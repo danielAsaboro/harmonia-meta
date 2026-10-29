@@ -1,0 +1,13 @@
+{
+  "cases": [
+    {"id": "grounded-answer"},
+    {"id": "wrong-skill"},
+    {"id": "wrong-tool"},
+    {"id": "missing-evidence"},
+    {"id": "invented-reference"},
+    {"id": "authority-overreach"},
+    {"id": "hidden-error"},
+    {"id": "invalid-retry"},
+    {"id": "false-no-data"}
+  ]
+}
