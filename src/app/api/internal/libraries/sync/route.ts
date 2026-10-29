@@ -1,0 +1,4 @@
+import { isInternalAuthorized, unauthorized, withInternalTenant } from "@/lib/internalAuth";
+import { listLibraryConnections } from "@/lib/brandLibraries/repository";
+import { isSyncDue, runLibrarySync } from "@/lib/brandLibraries/sync";
+export async function POST(request: Request) { if (!isInternalAuthorized(request)) return unauthorized(); return withInternalTenant(request, async () => { const now = new Date().toISOString(); const due = (await listLibraryConnections()).filter((connection) => connection.lastSyncStatus !== "running" && isSyncDue(connection, now)).slice(0, 3); const results = []; for (const connection of due) { try { results.push({ connectionId: connection.id, outcome: "healthy", ...(await runLibrarySync(connection.id, connection.revision)) }); } catch (error) { results.push({ connectionId: connection.id, outcome: "failed", errorType: error instanceof Error ? error.name : "Error" }); } } return Response.json({ checkedAt: now, results }); }); }
