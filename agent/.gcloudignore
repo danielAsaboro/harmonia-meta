@@ -1,0 +1,8 @@
+.gcloudignore
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/
+.coverage
+tests/
+*.pyc
