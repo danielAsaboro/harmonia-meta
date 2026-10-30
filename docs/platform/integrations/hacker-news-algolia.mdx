@@ -1,0 +1,31 @@
+---
+title: "Hacker News Algolia API"
+description: "How Nova and proactive checks obtain current public startup-technology signals."
+---
+
+Harmonia uses Hacker News's official Algolia API as a keyless, read-only source of current public stories. It does not scrape Hacker News pages or treat popularity as customer research.
+
+## How Harmonia uses it
+
+Nova's `trend-scan` and `signal-watch` skills can call `fetch_trend_signals` or `search_trend_signals`. Proactive checks may use the same bounded signal client. Results normalize title, URL, points, and comment count.
+
+Each successful envelope contains a dataset evidence ID and record-level evidence IDs for returned stories. Nova must display the exact IDs supporting factual claims, and its runtime validator binds them to the actual tool trace.
+
+## Security and authority
+
+The integration is public and read-only. Signals can inform proposed angles but cannot authorize content, prove a trend beyond the returned sample, or override source-grounding requirements.
+
+## Failure behavior
+
+Empty results are reported as no data. Dependency failures return typed envelopes and permit at most one retry when explicitly retryable. The model cannot substitute remembered trends.
+
+## Evidence status
+
+Normalization, mock fixtures, tool envelopes, citations, and failure behavior have automated coverage. Current-story claims require a live response captured for that invocation.
+
+## Relevant files
+
+- `agent/harmonia_agent/signals.py`
+- `agent/harmonia_agent/skills_runtime.py`
+- `agent/harmonia_agent/nova_liaison.py`
+- `agent/harmonia_agent/skills/trend-scan/SKILL.md`

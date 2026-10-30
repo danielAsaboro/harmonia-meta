@@ -1,0 +1,32 @@
+---
+title: "Cloud Pub/Sub"
+description: "How Harmonia uses Pub/Sub for recoverable asynchronous stage delivery."
+---
+
+Cloud Pub/Sub transports stage wake-ups. Firestore—not the message—is the source of truth for whether work is eligible and what payload should run.
+
+## How Harmonia uses it
+
+The web service writes durable stage and production-operation outboxes alongside workflow state. Stage dispatch publishes a compact tenant/job/stage envelope to `harmonia-stages`; mandate-authorized paid media dispatch publishes exact plan and operation identifiers to `harmonia-production`. Separate private worker push subscriptions deliver them to `/pubsub/push` and `/pubsub/production` with OIDC authentication. The worker reconstructs and claims the sealed operation in Firestore before execution.
+
+Dead-letter topics retain exhausted deliveries. The minute-level authenticated durable tick republishes due outbox entries, including provider polls, and reconciles abandoned claims.
+
+## Security and authority
+
+Messages contain identifiers and correlation metadata, not credentials or full source content. The push audience and service account are fixed during deployment. Receipt of a message never authorizes an effect; the worker reconstructs current authority from Firestore.
+
+## Failure behavior
+
+Transient failures are nacked for redelivery. Permanent protocol or policy failures are persisted visibly. Duplicate deliveries are safe because stage claims and production submission fences prevent duplicate work or provider spend.
+
+## Evidence status
+
+The emulator and automated suites cover outbox, claims, retries, and duplicate delivery. Production delivery requires correlated Pub/Sub message, worker trace, and Firestore claim evidence.
+
+## Relevant files
+
+- `src/lib/pubsub.ts`
+- `src/lib/stageOutbox.ts`
+- `agent/harmonia_agent/main.py`
+- `agent/harmonia_agent/stages.py`
+- `infra/deploy.sh`

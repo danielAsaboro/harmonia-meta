@@ -1,0 +1,18 @@
+---
+title: "Security and identity platform"
+description: "Operator identity, workload identity, and secret boundaries in Harmonia."
+---
+
+## How Harmonia uses it
+
+Firebase Authentication establishes operator identity and workspace membership. IAM service accounts identify Cloud Run and automation workloads. Secret Manager keeps provider credentials server-side; browsers receive neither integration secrets nor machine credentials.
+
+<CardGroup cols={2}>
+  <Card title="Firebase Authentication" href="/platform/security/firebase-auth">Operator authentication and tenant scope.</Card>
+  <Card title="IAM service accounts" href="/platform/security/iam-service-accounts">Machine identity and least privilege.</Card>
+  <Card title="Secret Manager" href="/platform/security/secret-manager">Credential storage and delivery.</Card>
+</CardGroup>
+
+## Evidence status
+
+Repository policy and tests verify access checks locally. Production IAM grants, secret versions, and authenticated access must be verified in the target project without exposing secret values.

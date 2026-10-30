@@ -1,0 +1,32 @@
+---
+title: "Structured logging"
+description: "How Harmonia logs operational outcomes without leaking prompts, content, or credentials."
+---
+
+Application logs complement traces with human-readable worker, scheduler, content, proactive, and Telegram diagnostics. Logs are operational evidence, not durable workflow state.
+
+## How Harmonia uses it
+
+Python modules use named `logging` loggers for service startup, stage outcomes, retry decisions, provider failures, scheduling, proactive scans, and notification errors. Cloud Run captures stdout and stderr. Correlation identifiers in surrounding telemetry and persisted records connect logs to a job or operation.
+
+Logs avoid raw prompts, transcripts, drafts, media bytes, connection data, authorization headers, and provider payloads. Typed errors shown to operators use value-free messages where secrets might otherwise leak.
+
+## Security and authority
+
+Logging a success message cannot advance a job or verify an effect. Receipts and verification records remain authoritative. Stack traces are server-side diagnostics and are not returned to operators or models.
+
+## Failure behavior
+
+Logging failure must not mask the primary workflow result. Secondary reporting errors are recorded when possible while preserving the original failure category.
+
+## Evidence status
+
+Redaction helpers, typed failures, and safe telemetry attributes have automated coverage. Production logging claims require redacted Cloud Run log entries correlated with persisted workflow records.
+
+## Relevant files
+
+- `agent/harmonia_agent/main.py`
+- `agent/harmonia_agent/stages.py`
+- `agent/harmonia_agent/failures.py`
+- `agent/harmonia_agent/proactive.py`
+- `docs/observability.mdx`

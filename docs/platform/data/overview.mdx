@@ -1,0 +1,18 @@
+---
+title: "Storage and messaging platform"
+description: "Durable state, asynchronous delivery, and binary asset storage in Harmonia."
+---
+
+## How Harmonia uses it
+
+Firestore owns tenant-scoped workflow truth and atomically records stage outbox entries. Pub/Sub transports stage triggers but cannot advance state by itself. Cloud Storage holds uploaded and generated binary assets while Firestore retains identity, lineage, and digests.
+
+<CardGroup cols={2}>
+  <Card title="Firestore" href="/platform/data/firestore">Durable records and transactions.</Card>
+  <Card title="Pub/Sub" href="/platform/data/pubsub">At-least-once stage delivery.</Card>
+  <Card title="Cloud Storage" href="/platform/data/cloud-storage">Authorized source and output assets.</Card>
+</CardGroup>
+
+## Evidence status
+
+Emulator and contract tests verify local persistence behavior. Cloud resource existence and production data paths require authenticated infrastructure evidence.

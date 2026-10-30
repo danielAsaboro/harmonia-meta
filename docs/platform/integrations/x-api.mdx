@@ -1,0 +1,36 @@
+---
+title: "X API v2"
+description: "How Harmonia publishes, verifies, and measures approved X posts through the official API."
+---
+
+Harmonia uses the official X API v2 for one bounded external-effect path: publishing an exact approved post, verifying it independently, and later reading public engagement metrics.
+
+## How Harmonia uses it
+
+1. Noni and Dara produce an accepted candidate from the selected editorial item.
+2. Deterministic code creates an exact `publish_x_post` proposal.
+3. Human approval binds to the proposal digest and current connection.
+4. The executor claims the effect idempotently and calls `POST /2/tweets`.
+5. Harmonia persists the provider response as a receipt.
+6. Verification re-fetches `GET /2/tweets/{id}` independently.
+7. The learn stage requests `public_metrics` and persists measured engagement.
+
+## Security and authority
+
+Access tokens are tenant-scoped server-side connection data. They are never included in agent prompts, browser payloads, logs, or evidence bundles. Nova has no X tool. Publishing requires both policy eligibility and exact human or mandate authority.
+
+## Failure behavior
+
+Rate limits, authorization failures, ambiguous outcomes, mismatched verification, and permanent provider errors remain explicit. An uncertain effect is not blindly retried; recovery checks receipts and provider state first.
+
+## Evidence status
+
+Mock mode and contract tests do not prove a real post. Live capability requires a redacted authenticated request, persisted receipt, independently fetched post, and correlated trace.
+
+## Relevant files
+
+- `agent/harmonia_agent/x_client.py`
+- `agent/harmonia_agent/stages.py`
+- `src/lib/effectCommands.ts`
+- `src/lib/effectClaims.ts`
+- `docs/approval-and-audit.mdx`

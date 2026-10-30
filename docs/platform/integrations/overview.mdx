@@ -1,0 +1,19 @@
+---
+title: "Integration platform"
+description: "Official external APIs used for sources, operator access, calendars, signals, and publishing."
+---
+
+## How Harmonia uses it
+
+YouTube supplies authorized source metadata and media context. Hacker News Algolia supplies public trend signals. Telegram offers an allow-listed operator surface. Google Calendar synchronization is explicit, and X publishing uses the official API behind digest-bound approval and idempotent execution.
+
+<CardGroup cols={2}>
+  <Card title="X API" href="/platform/integrations/x-api">Approval-gated publishing and read-back.</Card>
+  <Card title="Telegram" href="/platform/integrations/telegram">Allow-listed operator commands.</Card>
+  <Card title="Google Calendar" href="/platform/integrations/google-calendar-api">Explicit calendar synchronization.</Card>
+  <Card title="YouTube" href="/platform/integrations/youtube">Authorized source ingestion.</Card>
+</CardGroup>
+
+## Evidence status
+
+Integration code and tests do not prove credentials, quota, or provider acceptance. Each provider page separates implemented behavior from authenticated evidence.

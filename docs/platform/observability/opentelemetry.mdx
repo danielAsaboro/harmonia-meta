@@ -1,0 +1,32 @@
+---
+title: "OpenTelemetry"
+description: "How Harmonia propagates and records privacy-bounded execution traces."
+---
+
+OpenTelemetry provides vendor-neutral trace context across the Next.js service, Pub/Sub messages, FastAPI worker, model invocations, memory operations, tools, validation, and effects.
+
+## How Harmonia uses it
+
+The web runtime initializes a Node tracer provider and OTLP gRPC exporter when telemetry is enabled. The worker configures Python OpenTelemetry instrumentation for FastAPI and HTTPX. W3C `traceparent` values connect browser/API work to stage messages and worker spans.
+
+Span attributes contain operational identifiers such as workspace digest, job ID, stage, role, model, operation ID, Pub/Sub message ID, status, latency, and normalized token or cost units.
+
+## Privacy and security
+
+Telemetry helpers reject prompt, response, transcript, draft, media, content, body, credential, and token fields. Deployment disables ADK and GenAI message-content capture. Identifiers are bounded or digested where appropriate.
+
+## Failure behavior
+
+Tracing is diagnostic and cannot change workflow outcome. Export failure does not create false effect success, approval, or verification. Workflow truth remains in Firestore.
+
+## Evidence status
+
+Propagation, redaction, span structure, and instrumentation behavior have automated local coverage. An enabled exporter is not proof of received cloud traces; capture correlated backend evidence.
+
+## Relevant files
+
+- `src/instrumentation.ts`
+- `src/lib/telemetry.ts`
+- `agent/harmonia_agent/telemetry.py`
+- `agent/harmonia_agent/stages.py`
+- `docs/observability.mdx`

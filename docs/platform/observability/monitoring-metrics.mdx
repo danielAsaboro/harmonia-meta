@@ -1,0 +1,37 @@
+---
+title: "Monitoring and metrics"
+description: "How Harmonia exposes job health, agent activity, failures, receipts, and model usage to operators."
+---
+
+Harmonia's monitoring surface is assembled from durable Firestore records and bounded activity telemetry. It does not treat process memory or model narration as operational truth.
+
+## How Harmonia uses it
+
+- `/api/metrics` aggregates model calls, token usage, estimated cost, reservations, job status, and receipt counts.
+- `/dashboard/monitoring` presents operational health and recent execution data.
+- Structured agent activity records expose role, phase, status, operation, duration, and safe summaries without prompt or response bodies.
+- Notifications and failure records surface unresolved operator attention.
+- Trace IDs allow deeper diagnosis in the configured tracing backend.
+
+Metrics use integer microdollars for aggregation and preserve pricing-catalog versioning. Provider estimates remain distinct from observed billing data.
+
+## Security and authority
+
+Monitoring endpoints are tenant-scoped. Metrics cannot approve, retry, replay, publish, or change a budget. Operator actions leave the monitoring view and enter dedicated deterministic handlers.
+
+## Failure behavior
+
+Missing usage, stale state, unresolved effects, and failed verifications remain visible. The UI does not infer health from absence of logs.
+
+## Evidence status
+
+Aggregation, activity contracts, redaction, and dashboard rendering have automated coverage. Production monitoring requires authenticated records from the deployed services.
+
+## Relevant files
+
+- `src/app/api/metrics/route.ts`
+- `src/app/dashboard/monitoring/page.tsx`
+- `src/lib/observability/repository.ts`
+- `src/lib/observability/schema.ts`
+- `agent/harmonia_agent/activity_models.py`
+- `docs/observability.mdx`

@@ -1,0 +1,19 @@
+---
+title: "Logging and monitoring platform"
+description: "Correlation, traces, structured logs, metrics, and usage budgets across Harmonia."
+---
+
+## How Harmonia uses it
+
+OpenTelemetry-compatible identifiers correlate web and worker operations. Structured JSON logs support diagnosis, Cloud Trace is the managed trace target, metrics summarize health and throughput, and durable usage records enforce model-budget policy.
+
+<CardGroup cols={2}>
+  <Card title="OpenTelemetry" href="/platform/observability/opentelemetry">Propagation and correlation.</Card>
+  <Card title="Structured logging" href="/platform/observability/structured-logging">Machine-readable operational events.</Card>
+  <Card title="Monitoring metrics" href="/platform/observability/monitoring-metrics">Health and workflow measures.</Card>
+  <Card title="Usage and budgets" href="/platform/observability/usage-budget">Pricing, reservation, and reconciliation.</Card>
+</CardGroup>
+
+## Evidence status
+
+Local tests prove identifier and record shape. Managed trace ingestion, alerting, and dashboards need authenticated cloud evidence; logs are diagnostic records, not workflow authority.

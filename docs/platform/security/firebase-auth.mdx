@@ -1,0 +1,30 @@
+---
+title: "Firebase Authentication"
+description: "How Google sign-in establishes Harmonia operator identity and tenant scope."
+---
+
+Firebase Authentication provides the dashboard's Google sign-in and server-verifiable operator identity. Harmonia maps verified identities to workspace membership before exposing tenant data or decisions.
+
+## How Harmonia uses it
+
+The browser signs in with the Google provider through the Firebase client SDK. Server routes verify Firebase credentials with the Admin SDK, require the expected sign-in provider, create a bounded session identity, and resolve workspace/brand membership. The resulting principal is used by job, settings, approval, calendar, and monitoring routes.
+
+## Security and authority
+
+Authentication proves identity, not permission for every action. Workspace membership, administrator checks, action state, payload digest, and policy are evaluated separately. Firebase tokens are never agent context or approval evidence.
+
+## Failure behavior
+
+Missing, expired, malformed, wrong-provider, or unauthorized identities fail before tenant state is read. The application does not accept workspace IDs from an unverified browser as authority.
+
+## Evidence status
+
+Auth parsing, session, tenancy, and authority contracts have automated coverage. Production identity claims require an authenticated sign-in against the configured Google Cloud project.
+
+## Relevant files
+
+- `src/lib/firebaseClient.ts`
+- `src/lib/firebaseAdmin.ts`
+- `src/lib/auth.ts`
+- `src/lib/authority.ts`
+- `src/app/login/page.tsx`

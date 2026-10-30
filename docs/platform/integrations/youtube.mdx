@@ -1,0 +1,32 @@
+---
+title: "YouTube video sources"
+description: "How Harmonia resolves authorized YouTube videos into evidence-grounded normalized sources."
+---
+
+YouTube URLs are one supported direct-source path. Harmonia resolves source metadata and media only after the operator attests that the material is authorized for processing.
+
+## How Harmonia uses it
+
+The source registry validates the URL and records source rights. During `extract_sources`, the worker resolves public metadata through YouTube/oEmbed, obtains authorized media, and uses Gemini to produce digest-bound timed segments. Those segments and authorized video evidence join the same normalized source bundle used for documents, web pages, pasted text, uploads, and pinned brand-library snapshots.
+
+Google OAuth configuration is available where an authorized source requires it. Public URLs do not grant reuse rights by themselves; the job retains the operator's rights declaration and source provenance.
+
+## Security and authority
+
+Source extraction cannot authorize publication. Models receive only the bounded normalized source package and may not claim facts outside its segment/frame evidence. Credentials and download details remain server-side.
+
+## Failure behavior
+
+Invalid URLs, unavailable or private media, unsupported formats, rights failures, metadata mismatch, and download/transcription errors remain visible. Harmonia does not substitute fake transcripts.
+
+## Evidence status
+
+URL validation, rights records, local fixtures, and stage contracts have automated coverage. A real end-to-end source claim requires the captured authorized URL, resolved metadata, transcript, and source digest.
+
+## Relevant files
+
+- `agent/harmonia_agent/youtube.py`
+- `agent/harmonia_agent/content.py`
+- `agent/harmonia_agent/stages.py`
+- `src/lib/sourceRights.ts`
+- `docs/evidence-runbook.mdx`

@@ -1,0 +1,32 @@
+---
+title: "Google Calendar API"
+description: "How Harmonia explicitly synchronizes already scheduled content to an app-created calendar."
+---
+
+Google Calendar is an operator-controlled downstream projection. Temi proposes editorial windows but cannot create or modify external calendar events.
+
+## How Harmonia uses it
+
+Harmonia requests the narrow `calendar.app.created` OAuth scope and creates or reuses a Harmonia-owned calendar. After content has separately reached the application's scheduled state, the operator may explicitly add, update, or remove its calendar event.
+
+The mutation binds to the content item, tenant, calendar, operation, and prior synchronization state. The latest verified projection—or verified absence—is stored on the content item.
+
+## Security and authority
+
+OAuth tokens stay server-side. Harmonia does not request access to unrelated calendars. Calendar synchronization cannot approve content, choose a publication time, or publish a social post.
+
+## Failure behavior
+
+Provisioning and mutations use claims to prevent duplicate calendars or events. Ambiguous provider outcomes are marked uncertain and reconciled instead of blindly repeated. Stale content-item updates are rejected.
+
+## Evidence status
+
+Gateway, OAuth, idempotency, and state-machine behavior have automated coverage. Live use requires authenticated OAuth consent and redacted event reconciliation evidence.
+
+## Relevant files
+
+- `src/lib/googleCalendar.ts`
+- `src/lib/calendarSyncState.ts`
+- `src/app/api/calendar/google/route.ts`
+- `src/app/api/oauth/[platform]/`
+- `docs/google-calendar-reference.mdx`

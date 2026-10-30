@@ -1,0 +1,32 @@
+---
+title: "Google A2UI"
+description: "How Harmonia uses A2UI for bounded, server-hydrated generative operator surfaces."
+---
+
+Harmonia uses Google A2UI packages to represent and render generative interface layouts without granting the presenter authority over workflow data or actions.
+
+## How Harmonia uses it
+
+Maya receives a typed catalog of allowed entities and returns a reference-only `SurfacePlan`. Python and TypeScript validators require every component and entity reference to exist in the supplied context. The server then hydrates those references from authenticated Firestore records before `@a2ui/react` renders them.
+
+Supported campaign components include job progress, source evidence, moment exploration, draft comparison, platform preview, approval review, and verification receipts. Loading, empty, unresolved, and failure components remain host-owned.
+
+## Security and authority
+
+Maya cannot emit draft text, transcript content, receipt values, approval state, executable handlers, or arbitrary URLs. An approval component is valid only for the supplied pending action and approval slot. User actions still enter deterministic decision endpoints.
+
+## Failure behavior
+
+Unknown components, invented references, invalid slots, duplicate entities, or context-digest mismatches fail the presentation run. The host does not convert protocol errors into generic success screens.
+
+## Evidence status
+
+Schema parity, validation, hydration, replay, and rendering behavior have automated local coverage. Authenticated managed Maya execution requires separate Agent Engine evidence.
+
+## Relevant files
+
+- `agent/harmonia_agent/a2ui_models.py`
+- `agent/harmonia_agent/maya_prompt.py`
+- `src/lib/a2ui/`
+- `src/components/studio/`
+- `docs/a2ui-console.mdx`

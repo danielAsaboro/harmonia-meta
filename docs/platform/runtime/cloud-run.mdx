@@ -1,0 +1,37 @@
+---
+title: "Cloud Run"
+description: "How Harmonia deploys separate web and private worker services on Cloud Run."
+---
+
+Cloud Run is Harmonia's target compute platform. The deployment separates the public-facing Next.js service from the private FastAPI worker.
+
+## How Harmonia uses it
+
+| Service | Responsibility |
+|---|---|
+| Web | Dashboard, chat, authenticated APIs, Firestore state transitions, integrations, and signed asset routes |
+| Worker | Pub/Sub stage execution, ADK/Agent Engine invocation, media work, verification, and learning stages |
+
+The worker receives authenticated Pub/Sub pushes and Scheduler ticks. Each service uses its own least-privilege service account. Deployment injects resource names and non-secret configuration; provider tokens belong in Secret Manager-backed environment variables.
+
+Cloud Run instances are treated as disposable. Durable state, queues, assets, and operation claims live outside the container.
+
+## Security and authority
+
+The web service is the operator boundary. The worker is private and accepts fixed OIDC audiences for machine calls. Cloud Run identity grants are split by responsibility rather than shared through one broad account.
+
+## Failure behavior
+
+Container restart or scale-to-zero does not erase job state. Pub/Sub redelivery, outbox recovery, Firestore claims, and idempotent effects resume work safely.
+
+## Evidence status
+
+Production builds verify standalone packaging locally. The full deployment path builds commit-tagged images once, deploys their resolved digests, and emits the Cloud Run revision/image identities. A web-preview revision does not prove the worker or managed agent stack is deployed; retain the full release identity lines with correlated service revisions and traces.
+
+## Relevant files
+
+- `Dockerfile`
+- `agent/Dockerfile`
+- `infra/deploy.sh`
+- `infra/deploy-web-preview.sh`
+- `docs/deployment.mdx`

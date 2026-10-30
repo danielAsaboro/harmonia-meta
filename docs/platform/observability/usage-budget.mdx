@@ -1,0 +1,32 @@
+---
+title: "Usage and budget accounting"
+description: "How Harmonia reserves model cost, records normalized usage, and fails closed on unknown pricing."
+---
+
+Harmonia treats cost authorization as deterministic policy. Agents do not decide whether a paid invocation or media request is affordable.
+
+## How Harmonia uses it
+
+Before a paid operation, the worker requests a tenant/job-scoped budget reservation using the configured model and maximum eligible usage. After execution, it normalizes provider usage and resolves the reservation as consumed, released, failed-before-dispatch, or uncertain.
+
+The versioned pricing catalog uses decimal arithmetic. Durable usage records bind workspace, job, stage, role, model, policy version, operation, trace, token units, and estimated microdollars. `/api/metrics` aggregates these records for operators.
+
+## Security and authority
+
+An estimate is not an invoice. Workspace limits, job limits, approval thresholds, and pricing eligibility are application policy. Memory, prompts, model output, or telemetry cannot raise a budget or bypass a reservation.
+
+## Failure behavior
+
+Unknown pricing is not budget-authorized. Reservation conflicts, exceeded limits, missing usage, and ambiguous provider dispatch remain explicit. Resolution failure is logged without rewriting the primary provider outcome.
+
+## Evidence status
+
+Catalog arithmetic, reservations, normalization, and aggregation have automated coverage. Estimated cost must remain labeled separately from authenticated provider billing.
+
+## Relevant files
+
+- `agent/harmonia_agent/model_catalog.py`
+- `agent/harmonia_agent/usage.py`
+- `src/lib/firestore.ts`
+- `src/app/api/internal/budget/`
+- `src/app/api/metrics/route.ts`

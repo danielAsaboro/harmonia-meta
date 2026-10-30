@@ -1,0 +1,35 @@
+---
+title: "Google ADK"
+description: "How Harmonia uses Google ADK for typed specialist delegation, callbacks, skills, and managed state deltas."
+---
+
+Google ADK is Harmonia's agent framework. It defines one coordinator and bounded specialists while deterministic worker code controls stage ordering and persistence.
+
+## How Harmonia uses it
+
+- `harmonia_coordinator` delegates one typed task to the requested specialist.
+- Nimi, Ryan, Temi, Noni, Dara, Maya, and Nova use separate input/output contracts and model policies.
+- ADK `output_key` state deltas carry specialist results back to the deterministic wrapper.
+- Noni and Dara run as separate calls inside an application-controlled two-pass maximum.
+- Nimi and Ryan each receive one filesystem `SkillToolset` restricted to approved method references.
+- Meta web search is a separate request-bound ADK tool that makes its own Responses API call; it never shares a model request with Nimi's, Ryan's, or Noni's filesystem loaders.
+- Nimi records and validates independent skill-loader and grounded-research traces. Skill content cannot become search evidence.
+- Nova receives a read-only ADK `SkillToolset`; Noni has a filesystem writing skill plus separate grounded-research tools; Dara receives only its filesystem editing-skill loaders; Temi has one planning-method skill plus six request-bound reads over an immutable Firestore snapshot. Maya remains tool-free.
+- Callbacks attach authorized media evidence and reset, record, and validate actual skill-loader and tool traces.
+
+ADK output is never workflow truth by itself. Application validators reject incomplete schemas, invented references, authority overreach, and invalid trajectories before Firestore changes.
+
+## Failure behavior
+
+Malformed output becomes a permanent protocol failure. Provider and managed-runtime failures remain typed and visible. Harmonia does not silently switch roles or fabricate successful state.
+
+## Evidence status
+
+Agent construction, routing, schemas, callbacks, and validators have automated local coverage. Managed ADK execution on Vertex AI requires authenticated Agent Engine evidence.
+
+## Relevant files
+
+- `agent/harmonia_agent/agents.py`
+- `agent/harmonia_agent/agent_models.py`
+- `agent/harmonia_agent/skills_runtime.py`
+- `agent/harmonia_agent/team_runtime.py`

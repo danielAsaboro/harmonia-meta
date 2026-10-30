@@ -1,0 +1,36 @@
+---
+title: "ffmpeg"
+description: "How Harmonia deterministically renders clips, reels, captions, and local media fixtures."
+---
+
+ffmpeg performs deterministic media transformation after cognitive stages have proposed grounded source moments. It is application tooling, not a model-accessible effect tool.
+
+## How Harmonia uses it
+
+- Cut authorized source media to validated Nimi time ranges.
+- Reframe output for vertical social formats.
+- Burn captions when the installed build supports the subtitles filter.
+- Concatenate selected moments into reels.
+- Produce internal clip assets before any external publishing proposal.
+- Render deterministic local PNG fixtures in explicit mock development mode.
+
+Commands are constructed as argument arrays without a shell. Inputs, output paths, durations, and supported filters are checked before execution.
+
+## Security and authority
+
+ffmpeg reads only authorized local or staged media and writes internal artifacts. Rendering does not approve publishing, choose copy, or prove that an external post exists.
+
+## Failure behavior
+
+Missing binaries, invalid media, non-zero exits, absent outputs, and unsupported caption filters remain explicit. Captions may be skipped with a recorded note when the local build lacks the filter; the system does not claim captioned output in that case.
+
+## Evidence status
+
+Real local ffmpeg invocations and artifact checks have automated coverage. External publication of a rendered asset requires a separate approved effect and verification receipt.
+
+## Relevant files
+
+- `agent/harmonia_agent/clipper.py`
+- `agent/harmonia_agent/generative_media.py`
+- `agent/harmonia_agent/stages.py`
+- `agent/tests/test_generative_media.py`

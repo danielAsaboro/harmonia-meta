@@ -1,0 +1,32 @@
+---
+title: "Cloud Scheduler"
+description: "How authenticated scheduler ticks drive durable recovery and bounded resident checks."
+---
+
+Cloud Scheduler supplies time-based wake-ups. It does not contain workflow logic or model authority.
+
+## How Harmonia uses it
+
+Deployment creates authenticated HTTP jobs for the worker's durable tick and configured proactive cadences. The tick recovers stage outbox entries, scheduled commands, and expired claims from Firestore. Additional resident checks may observe trends, engagement, or due work under the governed autonomy policy.
+
+Each job sends an OIDC-authenticated POST using the dedicated `harmonia-scheduler` service account and the worker URL as audience.
+
+## Security and authority
+
+The scheduler identity receives Cloud Run invocation permission only. A tick cannot approve content, expand a mandate, or manufacture eligible work; deterministic code evaluates current Firestore records and policy after invocation.
+
+## Failure behavior
+
+Repeated ticks are expected and safe. Workspace leases, stage claims, effect claims, and operation IDs prevent concurrent or duplicate execution. Failed checks remain visible and are not represented as successful observations.
+
+## Evidence status
+
+Tick behavior and concurrency contracts have automated coverage. Production scheduling requires authenticated Scheduler execution plus the corresponding worker and Firestore records.
+
+## Relevant files
+
+- `agent/harmonia_agent/durable_tick.py`
+- `agent/harmonia_agent/proactive.py`
+- `agent/harmonia_agent/scheduler.py`
+- `infra/deploy.sh`
+- `docs/resident-autonomy.mdx`

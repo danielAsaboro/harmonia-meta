@@ -1,0 +1,36 @@
+---
+title: "Next.js"
+description: "How Harmonia uses Next.js for its operator UI, authenticated API boundary, and deterministic workflow services."
+---
+
+Next.js is Harmonia's web application and server-side API runtime. React renders the dashboard, Studio, settings, calendar, monitoring, and documentation-facing product surfaces.
+
+## How Harmonia uses it
+
+- App Router pages under `src/app/` render the dashboard and operator workflows.
+- Route handlers under `src/app/api/` expose tenant-scoped browser APIs and authenticated internal worker endpoints.
+- Server libraries under `src/lib/` enforce tenancy, decisions, Firestore transitions, integration contracts, and A2UI hydration.
+- `src/proxy.ts` applies the application request boundary.
+- `src/instrumentation.ts` initializes server tracing when telemetry is enabled.
+
+Next.js does not run agent reasoning. It invokes the private worker and renders validated results persisted in Firestore.
+
+## Security and authority
+
+Browser input is parsed with strict schemas. Tenant identity is derived server-side. Strategy and effect decisions use dedicated endpoints bound to exact persisted payloads; natural-language chat cannot bypass those handlers.
+
+## Failure behavior
+
+Routes return explicit non-success responses for invalid input, authorization failures, conflicts, and unavailable dependencies. UI success is derived from persisted state, not optimistic model output.
+
+## Evidence status
+
+The production build and Vitest suite verify the local application contract. A reachable preview proves only the deployed web revision unless correlated worker and cloud-service evidence is captured.
+
+## Relevant files
+
+- `src/app/`
+- `src/lib/`
+- `src/proxy.ts`
+- `src/instrumentation.ts`
+- `next.config.ts`

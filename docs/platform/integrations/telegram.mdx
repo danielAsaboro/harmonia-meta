@@ -1,0 +1,33 @@
+---
+title: "Telegram Bot API"
+description: "How Harmonia exposes tenant-scoped job, status, and approval interactions through Telegram."
+---
+
+Telegram is a remote operator interface to the same deterministic workflows used by the dashboard. It does not create a separate approval or publishing path.
+
+## How Harmonia uses it
+
+The settings flow calls the official `setWebhook` method, then stores a hashed route token, webhook secret digest, and allow-listed chat identity only after Telegram accepts the configuration. The webhook validates the route, Telegram secret, update schema, sender, chat scope, and replay identity before translating a message or callback into a Harmonia principal. Ordinary messages use the canonical chat handler and responses use the official `sendMessage` method.
+
+Operators can submit supported job requests, inspect status, receive notifications, and open exact approval/rejection confirmations. Decisions call the same digest-bound application handlers as the dashboard.
+
+## Security and authority
+
+Only the configured chat and sender scope are accepted. Raw secrets and chat IDs are excluded from model context and ordinary projections. Callback data references server-known entities; it cannot supply arbitrary effect payloads.
+
+## Failure behavior
+
+Unknown senders, invalid secrets, malformed updates, duplicate updates, stale decisions, and mismatched tenants fail closed. Notification failure does not rewrite workflow success or approval state.
+
+## Evidence status
+
+Webhook setup, ordinary-message routing, replies, allow-listing, decisions, replay behavior, and durable-mutation/reply-failure handling have automated coverage. A configured route is not proof of live Telegram delivery; authenticated webhook and Bot API evidence must be captured separately.
+
+## Relevant files
+
+- `src/lib/telegramWebhook.ts`
+- `src/lib/telegramApi.ts`
+- `src/app/api/telegram/webhook/[routeToken]/route.ts`
+- `src/app/api/settings/telegram/route.ts`
+- `agent/harmonia_agent/telegram_bot.py`
+- `agent/tests/test_telegram.py`

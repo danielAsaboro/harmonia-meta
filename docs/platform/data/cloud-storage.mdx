@@ -1,0 +1,32 @@
+---
+title: "Cloud Storage"
+description: "How Harmonia stores authorized uploads and generated binary artifacts outside Firestore."
+---
+
+Google Cloud Storage holds binary media that does not belong in Firestore: direct chat/source uploads, generated assets, rendered clips, and downloadable content artifacts.
+
+## How Harmonia uses it
+
+The web service creates short-lived signed upload and download URLs for tenant-scoped object names. Cloud deployments use a configured `GCS_BUCKET`; local development falls back to bounded files under the application data directory. Artifact metadata and workflow lineage remain in Firestore.
+
+Deployment creates staging and durable-media buckets, enables uniform bucket-level access, restricts runtime identities, and configures CORS for the deployed web origin.
+
+## Security and authority
+
+Object keys include tenant-derived scope. MIME type, size, completion state, and source rights are validated before an upload enters the pipeline. Signed URLs are short-lived and generated server-side. Bucket access does not grant publishing approval or workflow authority.
+
+## Failure behavior
+
+Incomplete uploads, invalid object scope, disallowed media, missing artifacts, and storage errors remain explicit. Cloud mode does not silently write uploads to ephemeral container storage.
+
+## Evidence status
+
+Storage contracts and local fallback behavior have automated coverage. Production claims require authenticated bucket/object evidence with secrets and signed query parameters redacted.
+
+## Relevant files
+
+- `src/lib/chatAttachments.ts`
+- `src/lib/storage.ts`
+- `src/app/api/chat/attachments/`
+- `infra/setup.sh`
+- `infra/deploy.sh`

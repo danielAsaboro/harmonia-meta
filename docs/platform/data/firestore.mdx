@@ -1,0 +1,34 @@
+---
+title: "Cloud Firestore"
+description: "How Firestore owns Harmonia's durable workflow, authority, lineage, and audit records."
+---
+
+Cloud Firestore is Harmonia's durable system of record. Every consequential transition is derived from tenant-scoped persisted state rather than agent sessions or chat history.
+
+## How Harmonia uses it
+
+Firestore stores jobs, source analysis, strategy versions and approvals, editorial plans and item lifecycle, drafts and reviews, effect proposals, decisions, claims, receipts, verification, engagement, usage, budgets, notifications, connections, chat runs, replay records, autonomy records, and retention metadata.
+
+Writes pass through typed server functions and transactions. Canonical digests bind approvals and handoffs to exact payloads. Stage and effect claims provide idempotency under retries and concurrent delivery.
+
+## Security and authority
+
+Workspace and brand scope are mandatory. Browser and worker routes derive or validate tenant context. Models never receive arbitrary Firestore write tools and cannot create authoritative approval, budget, receipt, or verification records.
+
+Secrets stored in connection records remain server-side and are excluded from public job projections, telemetry, and model context.
+
+## Failure behavior
+
+Conflicts, stale digests, invalid transitions, duplicate decisions, expired claims, and tenant mismatches fail closed. A successful model invocation cannot compensate for a failed persistence operation.
+
+## Evidence status
+
+Firestore emulator suites verify transactions, stage recovery, tenancy, approvals, persistence, and round trips. Production claims require authenticated database records from the deployed project.
+
+## Relevant files
+
+- `src/lib/firestore.ts`
+- `src/lib/strategyApproval.ts`
+- `src/lib/editorialPlan.ts`
+- `src/app/api/internal/`
+- `docs/state-ownership.mdx`

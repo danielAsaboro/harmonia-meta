@@ -1,0 +1,32 @@
+---
+title: "Google Cloud Trace"
+description: "How Cloud Trace is used as the target backend for correlated Harmonia execution traces."
+---
+
+Google Cloud Trace is Harmonia's intended managed trace backend. OpenTelemetry emits the spans; Cloud Trace provides deployed trace search and correlation.
+
+## How Harmonia uses it
+
+Both Cloud Run service accounts receive `roles/cloudtrace.agent`. Deployment enables the Cloud Trace API and configures OTLP export. A complete execution should expose correlated spans for the web request, Firestore transition, Pub/Sub delivery, worker stage, Agent Engine invocation, Memory Bank access when eligible, model call, validation, effect, and verification.
+
+Trace IDs are also carried in safe application records so an operator can compare observability data with Firestore workflow truth and provider receipts.
+
+## Security and authority
+
+Cloud Trace is metadata-only in Harmonia's design. It must not contain source material, prompts, drafts, access tokens, raw model responses, or hidden reasoning. A span is not a receipt and cannot prove an effect without authoritative provider and Firestore records.
+
+## Failure behavior
+
+Missing traces reduce diagnosability but do not change workflow state. Evidence collection reports telemetry gaps rather than inferring a successful export.
+
+## Evidence status
+
+IAM and exporter configuration exist in the repository. A judge-facing Cloud Trace claim requires an authenticated trace from the target project correlated with the same job and operation IDs.
+
+## Relevant files
+
+- `infra/setup.sh`
+- `infra/deploy.sh`
+- `src/instrumentation.ts`
+- `agent/harmonia_agent/telemetry.py`
+- `docs/cloud-proof.mdx`

@@ -1,0 +1,32 @@
+---
+title: "Platform and infrastructure"
+description: "Technology map for Harmonia's UI, agent runtime, durable state, integrations, media pipeline, and observability."
+---
+
+Harmonia separates agentic judgment from deterministic workflow authority. Models analyze, plan, write, review, compose bounded interfaces, and answer read-only questions. Application services own state transitions, approvals, external effects, receipts, and verification.
+
+## How Harmonia uses it
+
+| Area | Components | Responsibility |
+|---|---|---|
+| UI | Next.js, React, Google A2UI | Dashboard, chat, authenticated APIs, and server-hydrated generative surfaces |
+| Agents and AI | Google ADK, Gemini, Vertex AI Agent Engine, Memory Bank | Bounded specialist reasoning and eligible advisory memory |
+| Security and identity | Firebase Authentication, IAM service accounts, Secret Manager | Operator identity, machine identity, and server-side credentials |
+| Storage and messaging | Firestore, Pub/Sub, Cloud Storage | Durable workflow truth, asynchronous stage delivery, and binary assets |
+| Runtime and automation | Cloud Run, Cloud Scheduler | Web/worker hosting and authenticated durable ticks |
+| Media | ffmpeg, Vertex generative media | Deterministic rendering and approval-gated generated assets |
+| Integrations | X API, Telegram Bot API, Google Calendar API, Hacker News Algolia, YouTube | Publishing, operator access, explicit calendar synchronization, public signals, and authorized sources |
+| Observability | OpenTelemetry, Cloud Trace target, structured logs, metrics, budget records | Correlation, diagnosis, usage accounting, and operator visibility |
+
+<Warning>Firestore is the durable workflow authority. Agent Engine sessions, Memory Bank facts, model output, telemetry, and external API responses cannot approve or authorize an effect.</Warning>
+
+## Evidence status
+
+Repository tests and local emulator runs establish contract behavior. A technology page labels authenticated cloud or provider evidence separately. Code presence, mock mode, or a deploy script is not proof that a managed service or external effect has run successfully.
+
+## Source map
+
+- `src/` — Next.js UI, APIs, state, integrations, and telemetry
+- `agent/harmonia_agent/` — ADK team, worker stages, media, memory, and provider clients
+- `infra/` — Google Cloud setup and deployment scripts
+- `docs/` — operational contracts and evidence runbooks

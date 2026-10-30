@@ -1,0 +1,32 @@
+---
+title: "Vertex AI Agent Engine"
+description: "How Harmonia uses Agent Engine as an ephemeral managed runtime for the ADK team."
+---
+
+Vertex AI Agent Engine hosts Harmonia's managed ADK hierarchy. It provides cognitive execution and session transport; it does not own durable job state.
+
+## How Harmonia uses it
+
+The worker reconstructs a typed invocation snapshot from Firestore, creates a namespaced managed session, invokes one requested specialist, streams state deltas, validates the required output, and deletes the ephemeral session after success or failure.
+
+Each invocation is scoped by workspace, brand, user, job, stage, and operation identifiers. A fresh Agent Engine revision is required when agent schemas, hierarchy, prompts, or Nova skills change.
+
+## State and authority
+
+Session state is transport context only. It cannot advance a workflow, approve content, authorize cost, or prove an external effect. Only validated records persisted through deterministic routes have durable meaning.
+
+## Failure behavior
+
+Missing resources, malformed state deltas, unavailable sessions, and provider errors fail explicitly. Deployment refuses to invent or silently reuse an unknown managed resource.
+
+## Evidence status
+
+The managed-runtime adapter and protocol are locally tested. Deployment scripts express the intended topology; only an authenticated invocation trace proves the configured Agent Engine revision ran.
+
+## Relevant files
+
+- `agent/harmonia_agent/team_runtime.py`
+- `agent/harmonia_agent/agent_engine_app.py`
+- `agent/harmonia_agent/agents.py`
+- `agent/harmonia_agent/agent_engine_deploy.py`
+- `infra/deploy.sh`

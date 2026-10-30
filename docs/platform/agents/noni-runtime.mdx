@@ -1,0 +1,43 @@
+---
+title: "Noni writing runtime"
+description: "How Harmonia runs skill-backed, provenance-bound copywriting."
+---
+
+Noni uses Gemini 3.5 Flash through Google ADK because writing-skill and bounded
+research tools are part of the copywriting contract.
+
+## How Harmonia uses it
+
+Noni receives one selected Temi item, its exact Ryan brief, referenced Nimi
+evidence, brand constraints, and—on the second pass—Dara's issue-bound revision
+instructions. Noni first loads `noni-writing-skills` and a relevant local
+writing reference. It may then read independently verified prior publications
+or brief-scoped public sources.
+
+Every research-derived claim or URL must cite a live evidence ID returned by
+the actual tool trace. Noni cannot access Memory Bank, redefine strategy,
+approve, schedule, publish, or mutate workflow state.
+
+## Configuration and failure behavior
+
+`COPYWRITER_MODEL_ID` defaults to `gemini-3.5-flash`. Public web research uses
+Meta Model API `web_search` in a dedicated `noni_web_search` tool because search
+grounding runs only on the Responses API, apart from Noni's Chat Completions
+requests. The trace retains Meta's search results and URL citations. Cross-brief queries,
+invented references, malformed results, unsupported excerpts, and unknown URLs
+fail closed.
+
+## Evidence status
+
+The skill loader, research-tool contracts, trace validation, verified-publication
+query, grounding checks, and authority boundaries have automated offline
+coverage. Authenticated Agent Engine and live Meta web search execution
+remain unverified until a separately captured live run supplies correlated
+provider and usage evidence.
+
+## Relevant files
+
+- `agent/harmonia_agent/noni_skills.py`
+- `agent/harmonia_agent/noni_prompt.py`
+- `agent/harmonia_agent/skills/noni-writing-skills/SKILL.md`
+- `agent/tests/test_noni_skills.py`
