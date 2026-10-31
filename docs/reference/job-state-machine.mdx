@@ -1,0 +1,39 @@
+---
+title: "Job state machine reference"
+description: "Canonical Harmonia stages, gates, terminal states, and transition ownership."
+---
+
+The canonical stage vocabulary is declared by `STAGES` in `src/lib/types.ts`.
+
+```text
+queued → collect_sources → extract_sources → understand → strategize
+→ awaiting_strategy_approval → plan → draft → awaiting_approval
+→ publish → verify → learn → complete
+```
+
+`awaiting_source_resolution` pauses extraction until an operator retries, removes, replaces, or reconnects a failed source and seals a new manifest revision. `failed` is terminal until an eligible deterministic retry creates the next authorized transition.
+
+| Gate | Required record | On rejection |
+|---|---|---|
+| `awaiting_strategy_approval` | Strategy decision bound to current digest and revision | One feedback-bound Ryan revision; second rejection ends the job |
+| `awaiting_approval` | Per-action decision bound to exact payload digest | Action is skipped or job completes according to deterministic policy |
+
+Only application transactions advance the stage. Agents, Pub/Sub messages, logs, and external providers cannot do so directly. See [Production flow](/diagrams/production-flow) and [State ownership](/state-ownership).
+
+The evidence packet is assembled and persisted during verification. It is an artifact and audit event, not a job stage.
+
+## Operational control state
+
+`controlState` is independent of `status` and `stage`:
+
+| Value | Admission behavior |
+|---|---|
+| `running` | New eligible stage and effect claims may execute. |
+| `paused` | New work returns `paused`; an already-owned claim may finish its safe unit. |
+| `cancelled` | New work returns `cancelled`; unexecuted actions are rejected and the job cannot resume. |
+
+`controlEpoch` starts at `0` and increments for every accepted control or steering mutation. Commands must present the current epoch. This prevents a stale browser, steering request, or duplicate operator action from overwriting a newer decision.
+
+Pause and cancellation do not rewrite an already-dispatched external effect. Such an effect still requires observation, verification, or uncertain-outcome reconciliation.
+
+Each stage outbox generation has a distinct operation and execution identity. A redo can therefore execute a previously completed stage without overwriting or replaying the earlier generation's durable claim.

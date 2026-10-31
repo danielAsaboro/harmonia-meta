@@ -1,0 +1,74 @@
+---
+title: "API routes reference"
+description: "The public operator, integration, and internal worker route families exposed by Harmonia."
+---
+
+Route handlers live under `src/app/api/`. Exact request schemas are enforced in each `route.ts`; this page groups the surface by trust boundary.
+
+| Family | Examples | Caller |
+|---|---|---|
+| Jobs | `/api/jobs`, `/api/jobs/{id}`, strategy and action decisions, retry | Authenticated operator UI |
+| Operational control | `/api/operations/shell`, `/api/jobs/{id}/control`, steering nudge/apply/redo routes | Authenticated operator; pause/resume/cancel require workspace admin |
+| Chat | `/api/chat`, history, streams, runs, attachments, operation decisions | Authenticated operator chat |
+| Content and calendar | `/api/content-items`, approvals, `/api/calendar`, `/api/calendar/google` | Authenticated operator UI |
+| Media production | `/api/production-plans`, plan revision/seal/decision routes | Authenticated operator UI and chat |
+| Settings and OAuth | `/api/settings/*`, `/api/oauth/{platform}/*` | Authenticated workspace admin |
+| Evidence and operations | `/api/receipts`, `/api/events`, `/api/metrics`, `/api/observability` | Authenticated operator UI |
+| Telegram | `/api/telegram/webhook/{routeToken}` | Official Telegram webhook |
+| Internal worker | `/api/internal/*` | Authenticated worker or scheduler identity |
+
+Internal routes cover stage claims and finalization, outbox delivery, job context, analysis, strategy, editorial plans, actions, receipts, verification, usage, budgets, assets, notifications, retention, and proactive cycles. An `internal` URL is not a security boundary by itself; deployment identity and server-side authentication are required.
+
+Production-plan routes create immutable revisions, expose the current plan, seal the exact revision, record the approval decision, and request cost-free rerenders. Internal production routes claim mandate-bound operations, persist source and provider submissions, attach generated artifacts, and finalize explicit failures. `POST /api/internal/production-outbox` publishes eligible production work; Pub/Sub delivery does not grant provider authority.
+
+Large-batch workers use `/api/internal/data-plane/batches`, the batch dispatch and outcome routes, and per-item claim/finalize routes. Pub/Sub delivery never grants write authority by itself; the internal identity, tenant scope, lease token digest, and epoch fence do.
+
+## Operational control endpoints
+
+### `GET /api/operations/shell`
+
+Authentication: operator session. Query parameter `after` is `-1` or a non-negative sequence number; the default is `-1`.
+
+The response contains:
+
+- `snapshot.snapshotSequence`: latest durable feed sequence;
+- `snapshot.jobs`: job shells keyed by job ID;
+- `snapshot.attention`: unresolved attention items keyed by attention ID;
+- `updates`: ordered changes newer than `after`, up to 500 records;
+- `resumable`: always `true` for this feed.
+
+An invalid cursor returns `400`. The current snapshot remains authoritative when a client has no cursor or must reset local state.
+
+### `POST /api/jobs/{id}/control`
+
+Authentication: workspace administrator using a browser operator session.
+
+```json
+{
+  "commandId": "control_01",
+  "action": "pause",
+  "expectedControlEpoch": 4
+}
+```
+
+`action` is `pause`, `resume`, or `cancel`. Cancellation also requires `"confirmation": "CANCEL {jobId}"`. The server derives the actor from the authenticated principal. An accepted command returns `200` with its immutable receipt. A valid but rejected transition, including a stale epoch, returns `409` with the rejected receipt. Invalid input returns `400`.
+
+### Steering endpoints
+
+`POST /api/jobs/{id}/steering/nudges` proposes a bounded instruction and returns its exact impact digest. `POST /api/jobs/{id}/steering/nudges/{nudgeId}/apply` accepts that digest, revokes affected approvals and prepared effects atomically, advances the control epoch, and queues a generation-fenced stage execution. Gate stages rewind to their owning production stage; terminal stages reject steering.
+
+`POST /api/jobs/{id}/steering/redo` requires `expectedControlEpoch`, `targetStage`, and exact `confirmation` equal to `REDO {targetStage}`. Redo refuses to cross executed external effects. These steering routes require an authenticated operator and enforce both workspace and brand ownership.
+
+## Data-plane endpoints
+
+All data-plane routes require the internal service boundary and tenant headers established by that boundary.
+
+| Method and route | Behavior |
+|---|---|
+| `POST /api/internal/data-plane/batches` | Create or resume one manifest batch and its deterministic work items. |
+| `POST /api/internal/data-plane/batches/{batchId}/dispatch` | Publish currently eligible items, bounded by `maxInFlight`. |
+| `GET /api/internal/data-plane/batches/{batchId}` | Return the persisted fan-in outcome. |
+| `POST /api/internal/data-plane/batches/{batchId}/items/{itemId}/claim` | Acquire or inspect a lease-fenced work claim. |
+| `POST /api/internal/data-plane/batches/{batchId}/items/{itemId}/finalize` | Finalize a claim using its epoch and original claim token. |
+
+Batch manifests permit 1 to 1,000,000 items. Firestore initialization writes at most 400 work items per commit. Dispatch concurrency is 1 to 100; claim attempt budgets are 1 to 20. Successful finalization requires at least one persisted artifact ID.

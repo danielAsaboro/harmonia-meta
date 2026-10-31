@@ -1,0 +1,17 @@
+---
+title: "Receipts and verification reference"
+description: "Immutable execution evidence, independent read-back, and replay lineage."
+---
+
+A `Receipt` records action identity, idempotency key, type, time, outcome, optional artifact evidence, provider detail, operation ID, and trace ID. It states what the executor reports happened.
+
+A `VerificationResult` references the exact action and receipt, then records an independent `official_api_readback` or `artifact_digest_reread`, evidence, time, and result. It states what a separate observation found.
+
+```text
+approved payload → effect command → claim → receipt → independent verification
+                                           ↘ replay: already_applied
+```
+
+Verification must match receipt identity and artifact lineage. A receipt alone is not verification; a successful API response without a persisted receipt is not durable proof; a screenshot without identifiers is not replayable evidence.
+
+The vertical-slice validator in `src/lib/verticalSliceEvidence.ts` checks approval, command, claim, receipt, verification, trace, digest, and replay consistency. See [Evidence runbook](/evidence-runbook).

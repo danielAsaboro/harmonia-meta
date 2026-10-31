@@ -1,0 +1,16 @@
+---
+title: "Media upload reference"
+description: "Tenant-scoped upload sessions, source-rights declarations, completion, and source-registry handoff."
+---
+
+The chat attachment flow is implemented in `src/lib/chatAttachments.ts` and the routes below.
+
+| Route | Purpose |
+|---|---|
+| `POST /api/chat/attachments/session` | Create an authenticated tenant-scoped upload session |
+| `GET /api/chat/attachments/{id}` | Read attachment state within the tenant |
+| `POST /api/chat/attachments/{id}/complete` | Finalize uploaded metadata and storage identity |
+
+An attachment records its identity, filename, MIME type, storage URI, lifecycle state, and ownership scope. A completed attachment is registered as an independent direct source and sealed into the job's immutable source manifest only after its source-rights authorization passes `src/lib/sourceRights.ts`.
+
+Uploaded bytes belong in the configured asset store. The browser does not mint workflow authority, and a filename or MIME declaration is not proof of rights or content integrity.

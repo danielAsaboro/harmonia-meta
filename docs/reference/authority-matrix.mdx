@@ -1,0 +1,32 @@
+---
+title: "Authority matrix reference"
+description: "Who may reason, decide, persist, schedule, execute, and verify in Harmonia."
+---
+
+| Capability | Agent | Human operator | Deterministic application | External provider |
+|---|---:|---:|---:|---:|
+| Analyze and recommend | Yes, within role | Yes | Validates | Supplies evidence only |
+| Approve strategy | No | Yes | Authenticates and binds digest | No |
+| Select and persist next stage | No | No | Yes | No |
+| Approve an effect | No | Yes | Authenticates and binds digest | No |
+| Create a scheduled command | No | Requests through UI | Yes | No |
+| Execute an authorized effect | No | No | Yes | Performs requested API operation |
+| Record receipt | No | No | Yes | Supplies response evidence |
+| Verify result | No | No | Yes, by independent read-back | Supplies observed state |
+| Grant policy exception | No | Explicit governed action only | Enforces policy | No |
+
+Memory Bank, Agent Engine sessions, telemetry, and calendar entries confer no authority. Tenant membership and payload identity are checked at decision time. See [Authority boundaries](/diagrams/authority-boundaries).
+
+## Agent-specific reasoning scope
+
+| Agent | May decide | Must not decide |
+|---|---|---|
+| Nimi | Evidence-supported moments and analytical angles | Strategy, copy, approval, or effects |
+| Ryan | Strategy, briefs, priorities, channels, cadence, CTA, and KPI recommendations | Strategy approval, calendar dates, copy, or effects |
+| Temi | Operational sequencing inside the approved strategy and immutable planning snapshot | Strategy changes, external calendar mutation, approval, or effects |
+| Noni | Exact platform-native draft and one issue-bound revision | Strategy, item selection, approval, scheduling, or publishing |
+| Dara | Accept or request bounded draft correction | Rewriting, final effect approval, or workflow mutation |
+| Maya | Reference-only component composition | Authoritative content, decisions, or callbacks |
+| Nova | Read-only interpretation of current tool evidence | Commands, approvals, retries, schedules, or mutations |
+
+The complete runtime capability inventory is [here](/reference/agent-runtime-inventory).

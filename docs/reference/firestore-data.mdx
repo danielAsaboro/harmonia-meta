@@ -1,0 +1,32 @@
+---
+title: "Firestore data reference"
+description: "Tenant hierarchy and durable record families used as Harmonia's workflow truth."
+---
+
+Tenant paths are constructed by `src/lib/tenancy.ts`. Workspace membership is resolved before tenant-scoped reads or writes.
+
+| Record family | Purpose |
+|---|---|
+| `workspaces`, `members`, `brands` | Tenant identity, membership, and brand context |
+| `jobs`, events, stage outbox, stage executions | Workflow state, history, delivery, and claims |
+| strategy and editorial-plan fields on jobs | Versioned proposals, digests, approvals, and lineage |
+| `pending_operations`, `chat_runs`, `chat_attachments` | Conversational commands, streams, and uploads |
+| `content_items`, `effect_commands` | Calendar items and digest-bound execution commands |
+| approvals, claims, receipts, verifications | Human authority and effect evidence chain |
+| usage, budgets, notifications | Cost controls and operator attention |
+| `operational_feeds`, command receipts | Resumable operator projections and versioned control mutations |
+| `data_batches`, nested `work_items` | GCS-manifest fan-out, leases, dead letters, and fan-in state |
+
+Binary media belongs in the asset store; Firestore records identifiers, URIs, digests, rights, and lineage. Pub/Sub delivers triggers, while Firestore transactions decide whether a trigger is current and claimable. See [State ownership](/state-ownership).
+
+## Operational feed records
+
+`workspaces/{workspaceId}/operational_feeds/{brandId}` stores the current compact projection and `lastSequence`. Its `updates` subcollection uses zero-padded sequence IDs. A synchronization transaction emits at most 400 changes so the feed remains below Firestore's per-transaction write ceiling; later polls converge any remaining changes.
+
+Job control receipts live below the job in `control_commands/{commandId}`. A receipt records the payload digest, authenticated actor, accepted or rejected outcome, and resulting control version when accepted.
+
+## Data batches
+
+`workspaces/{workspaceId}/data_batches/{batchId}` owns the manifest identity and batch policy. Work items live in `work_items/{itemId}` and record partition identity, state, attempt, epoch, lease owner digest, dispatch visibility, artifacts, and terminal failure code.
+
+Batch initialization states are `initializing`, `pending`, `running`, `complete`, `partial`, `failed`, and `cancelled`. Work-item states are `pending`, `claimed`, `succeeded`, `failed`, `dead_lettered`, and `cancelled`.

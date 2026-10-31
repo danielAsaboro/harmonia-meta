@@ -1,0 +1,19 @@
+---
+title: "Error taxonomy reference"
+description: "Normalized failure categories, retry rules, and safe public reporting."
+---
+
+`agent/harmonia_agent/failures.py` normalizes worker exceptions into a strict `FailureEnvelope` with category, code, safe public message, retryability, stage, operation ID, trace ID, attempt count, and sanitized details.
+
+| Category | Meaning | Default retry posture |
+|---|---|---|
+| `validation` | Input or output violates a contract | Stop |
+| `authorization` | Required service authority is missing | Stop |
+| `policy` | Operator or policy action is required | Stop |
+| `budget` | Model or media use is not budget-authorized | Stop |
+| `provider_transient` | Timeout, rate limit, or temporary provider failure | Retry within limit |
+| `provider_permanent` | Provider rejects or cannot perform the operation | Stop |
+| `dependency` | Required dependency is temporarily unavailable | Retry within limit |
+| `protocol` | Agent or provider returned an invalid response | Stop |
+
+The worker allows at most three stage attempts by default. Retryability is removed on the final attempt. Sensitive response bodies, prompts, tokens, secrets, transcripts, and cookies are excluded from public details. See [Failure recovery](/failure-recovery).

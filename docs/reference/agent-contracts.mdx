@@ -1,0 +1,58 @@
+---
+title: "Agent contracts reference"
+description: "Strict inputs, outputs, evidence requirements, and authority limits for every Harmonia specialist."
+---
+
+Python contracts live in `agent/harmonia_agent/agent_models.py`; shared application representations live in `src/lib/types.ts`. Pydantic models forbid unknown fields and deterministic validators reject ungrounded or authority-expanding output.
+
+The ADK root is `HarmoniaCoordinator`, a deterministic `BaseAgent`. Specialist selection comes from host-owned session state. Models cannot choose arbitrary recipients or establish workflow authority through prose.
+
+| Agent | Input | Output | Boundary |
+|---|---|---|---|
+| Nimi | `AnalystInput` | `SourceAnalysis` | Evidence analysis only |
+| Ryan | `StrategistInput` | `StrategistResult` containing `ContentStrategy` | Strategy and source-grounded briefs only |
+| Temi | `EditorialPlannerInput` | `EditorialPlan` | Operational editorial plan; supported channels only |
+| Noni | `CopywriterInput` | `ContentDraft` | Final-copy drafting, not approval or publishing |
+| Dara | `EditorialReviewInput` | `EditorialAssessment` | Bounded acceptance or revision issues |
+| Maya | Typed surface context | `SurfacePlan` | Presentation plan, no durable mutation |
+| Nova | `LiaisonInput` plus read tools | `LiaisonAnswer` | Read-only explanation and navigation |
+
+Evidence identifiers form a closed world per invocation: references not supplied in the input are invalid. Memory facts retain Firestore provenance and remain advisory. See the [agent team](/agents/overview) for role-by-role detail.
+
+## Durable handoffs
+
+Every cognitive delegation includes a host-created `harmonia.handoff/v1` envelope. Its identity is derived from the operation, receiver, and canonical input digest. The paired acknowledgement repeats the handoff identity and expected output contract. Neither object is authored by the specialist.
+
+| Field | Owner | Rule |
+|---|---|---|
+| handoff ID and input digest | Harmonia host | Canonical and deterministic; never accepted from model output |
+| receiver and task | Harmonia coordinator | Must resolve to a registered specialist |
+| authority reads | Authenticated host tools | Recorded from actual values and bound to their authority identity |
+| semantic result | Specialist | Must satisfy the role's structured schema and evidence rules |
+| artifact/action IDs and digests | Application code | Computed after semantic validation |
+| approval, receipt, verification | Human and deterministic effect system | Outside specialist authority |
+
+| From | To | Exact handoff | Deterministic gate |
+|---|---|---|---|
+| Nimi | Ryan | Persisted `SourceAnalysis` plus canonical digest | Evidence and provenance validation |
+| Ryan | Temi | Persisted `ContentStrategy`, lineage, version, and digest | Authenticated strategy approval bound to the current digest |
+| Temi | Noni | One selected `EditorialPlan` item, exact Ryan brief, referenced Nimi evidence | Plan validation, persistence, and deterministic item selection |
+| Noni | Dara | Immutable `EditorialReviewInput` and exact `ContentDraft` | Draft contract and claim-ledger validation |
+| Dara | Noni or final approval | Structured issues or the exact accepted draft | One-revision limit and assessment validation |
+| Maya | UI host | Reference-only `SurfacePlan` | Entity and component validation, then server hydration |
+| Nova | Operator UI | Read-only `LiaisonAnswer` | Skill/tool trace and evidence-citation validation |
+
+## Evidence namespaces
+
+| Basis | Valid identifier source | What it may support |
+|---|---|---|
+| Operator context | IDs in typed company, product, audience, objective, and campaign input | Supplied business assertions |
+| Source analysis | Nimi moment and angle IDs | Source-derived claims and Ryan briefs |
+| Performance | Verified performance observation IDs | Performance-derived recommendations |
+| Memory Bank | Eligible fact IDs with Firestore provenance | Advisory cross-job learning only |
+| Public research | Request-bound search evidence IDs validated against Meta web search results and URL citations | Current external claims within the exact research request |
+| Internal reads | Tenant-scoped tool evidence IDs or planning snapshot identity/digest | Prior publication, job, engagement, capacity, dependency, and calendar-projection facts |
+
+All models forbid extra fields. Unknown references, empty grounding, skill references used as facts,
+memory used as authorization, and role-expanding claims fail closed. See
+[Agent skills, tools, prompts, and traces](/reference/agent-runtime-inventory) for the runtime inventory.

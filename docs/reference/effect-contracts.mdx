@@ -1,0 +1,23 @@
+---
+title: "Effect contracts reference"
+description: "Commands, authorization, claims, idempotency, and terminal effect outcomes."
+---
+
+`EffectCommand` in `src/lib/effectCommands.ts` is the deterministic execution envelope. It identifies tenant, source, job, action, payload, digest, authorization, optional execution time, and state.
+
+## Authorization
+
+A command is authorized by either an approval record carrying the approved payload digest or a governed mandate carrying its digest and authorized payload digest. Construction fails when the recomputed canonical SHA-256 digest differs.
+
+## Lifecycle
+
+```text
+pending → claimed → applied
+                  ↘ failed
+                  ↘ uncertain
+pending → cancelled
+```
+
+Claims lease one attempt and use an idempotency key. An existing applied receipt yields `already_applied`; an expired or ambiguous claim fails closed as uncertain rather than repeating the external effect.
+
+Terminal aggregation is `succeeded`, `partial`, `failed`, or `unresolved`. See [Effect lifecycle](/diagrams/effect-lifecycle) and [Receipts and verification](/reference/receipts-verification).

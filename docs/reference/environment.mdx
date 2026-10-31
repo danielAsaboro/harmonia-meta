@@ -1,0 +1,30 @@
+---
+title: "Environment variable reference"
+description: "Index of Harmonia configuration domains and the source files that validate them."
+---
+
+Use `.env.example` as the value-level template and [Configuration](/configuration) for setup instructions. `src/lib/config.ts` validates web and budget configuration; `agent/harmonia_agent/config.py` validates worker settings.
+
+| Domain | Purpose | Typical requirement |
+|---|---|---|
+| Firebase and Firestore | Operator sessions and durable tenant data | Required outside local emulators |
+| Google Cloud | Project, region, storage, Pub/Sub, Cloud Run | Required for cloud runtime |
+| Gemini / Vertex AI | Agent and media model access | Required for real model calls |
+| Internal service auth | Web-to-worker and scheduler authentication | Required outside local development |
+| X | OAuth and official API publishing/read-back | Only when X is enabled |
+| Telegram | Bot webhook and allow-listed chat | Only when Telegram is enabled |
+| Google Calendar | OAuth client and redirect configuration | Only for explicit calendar sync |
+| Budgets and models | Catalog, ceilings, approval thresholds | Required for paid operations |
+
+Secrets belong in server-side environment injection or Secret Manager. Never expose them through `NEXT_PUBLIC_*`, documentation, logs, or evidence artifacts.
+
+| Variable | Default | Consumer | Purpose |
+|---|---|---|---|
+| `PUBSUB_STAGE_TOPIC` | `harmonia-stages` | Web and agent runtime | Ordinary job-stage trigger transport. |
+| `PUBSUB_DATA_TOPIC` | `harmonia-data-work` | Web data-plane dispatcher | Large-batch work-item trigger transport. |
+| `PUBSUB_PRODUCTION_TOPIC` | `harmonia-production` | Web and agent runtime | Mandate-authorized paid production-operation wake transport. |
+| `HARMONIA_TIME_ORIGIN` | host time | Next.js server | Optional ISO-8601 UTC origin for replayable server time. |
+| `HARMONIA_TIME_SPEED` | `1` | Next.js server | Positive multiplier relative to the configured origin. |
+| `STRATEGIST_TIMEOUT_SECONDS` | `300` | ADK worker | Ryan's bounded strategy invocation timeout. Other roles accept the corresponding `<ROLE>_TIMEOUT_SECONDS` variable and default to 120 seconds. |
+
+Production infrastructure must provision all three before enabling their corresponding dispatch paths. `infra/setup.sh` creates the topics with the selected-region message storage policy.

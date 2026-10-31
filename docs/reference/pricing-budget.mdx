@@ -1,0 +1,17 @@
+---
+title: "Pricing and budget reference"
+description: "Versioned model pricing, reservations, observed usage, and paid-operation policy."
+---
+
+`agent/harmonia_agent/model_catalog.py` is the versioned pricing catalog. Unknown model prices fail closed. Each eligible invocation reserves an estimated amount before dispatch and resolves the reservation afterward as observed, not invoked, or uncertain.
+
+`UsageRecord` in `src/lib/types.ts` records job, operation, stage, role, model, units, estimated and observed cost, pricing version, policy snapshot, trace ID, and timestamp. Job budgets track estimated, observed, reserved, limit, and approval-threshold USD values.
+
+| Principle | Rule |
+|---|---|
+| Estimate before dispatch | No paid invocation without a known catalog entry and available budget |
+| Reconcile after dispatch | Record observed cost when available; retain uncertainty honestly |
+| Preserve lineage | Usage shares operation and trace identifiers with the invocation |
+| Separate money from authority | Available budget does not approve publishing or other effects |
+
+See [Usage and budget tracking](/platform/observability/usage-budget) for the implementation map.
