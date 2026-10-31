@@ -1,0 +1,72 @@
+---
+title: "Nimi — evidence analyst"
+description: "Nimi's source-analysis contract, evidence method, and authority boundary."
+---
+
+## Role
+
+Nimi turns one typed source package into grounded moments and defensible angles for Ryan. Nimi
+analyzes supplied transcript segments, bounded frame evidence, verified performance observations,
+and eligible Memory Bank facts without defining strategy or writing copy.
+
+## Contract
+
+| Property | Value |
+|---|---|
+| ADK name | `nimi_analyst` |
+| Default model | `gemini-3.5-flash` |
+| Input | `AnalystInput` |
+| Output | `SourceAnalysis` |
+| Runtime skills | `nimi-analysis-skills` with seven allow-listed method references |
+| Skill interface | ADK filesystem `SkillToolset` exposing `load_skill` and `load_skill_resource` |
+| Research tools | `nimi_web_search`: Meta Model API `web_search` in a separate request-bound call |
+
+## Skills
+
+`nimi-analysis-skills` provides seven allow-listed analysis methods. Nimi loads it exactly once and
+only loads references relevant to the active evidence problem. Skill guidance is method, never evidence.
+
+## Tools and research
+
+Public research runs only through `nimi_web_search`. It requires an exact application-supplied
+`researchRequest` and remains isolated from the filesystem skill tools.
+
+## Prompt method
+
+The prompt requires the skill exactly once and only the references relevant to the analytical
+problem. The skill establishes an evidence hierarchy: transcript segments and supplied frames are
+primary source evidence; verified performance and eligible memory are advisory and retain distinct
+provenance. Exact quotes must occur in cited segments, timestamps must remain in bounds, and visible
+facts require supplied frame IDs. Evidence kinds cannot be mixed.
+
+Skill guidance shapes method but is never evidence. Weak evidence becomes an explicit assumption with lower confidence. Nimi cannot invent trends,
+speaker identity, customer outcomes, or unseen visuals.
+
+## Evidence and provenance
+
+Transcript segments and supplied frames are primary evidence. Verified performance, eligible memory,
+and validated research retain distinct IDs and provenance. Exact quotes must occur in cited segments;
+timestamps and frames remain in supplied bounds. Unknown or mixed-kind references fail closed.
+
+## Authority boundary
+
+Nimi cannot define objectives, positioning, pillars, campaigns, channels, cadence, KPIs, briefs,
+final copy, CTAs, approvals, schedules, publishing actions, receipts, or verification claims.
+
+## Handoff
+
+Deterministic code persists the complete `SourceAnalysis` and canonical digest. Ryan receives that
+exact typed object, not a prose summary or a new source-analysis opportunity.
+
+## Runtime enforcement
+
+Deterministic validation checks the independent skill-loader and research-tool traces, the exact
+request binding, web search provenance, transcript support, media bounds, reference existence, evidence-kind compatibility,
+confidence, authority overreach, canonical digesting, persistence, and the exact Ryan handoff.
+
+## Implementation references
+
+- Prompt: `agent/harmonia_agent/nimi_prompt.py`
+- Contracts: `AnalystInput` and `SourceAnalysis` in `agent_models.py`
+- Skill: `agent/harmonia_agent/skills/nimi-analysis-skills/SKILL.md`
+- Tests: `agent/tests/test_nimi_contracts.py`, `test_nimi_validation.py`, and `test_nimi_skills.py`

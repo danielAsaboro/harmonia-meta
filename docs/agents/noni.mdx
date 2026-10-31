@@ -1,0 +1,88 @@
+---
+title: "Noni — copywriter"
+description: "Noni's selected-item writing, claim-grounding, and revision contract."
+---
+
+## Role
+
+Noni writes exactly one platform-native candidate from the deterministically selected Temi item, its
+exact Ryan brief, referenced Nimi evidence, and optional provenance-bearing research.
+
+## Contract
+
+| Property | Value |
+|---|---|
+| ADK name | `noni_copywriter` |
+| Default model | `gemini-3.5-flash` |
+| Input | `CopywriterInput` |
+| Output | `ContentDraft` |
+| Runtime skills | `noni-writing-skills` |
+| Tools | `load_skill`, `load_skill_resource`, `search_verified_publications`, and Meta web search through `noni_web_search` |
+
+## Skills
+
+`noni-writing-skills` contains eleven allow-listed writing methods. Noni loads it once and selects only
+references relevant to the selected brief. The methods guide judgment and never count as evidence.
+
+## Tools and research
+
+`search_verified_publications` supplies tenant-scoped prior-publication evidence. Public web search
+runs through isolated `noni_web_search`. Both are bound to the exact brief ID; neither grants
+open-ended strategy research.
+
+## Prompt method
+
+Noni first loads `noni-writing-skills` and at least one relevant writing-method reference. It then
+locks to the selected item and brief, builds a closed-world claim ledger from supplied Nimi
+evidence, writes one X candidate of at most 280 characters, maps each factual claim to evidence IDs,
+and preserves the exact CTA intent and intended conversion. Creative assumptions use a deliberately
+bounded grammar and cannot hide factual assertions.
+
+After loading the writing skill, Noni may search independently verified prior Harmonia publications
+for continuity and canonical internal links. It may also use Meta web search grounding to
+verify or strengthen execution of the exact brief. Both calls must carry the exact brief ID. Every
+used claim or URL must cite a live evidence ID returned by the tool; unavailable configuration,
+unknown references, and invented URLs fail closed.
+
+On revision, Noni changes only what Dara requested, retains immutable lineage, links the prior draft,
+and identifies every addressed issue.
+
+The skill contains eleven writing methods: thought leadership, hooks and introductions, MECE
+structure, case studies, storytelling, bad-content diagnosis, persuasion, outlining, titles and
+headlines, convincing content, and short-form narrated video scripting. These methods distill practical lessons supplied by Harmonia's
+creator from two years of content-marketing work for brands. They guide writing judgment; they are
+never factual evidence for a draft.
+
+## Evidence and provenance
+
+Every factual claim and URL cites a live evidence ID supplied with the brief or returned by a
+brief-bound tool. Creative assumptions cannot conceal factual assertions. Unknown IDs, invented links,
+stale research, or skill references used as proof fail closed.
+
+## Authority boundary
+
+Noni cannot conduct open-ended strategy research, search trend feeds, access Memory Bank
+independently, inspect or choose another plan item, create strategy, invent facts or capabilities,
+approve, schedule, publish, construct effects, create receipts, access credentials, verify results,
+or mutate workflow state.
+
+## Handoff
+
+The draft goes to Dara with immutable production input. One issue-bound revision may return to Dara;
+accepted text passes to deterministic effect-proposal construction, never directly to publish.
+
+## Runtime enforcement
+
+Validation checks the actual skill-first trace, exact brief binding, live research provenance,
+approved reference paths, lineage, item and brief
+alignment, platform limits, CTA behavior, exact evidence support, assumptions, URLs, authority, and
+issue-bound revision completeness. Missing, invented, duplicated, or out-of-order skill calls fail
+closed.
+
+## Implementation references
+
+- Prompt: `agent/harmonia_agent/noni_prompt.py`
+- Skill: `agent/harmonia_agent/skills/noni-writing-skills/SKILL.md`
+- Skill runtime: `agent/harmonia_agent/noni_skills.py`
+- Contracts: `CopywriterInput` and `ContentDraft` in `agent_models.py`
+- Tests: `agent/tests/test_noni_skills.py`, `test_noni_contracts.py`, and `test_noni_dara_loop.py`

@@ -1,0 +1,77 @@
+---
+title: "Nova — read-only liaison"
+description: "Nova's skill-first read tools, evidence citations, and operator-answer contract."
+---
+
+## Role
+
+Nova answers operator questions about current signals, measured engagement, posting windows, and
+tenant-scoped job state. Every factual answer is bound to the actual skill and tool trace from that
+invocation.
+
+## Contract
+
+| Property | Value |
+|---|---|
+| ADK name | `nova_liaison` |
+| Default model | `gemini-3.5-flash` |
+| Input | `LiaisonInput` |
+| Output | `LiaisonAnswer` |
+| Runtime skills | Five filesystem ADK skills |
+| Tools | Six bounded read-only tools |
+
+## Skills
+
+Nova selects exactly one of five routing skills before reading data: `trend-scan`, `signal-watch`,
+`engagement-insights`, `posting-schedule`, or `job-status`.
+
+## Tools and research
+
+| Skill | Purpose | Allowed tools |
+|---|---|---|
+| `trend-scan` | Current public startup-technology topics | `fetch_trend_signals`, `search_trend_signals` |
+| `signal-watch` | Topic-specific public signals and scoped feed context | `fetch_trend_signals`, `search_trend_signals`, `get_operator_feed` |
+| `engagement-insights` | Measured published-post performance | `get_engagement_insights` |
+| `posting-schedule` | Evidence-based UTC window suggestions | `get_engagement_insights`, `get_operator_feed`, `suggest_posting_windows` |
+| `job-status` | One tenant-scoped job summary | `get_job_status` |
+
+## Prompt method
+
+Nova loads exactly one skill before a data tool, uses only successful data returned in that turn,
+binds every factual claim to exact returned `evidenceId` values, displays those IDs, and separates
+interpretation into uncertainty. Typed errors retain their exact code, category, safe message, and retryability. One retry is
+allowed only after an explicitly retryable error; successful empty reads become `no_data`.
+
+## Evidence and provenance
+
+Every factual statement cites an `evidenceId` returned successfully in the current invocation.
+Skill text, model memory, earlier turns, hidden errors, and unsuccessful reads are not evidence.
+Typed errors and successful empty results remain explicit.
+
+## Authority boundary
+
+Nova cannot approve, reject, retry jobs, schedule, publish, execute, verify, create receipts, change
+credentials or budgets, or mutate Firestore. Skill text, model memory, and earlier turns are not
+evidence.
+
+## Handoff
+
+Nova returns a read-only `LiaisonAnswer` to the operator interface. It does not hand commands to the
+workflow; requested state changes must enter the deterministic application path.
+
+## Runtime enforcement
+
+ADK callbacks record the actual skill/tool envelopes. Deterministic validation rejects wrong skills
+or tools, invented evidence IDs, uncited claims, invalid retries, false `no_data`, hidden errors, and
+effect-authority claims.
+
+Monitoring receives only safe tool metadata: tool and skill names, status, duration, attempt,
+stable error fields, operation, and trace. Arguments, returned data, prompts, answers, credentials,
+and provider bodies are excluded.
+
+## Implementation references
+
+- Prompt: `agent/harmonia_agent/nova_prompt.py`
+- Skills: `agent/harmonia_agent/skills/*/SKILL.md`
+- Tool contracts: `agent/harmonia_agent/skills_runtime.py` and `tool_contracts.py`
+- Tests: `agent/tests/test_nova_contracts.py` and `test_skills_runtime.py`

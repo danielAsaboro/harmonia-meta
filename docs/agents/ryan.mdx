@@ -1,0 +1,90 @@
+---
+title: "Ryan — content strategist"
+description: "Ryan's strategy, content-brief, provenance, and approval-boundary reference."
+---
+
+## Role
+
+Ryan converts Nimi analysis and bounded startup context into a coherent four-week strategy proposal
+and source-grounded content briefs for Temi.
+
+## Contract
+
+| Property | Value |
+|---|---|
+| ADK name | `ryan_strategist` |
+| Default model | `gemini-3.5-flash` |
+| Input | `StrategistInput` |
+| Output | `StrategistResult` containing `ContentStrategy` |
+| Runtime skill | `ryan-strategy-skills` |
+| Tools | `load_skill`, `load_skill_resource`, and isolated `ryan_web_search` |
+
+## Skills
+
+`ryan-strategy-skills` contains seven allow-listed methods for diagnosis, thesis and positioning,
+campaign architecture, channel and format decisions, funnel/CTA/measurement, brief construction,
+and evidence-informed revision. Ryan loads it once and selects only relevant references.
+
+## Tools and research
+
+Ryan principally synthesizes typed Nimi analysis, operator context, verified performance, and eligible
+memory. When an exact `researchRequest` requires current external facts, the isolated
+`ryan_web_search` returns typed evidence with Meta web search provenance. The search runs in its
+own Responses API request, never beside Ryan's skill tools.
+
+## Prompt method
+
+Ryan first loads the strategy skill exactly once and at least one problem-relevant approved
+reference. A deterministic callback trace rejects missing, duplicate, out-of-order, or unapproved
+loads. The seven focused references cover diagnosis; positioning and thesis; campaign portfolio;
+channels, formats, and cadence; funnel, CTA, and measurement; brief construction; and
+evidence-informed learning and revision.
+
+Ryan then synthesizes business objectives, audience pains, positioning, funnel intent, intended
+conversion, and differentiated narrative. The resulting proposal defines content pillars, campaign
+themes, channel roles, format mix, cadence guidance, CTAs, KPIs, success criteria, constraints, and
+complete briefs.
+
+Evidence is closed-world. Ryan may reference only supplied company or campaign context IDs, Nimi
+moment and angle IDs, verified performance IDs, and eligible Memory Bank fact IDs. Every brief must
+cite at least one Nimi moment or angle. Unsupported recommendations become assumptions with reduced
+confidence.
+
+Skill guidance changes Ryan's method, not the typed contract, and can never be cited as evidence.
+The source-coverage ledger is development documentation and is excluded from the runtime allow-list.
+
+## Evidence and provenance
+
+The catalog is closed-world: operator context IDs, Nimi moment/angle IDs, verified performance IDs,
+eligible Memory Bank fact IDs, and validated search IDs retain their exact kind and provenance. Every
+brief cites a Nimi moment or angle. Weak support becomes a bounded assumption with reduced confidence.
+
+## Authority boundary
+
+Ryan proposes strategy; Ryan does not write final post copy, approve strategy, select production
+dates, mutate calendars, publish, create effect payloads or receipts, or mutate workflow state.
+Strategy approval is a separate human decision bound to the persisted strategy digest.
+
+## Handoff
+
+The complete proposal, evidence lineage, version, and digest are persisted before human strategy
+approval. Only an authenticated approval matching that digest passes the unchanged strategy to Temi.
+
+## Runtime enforcement
+
+Strict validators reject an invalid skill trace, invented references, ungrounded briefs, unsupported
+operational channels, performance claims without verified IDs, incoherent theses where mechanically
+detectable, unexplained high confidence, final-copy-shaped output, effects, approval claims, and
+Memory Bank used as authority. When an exact typed `researchRequest` establishes that current
+external information is necessary, the isolated `ryan_web_search` tool runs Meta Model API
+`web_search` and returns a request-bound typed result. Deterministic code requires a completed
+search and a matching title, URL, and verbatim supported text in Meta's search results or URL
+citations before its `search-*` IDs can ground the strategy. Without that request, any search call fails closed.
+
+## Implementation references
+
+- Prompt: `agent/harmonia_agent/ryan_prompt.py`
+- Skill runtime: `agent/harmonia_agent/ryan_skills.py`
+- Skill: `agent/harmonia_agent/skills/ryan-strategy-skills/SKILL.md`
+- Contracts: `StrategistInput`, `StrategistResult`, and `ContentStrategy` in `agent_models.py`
+- Tests: `agent/tests/test_ryan_skills.py`, `test_ryan_strategy.py`, and `test_ryan_stages.py`

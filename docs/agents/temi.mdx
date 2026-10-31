@@ -1,0 +1,90 @@
+---
+title: "Temi — editorial planner"
+description: "Temi's approved-strategy operationalization and production handoff reference."
+---
+
+## Role
+
+Temi converts one human-approved Ryan strategy into a complete editorial plan for the supplied
+horizon. Deterministic code persists the plan and selects its exact eligible next item for Noni.
+
+## Contract
+
+| Property | Value |
+|---|---|
+| ADK name | `temi_editorial_planner` |
+| Default model | `gemini-3.5-flash-lite` |
+| Input | `EditorialPlannerInput` |
+| Output | `EditorialPlan` |
+| Runtime skill | `temi-editorial-planning-skills` with six allow-listed method references |
+| Tools | Six request-bound read-only views over one immutable Firestore planning snapshot |
+
+## Skills
+
+`temi-editorial-planning-skills` supplies six allow-listed operational planning methods. Temi loads
+the skill once and only references relevant to the active planning constraints.
+
+## Tools and research
+
+Temi may call `read_editorial_commitments`, `read_production_capacity`, `read_asset_readiness`,
+`read_posting_window_observations`, `read_calendar_projection`, and `read_blocked_dependencies` over
+one immutable planning snapshot. It has no web search and no core MCP server.
+
+## Prompt method
+
+Temi loads the planning skill exactly once, selects at least one relevant reference, and reads only
+sections of the exact digest-bound planning snapshot supplied for the request. Temi preserves the approved strategy and each chosen Ryan brief while deciding sequencing, supported
+channel and format, cadence distribution, publication windows, production deadlines, dependencies,
+assets, priority, and selection rationale. Choices remain inside supplied capabilities, commitments,
+capacity, horizon, and observed posting-window context.
+
+## Evidence and provenance
+
+Every decision remains bound to the approved strategy digest, planning snapshot ID and digest, Ryan
+brief IDs, Nimi evidence IDs, and returned snapshot-section identity. Temi cannot invent research,
+availability, capacity, dependencies, or supported channels.
+
+## Authority boundary
+
+Temi cannot change strategy or briefs, invent evidence, write final copy, approve anything, mutate an
+external calendar, claim external scheduling, publish, access credentials, construct effects, or
+create receipts.
+
+## Calendar and MCP boundary
+
+Temi reads Harmonia's persisted calendar projection, not Google Calendar directly. The existing
+Google Calendar integration remains an operator-controlled downstream effect using the narrow
+`calendar.app.created` scope, so it cannot truthfully serve as a general availability reader.
+No MCP server is part of Temi's core runtime: no external project-management system has been
+selected, and the deployed Python environment does not currently include the optional MCP package.
+If a real external system is chosen later, it must be a separate tenant-scoped, read-only adapter
+that normalizes into the same snapshot contract; it must not expose mutation tools to Temi.
+
+Relevant platform references: [Google Calendar events list](https://developers.google.com/workspace/calendar/api/v3/reference/events/list),
+[free/busy query](https://developers.google.com/workspace/calendar/api/v3/reference/freebusy/query),
+[Calendar authorization scopes](https://developers.google.com/workspace/calendar/api/auth), and
+[ADK MCP tools](https://google.github.io/adk-docs/tools-custom/mcp-tools/).
+
+## Handoff
+
+Deterministic code persists and digests the validated plan, then selects exactly one eligible item.
+Noni receives that item, its exact Ryan brief, and only the referenced Nimi evidence.
+
+## Runtime enforcement
+
+Deterministic code creates and persists the snapshot before invocation from tenant-scoped Firestore
+content commitments, calendar projection state, supported capabilities, and explicit planning policy.
+Callbacks reject unapproved or duplicate resources, invalid ordering, prohibited tools, cross-request
+snapshot IDs, and read responses without the exact snapshot identity. Validation binds the plan to
+both the approved strategy digest and planning snapshot digest, rejects unsupported channels and formats,
+collisions, capacity or cadence violations, invalid deadlines, dependency cycles, invented evidence,
+and authority overreach. Only deterministic code advances item lifecycle state.
+
+## Implementation references
+
+- Prompt: `agent/harmonia_agent/temi_prompt.py`
+- Skill runtime: `agent/harmonia_agent/temi_skills.py`
+- Skill: `agent/harmonia_agent/skills/temi-editorial-planning-skills/SKILL.md`
+- Contracts: `EditorialPlannerInput` and `EditorialPlan` in `agent_models.py`
+- Snapshot API: `src/app/api/internal/editorial-planning-snapshot/route.ts`
+- Tests: `agent/tests/test_temi_skills.py`, `test_temi_editorial_plan.py`, and `test_temi_stages.py`

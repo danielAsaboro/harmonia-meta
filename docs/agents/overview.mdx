@@ -1,0 +1,37 @@
+---
+title: "Agent team"
+description: "Reference for Harmonia's seven bounded Google ADK specialists."
+---
+
+Harmonia separates agentic judgment from deterministic workflow authority. Agents analyze,
+strategize, plan, write, review, compose interfaces, and answer read-only questions. Firestore and
+application code own stage transitions, approvals, scheduling effects, publishing, receipts, and
+verification.
+
+Use [Agent skills, tools, prompts, and traces](/reference/agent-runtime-inventory) for the canonical
+runtime inventory and [Agent contracts](/reference/agent-contracts) for exact handoff boundaries.
+
+```mermaid
+flowchart LR
+  NIMI[Nimi: evidence] --> RYAN[Ryan: strategy]
+  RYAN --> GATE[Human strategy approval]
+  GATE --> TEMI[Temi: editorial plan]
+  TEMI --> NONI[Noni: draft]
+  NONI --> DARA[Dara: review]
+  DARA -->|one bounded revision| NONI
+  DARA --> FINAL[Human effect approval]
+  MAYA[Maya: presentation] -. reads bounded context .-> GATE
+  NOVA[Nova: read-only liaison] -. reads bounded tools .-> GATE
+```
+
+| Agent | Runtime role | Output | Filesystem skills | Separate runtime tools |
+|---|---|---|---|---|
+| [Nimi](/agents/nimi) | Evidence analyst | `SourceAnalysis` | `nimi-analysis-skills` | Isolated request-bound Meta web search |
+| [Ryan](/agents/ryan) | Content strategist | `StrategistResult` / `ContentStrategy` | `ryan-strategy-skills` | Isolated request-bound Meta web search |
+| [Temi](/agents/temi) | Editorial planner | `EditorialPlan` | `temi-editorial-planning-skills` | Six immutable planning-snapshot reads |
+| [Noni](/agents/noni) | Copywriter | `ContentDraft` | `noni-writing-skills` | Verified-publication read; isolated Meta web search |
+| [Dara](/agents/dara) | Editor | `EditorialAssessment` | `dara-editing-skills` | None |
+| [Maya](/agents/maya) | A2UI presenter | `SurfacePlan` | None | None |
+| [Nova](/agents/nova) | Read-only liaison | `LiaisonAnswer` | Five routing skills | Six bounded read-only tools |
+
+<Warning>Memory Bank provides eligible context only. It never grants approval, permissions, policy exceptions, or authority to cause an external effect.</Warning>
