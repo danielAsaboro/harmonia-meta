@@ -1,0 +1,19 @@
+---
+title: "State ownership map"
+description: "Visual guide to authoritative, transport, advisory, asset, and observability state."
+---
+
+```mermaid
+flowchart LR
+  UI[Dashboard, chat, Telegram] --> APP[Application transactions]
+  APP <--> FS[(Firestore: durable truth)]
+  FS --> OUT[Stage outbox]
+  OUT --> PS[Pub/Sub: delivery]
+  PS --> W[Worker]
+  W --> APP
+  W <--> CS[(Cloud Storage: bytes)]
+  W -. context .-> MB[(Memory Bank)]
+  APP -. events .-> TEL[Logs, traces, metrics]
+```
+
+When systems disagree, Firestore determines workflow state; Cloud Storage determines asset bytes and its digest; an official provider read-back determines external state. See [State ownership](/state-ownership).
