@@ -1,0 +1,2 @@
+import { readFileSync } from "node:fs"; import { describe, expect, it } from "vitest";
+describe("autonomous operations view", () => { it("surfaces durable state without private reasoning", () => { const source = readFileSync("src/components/AutonomousOperationsView.tsx", "utf8"); for (const text of ["Resident cycles", "Wakeup agendas", "Estimated cost", "Open attention", "Schedules are disabled by default"]) expect(source).toContain(text); expect(source).not.toMatch(/chain.of.thought|private reasoning/i); }); });
