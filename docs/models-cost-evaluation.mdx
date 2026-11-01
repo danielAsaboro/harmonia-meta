@@ -1,0 +1,50 @@
+---
+title: "Models, cost, and evaluation"
+description: "Role-specific model policies, safety configuration, budget reservations, usage records, and evidence-gated promotion."
+---
+
+Harmonia balances quality and cost per role rather than applying one model and one generation profile everywhere.
+
+## Role policy
+
+| Role | Default target | Temperature | Max output | Primary evaluation |
+|---|---|---:|---:|---|
+| coordinator | Gemini 3.5 Flash-Lite | 0.1 | 1,024 | exact specialist route |
+| strategist | Gemini 3.5 Flash | 0.4 | 4,096 | provenance-linked four-week strategy and briefs |
+| analyst | Gemini 3.5 Flash multimodal | 0.2 | 2,048 | quote, time, and frame grounding |
+| copywriter | Gemini 3.5 Flash | 0.8 | 2,048 | skill trace, references, grounding, and platform limits |
+| editor | Gemini 3.5 Flash | 0.2 | 2,048 | seven complete checks, grounded issues, and no false acceptance |
+| planner | Gemini 3.5 Flash-Lite | 0.1 | 1,024 | approved-strategy fidelity and no scheduling/effect authority |
+| presenter | Gemini 3.5 Flash | 0.2 | 2,048 | bounded A2UI component/entity references |
+| liaison | Gemini 3.5 Flash | 0.2 | 2,048 | grounded read-only answers |
+
+Every role records the policy version, provider/model identity, generation limits, and safety profile. An unavailable configured target fails visibly.
+
+## Reservation and usage lifecycle
+
+<Steps>
+  <Step title="Estimate">Resolve an immutable pricing-catalog entry and the operation’s maximum authorized cost.</Step>
+  <Step title="Reserve">Atomically reserve budget using the stable operation ID before provider execution.</Step>
+  <Step title="Execute">Call the configured provider only after reservation succeeds.</Step>
+  <Step title="Finalize">Write one immutable usage record and reconcile observed units or endpoint time.</Step>
+  <Step title="Report">Group cost by workspace, job, stage, role, model, and pricing version.</Step>
+</Steps>
+
+Retried operation IDs reuse their reservation and usage document. Unknown pricing is not represented as zero and cannot be budget-authorized.
+
+## Evaluation gates
+
+The public ADK evalset contains source-neutral contract fixtures. Private real-video runs record quality, latency, usage IDs, policy version, and artifact digests outside the public repository.
+
+| Gate | Required outcome |
+|---|---|
+| schema and trajectory | valid ADK events, handoffs, and required output keys |
+| grounding | claims retain supplied transcript/media references |
+| authority | no role approves or executes an action |
+| quality floor | candidate pass rate is at least `0.95` for the recorded role policy |
+| pricing | model has a known catalog entry |
+| ranking | pass rate, then observed cost, then p95 latency |
+
+<Warning>Offline fixtures prove contracts, not real-model quality. No numeric promotion, cost, latency, or quality claim is valid until linked private artifacts and immutable usage records exist.</Warning>
+
+See [Configuration](/configuration#model-evaluation-and-promotion) for the live runner and comparison manifest.

@@ -1,0 +1,51 @@
+---
+title: "Generative A2UI console"
+description: "Durable streamed chat runs, trusted presentation catalogs, hydration, uploads, and approval-safe operator UI."
+---
+
+The Harmonia Console combines operator conversation with a living editorial canvas. Gemini may select and arrange a fixed vocabulary of trusted A2UI components; it cannot generate JavaScript, HTML, CSS, arbitrary React components, or executable callbacks.
+
+<CardGroup cols={3}>
+  <Card title="Conversation" icon="comments">Chaptered messages, safe activity summaries, tool state, and context.</Card>
+  <Card title="Working canvas" icon="objects-column">Typed content artifacts, media, evidence, plans, comparisons, and receipts.</Card>
+  <Card title="Approval dock" icon="user-check">Server-owned controls bound to durable job and action identities.</Card>
+</CardGroup>
+
+## Trusted rendering pipeline
+
+```mermaid
+flowchart LR
+  CTX[Typed UI context] --> MAYA[Maya presenter]
+  MAYA --> PLAN[Reference-only surface plan]
+  PLAN --> VALIDATE[Schema + catalog validation]
+  VALIDATE --> HYDRATE[Server hydration from Firestore]
+  HYDRATE --> RENDER[Official A2UI React renderer]
+  FIRE[(Authoritative records)] --> HYDRATE
+```
+
+Unknown components, wrong-job or invented entity references, duplicate references, component/reference mismatches, authoritative titles, non-HTTP citations, and preview URLs outside authenticated routes fail validation. `ApprovalReview` is valid only in the approval slot for exactly one action that the supplied context marks pending. Loading, empty, unresolved, and failure components are host-owned and cannot be selected by Maya. Hydration supplies exact content-artifact payloads, transcript excerpts, policy state, costs, asset routes, and receipts from authenticated records; the model never supplies those authoritative values.
+
+## Durable streaming
+
+`POST /api/chat/stream` creates a tenant-scoped Firestore run. Each schema-validated NDJSON record receives a monotonic sequence number and is persisted before delivery. A disconnected client resumes with:
+
+```text
+GET /api/chat/runs/{runId}/events?after={sequence}
+```
+
+This is durable transport streaming. It does not claim direct provider-token streaming when the underlying compatibility handler returns a complete Gemini result.
+
+## Upload boundary
+
+Cloud uploads use a tenant-scoped resumable Cloud Storage URL. The server downloads the completed object, verifies size, declared type, and magic bytes, then keeps it quarantined until the configured private malware scanner returns a complete clean verdict for every byte. Infected objects and content mismatches are deleted; scanner outages remain quarantined and unavailable. Local development follows the same fail-closed scanner boundary with the local artifact store.
+
+| Upload | Current behavior |
+|---|---|
+| video/audio | registered as direct sources and normalized into timed evidence when the prompt selects `create_job` |
+| document | registered as a direct source and normalized into page/paragraph evidence |
+| image | retained and rendered as conversation context; standalone image analysis is not claimed |
+| upload without task intent | stores the attachment but creates no job |
+
+<Warning>Generated approval detail is presentation only. The unchanged server-protected approval dock validates persisted `jobId + actionId` and remains the sole dashboard decision control.</Warning>
+
+See [Operator Interfaces](/interfaces) for surface behavior and [Approvals & Audit](/approval-and-audit) for authority.

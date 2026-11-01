@@ -1,0 +1,90 @@
+---
+title: "Authenticated vertical-slice evidence"
+description: "Fail-closed protocol for proving one real Harmonia run without exposing private content."
+---
+
+This protocol preserves the private/public boundary: raw provider responses, authorized source material, cookies, transcripts, drafts, and command exports remain in the parent-private `submission/evidence/` workspace. Only the verifier, redacted schema, and this procedure belong in the public repository. Passing the verifier proves consistency; retained cloud exports prove provenance.
+
+## Phase 1: preflight
+
+Before creating or changing application state, confirm an active gcloud identity and matching project. Record the deployed Cloud Run revision for both services, the exact Agent Engine resource, Firestore database, Pub/Sub topic/subscription, secret metadata (never values), and deployed health response. Every emulator setting must be unset. Any missing or unauthorized prerequisite stops the run.
+
+Also record the ready `operations` composite index, the subscription retry/dead-letter policy, and
+both scheduler jobs (`harmonia-durable-autonomy` and `harmonia-durable-recovery`). Confirm the worker
+health response exposes the expected protocol/compiler and bounded recovery settings without any
+credential, tenant content, prompt, or artifact body.
+
+```bash
+gcloud auth list --filter=status:ACTIVE
+gcloud config get-value project
+gcloud run services describe harmonia-web --project "$PROJECT_ID" --region "$REGION"
+gcloud run services describe harmonia-agent --project "$PROJECT_ID" --region "$REGION"
+python3 submission/evidence-runner/collect_vertical_slice.py /absolute/private/config.json
+```
+
+The evidence runner path above is relative to the private parent workspace, not this public repository.
+
+## Phase 2: capture-awaiting-approval
+
+Use Harmonia's normal dashboard or chat to upload one authorized MP4 as a direct source. The primary
+deterministic demo fixture is a short H.264/AAC file below the 24 MiB upload limit. Confirm the scanner
+records a complete clean verdict before submitting the natural-language job. YouTube remains a
+supported network-dependent source and its unresolved-source recovery is useful secondary evidence,
+but it is not the primary recorded-demo path. Do not call an internal stage or decision endpoint by
+hand. Wait until the persisted job reaches `awaiting_approval`, then run the read-only collector without
+`--require-complete`. Preserve each W3C `traceId` and its lineage across web ingress, Pub/Sub stage
+events, ADK cognition, usage, and the pending action. A later operator decision is a separate inbound
+request and may correctly begin a new trace.
+
+At this checkpoint, the collector must not approve, publish, retry, or manufacture a receipt. An incomplete run is expected and must not be presented as a completed vertical slice.
+
+## Operator checkpoint
+
+The signed-in operator reviews the real drafts and clip candidates in the normal dashboard and makes the approval decision there. This manual checkpoint is intentionally outside the collector. Rejection ends the candidate run honestly; it is never rewritten as approval.
+
+## Phase 3: capture-complete
+
+After the normal workflow persists a human approval, a finalized pre-effect claim, effect receipt, and independent verification, capture again:
+
+```bash
+python3 submission/evidence-runner/collect_vertical_slice.py /absolute/private/config.json --require-complete
+cd harmonia
+npm run verify:evidence -- /absolute/private/run/bundle.json
+```
+
+The complete capture must correlate the approval action, finalized effect claim, idempotency key, effect receipt, verification readback or artifact digest, cognition usage, cost records, trace lineage, and demonstrated-job KPIs. The KPI block includes source duration, elapsed time, approval wait, hands-off processing time, operator decisions, outputs, approved outputs, and independently verified approved outputs. Elapsed time must match the persisted job timestamps and exactly equal hands-off time plus approval wait; output counts must remain monotonic. The claim must follow durable human approval, precede effect execution, own the same idempotency key, operation, and action trace as the effect, and finalize against the original receipt. Cognition must share a trace with a lifecycle event; approval, claim, effect, and verification must share their action trace; replay must be a distinct traced attempt. A missing or late claim, zero trace ID, inconsistent KPI, verification timestamp before effect execution, receipt mismatch, unknown observed cost, mock provenance, or raw private field fails closed.
+
+The redacted bundle also requires replay evidence: a distinct replay operation after the original effect must return `already_applied` and reference the original receipt.
+
+## Restart and ambiguity proof
+
+In a separate authorized test job, interrupt the worker after a persisted boundary and before its
+next commit. Preserve the pre-interrupt operation epoch and lease, allow or invoke bounded recovery,
+and record the replacement claim's newer epoch. Attempt the old finalize call and retain the rejected
+fence result. Redeliver the same source event and retain the canonical duplicate response.
+
+For effects, inject failure only at the supported deterministic fault boundary. A failure before
+provider dispatch may return to `prepared`; a failure after dispatch must remain `unknown` until
+provider reconciliation or the operator-resolution workflow supplies digest-verified evidence.
+Never perform the provider call merely to manufacture failure evidence, and never relabel unknown as
+failed. Keep raw records and command output in the private parent evidence directory.
+
+## Replay proof
+
+Replay the already-approved action only through Harmonia's **Prove duplicate suppression** audit control. The normal claim state machine must return `already_applied` and reference the original receipt; the replay route has no authority to execute. Capture that durable replay observation and the external readback privately.
+
+## Google Calendar evidence
+
+Calendar sync is useful supporting product evidence, but it does not replace the required publishing or content-pack effect in the vertical-slice bundle.
+
+To claim Calendar integration in the demo, capture privately:
+
+1. the Google consent screen showing only `calendar.app.created`;
+2. the connected workspace state with credentials redacted;
+3. one operator-triggered event creation and its verified link/timestamp;
+4. one Harmonia reschedule that becomes `update_required`, followed by an operator-triggered update and a newer verified ETag/timestamp; and
+5. one operator-triggered removal followed by Google API `404` or `410` read-back.
+
+Retain the content-item document before and after each action, sanitized Calendar API request/response metadata, and trace correlation outside the public repository. Offline tests, a green connection badge, or an event visible only in the Harmonia UI are not live-provider proof. Do not include OAuth tokens, calendar IDs tied to a personal account, personal event data, or private extended-property values in public artifacts.
+
+The collector itself performs neither the original action nor the replay. Do not edit a failed bundle to make it pass. Preserve command status, verifier output, and unresolved gaps exactly as observed.

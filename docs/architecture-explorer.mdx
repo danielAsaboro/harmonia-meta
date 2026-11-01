@@ -1,0 +1,98 @@
+---
+title: "Interactive architecture explorer"
+description: "Navigate Harmonia's agents, workflow, authority boundaries, state, APIs, effects, and verification progressively."
+---
+
+The interactive explorer turns Harmonia's repository-backed architecture into a progressive system map. It is a presentation surface and technical index; the checked-in TypeScript dataset, implementation, and linked documentation remain the source of truth.
+
+## Open the explorer
+
+Open the public explorer at [`docs.useharmonia.xyz/architecture`](/architecture). No Harmonia sign-in is required. The initial System overview intentionally keeps most groups collapsed. Search for an agent, model, route, tool, skill, store, service, or stage; use presets for a guided view; select any node for its source, authority, state, and evidence details.
+
+Zoom, pan, drag, fit, reset, expand, and collapse controls are available on desktop. Every visible node can be repositioned locally. Select a connector to reveal its full relationship label. The URL stores the preset, selected node, expansion, filters, and search query so the current explanation can be shared. Node positions, pan, and zoom stay local to avoid noisy links.
+
+On narrow screens the graph becomes a searchable hierarchical list with the same filters, expansion, selection, and detail content.
+
+## Layer and edge semantics
+
+The palette follows Harmonia's product system: warm paper and forest neutrals form the canvas, violet distinguishes cognitive roles, amber marks policy and human approval, green marks executed or independently verified effects, red marks uncertainty or blocked authority, and gray marks external systems.
+
+Edge semantics never rely on color alone. Labels, marker words, and line patterns distinguish durable transitions, delegation, human decisions, effects, independent verification read-back, read-only retrieval, Memory Bank retrieval, telemetry, and blocked or uncertain paths. Open the persistent Legend for the current key.
+
+## Agent hierarchy and authority
+
+Harmonia delegates bounded evidence analysis to Nimi, strategy to Ryan, and editorial operationalization to Temi. Nimi loads one allow-listed filesystem analysis skill; when an exact research request exists, Meta web search runs in an isolated request-bound tool call and retains Meta's search results and URL citations. Deterministic code validates the approved output plan, then runs separate typed Noni production and Dara review batches with at most one issue-bound revision before sealing immutable artifacts. Maya provides bounded A2UI presentation and Nova provides skill-first read-only answers. The coordinator delegates; it cannot approve or publish. No cognitive role can approve, publish, mutate credentials or external calendars, perform destructive work, or execute a paid effect.
+
+See [ADK agent platform](./agent-platform) and [tool contracts](./tool-contracts).
+
+## Workflow and state ownership
+
+The workflow is collect_sources → extract_sources → understand with Nimi → strategize with Ryan → await strategy approval → plan with Temi → Noni/Dara typed artifact production → await effect approval → publish/export/render → verify → learn. Firestore is the durable source of truth and Pub/Sub owns asynchronous delivery and retry. Agent Engine sessions are ephemeral cognition; Memory Bank stores only exact-scope eligible facts and never authority.
+
+See [pipeline](/pipeline), the [system architecture guide](/architecture/overview), and [state ownership](/state-ownership).
+
+## Human approval and effect safety
+
+Every external effect passes through an action-specific human approval receipt, deterministic idempotency key, atomic effect claim, provider or artifact execution, immutable execution receipt, independent read-back, and immutable verification record. Execution receipts record what Harmonia attempted; independent verification records what is true. Expired unresolved claims become uncertain and require operator reconciliation instead of automatic replay.
+
+See [approval and audit](./approval-and-audit).
+
+## Skill system
+
+Filesystem skills contain reusable project-owned methods. They are loaded through ADK
+`SkillToolset` loaders, have explicit resource allow-lists, and never count as factual evidence.
+
+## Tool system
+
+Runtime tools retrieve or ground data. Meta web search runs inside isolated request-bound research
+tools, not skills. Their outputs require request binding and web search provenance validation.
+
+Dara loads `dara-editing-skills` once and at least one allow-listed editing-method reference. Its
+filesystem loaders are read-only, the actual trace is validated fail closed, and skill guidance is
+never accepted as evidence, a constraint, or workflow authority.
+
+Nova loads exactly one of `trend-scan`, `signal-watch`, `engagement-insights`,
+`job-status`, or `posting-schedule` before using bounded read-only tools. Public
+signal tools are distinguished from tenant-scoped workspace reads. Managed ADK
+state captures Nova's actual tool trajectory, and deterministic validation
+binds its strict answer, citations, errors, and retry behavior to that trace.
+
+## Model allocation
+
+The explorer records the checked-in allocation: Gemini 3.5 Flash-Lite for Harmonia and Temi, and Gemini 3.5 Flash for Ryan, Nimi, Noni, Dara, Maya, and Nova. Noni and Dara link to their bounded filesystem method skills. Status badges distinguish offline contract verification from pending authenticated live evidence.
+
+See [models, cost, and evaluation](./models-cost-evaluation).
+
+## Route families
+
+Routes are grouped by responsibility: auth and tenancy; jobs and decisions; chat and A2UI; content and monitoring; Calendar and OAuth; and the service-authenticated internal worker API boundary. The detail drawer lists representative checked-in endpoints rather than pretending the group is exhaustive.
+
+## Observability and cost controls
+
+W3C trace context crosses Pub/Sub and internal calls. Spans contain identifiers, stages, role/model labels, counts, and outcomes only—not prompts, responses, transcripts, drafts, media, or hidden reasoning. Deterministic reservations and immutable usage records support job and workspace budget guards.
+
+See [observability](./observability).
+
+## Status vocabulary
+
+- **Implemented** — corresponding code exists in the public repository.
+- **Offline verified** — deterministic contracts and tests have run without claiming authenticated provider success.
+- **Approval gated** — an external effect cannot run without an action-specific human decision.
+- **Read only** — the capability cannot mutate workspace or provider state.
+- **Pending live evidence** — authenticated model, managed runtime, provider, deployment, or trace proof has not yet been captured.
+- **Planned / unsupported** — intentionally absent behavior; it must not be inferred from adjacent nodes.
+
+## Update the dataset
+
+The architecture dataset lives in `src/lib/architecture/data.ts`; its closed schema and semantic validation live beside it. To add a node, edge, group, preset, or documentation link:
+
+1. Add or update a failing test for the architectural fact.
+2. Add the typed record with a unique ID, known layer/status/authority, explicit scope and lifetime, and only public repository-relative references.
+3. Connect external effects to approval and independent verification edges.
+4. Run the architecture tests, TypeScript, lint, and production build.
+
+Validation rejects duplicate IDs, dangling endpoints, parent cycles, private paths, prohibited agent authority, durable Agent Engine ownership, effects without approval, and effects without verification. Keep source links under `src/`, `agent/`, or `docs/`.
+
+## Accessibility and keyboard navigation
+
+Controls have accessible names and visible focus. Use Tab to reach toolbar controls and graph nodes, Enter or Space to activate buttons, and Escape to close details. Edge labels and patterns preserve meaning without color. Search/filter results are announced politely. Narrow screens use native buttons and nested lists instead of an unusably compressed graph.

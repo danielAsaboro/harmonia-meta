@@ -1,0 +1,340 @@
+---
+title: "Content strategy is rarely the bottleneck. Execution is."
+description: "How we built Harmonia to turn scattered startup source material into a durable, approval-controlled content operation."
+"og:image": "https://docs.useharmonia.xyz/brand/harmonia-banner.png"
+---
+
+<Note>
+  I created this article for the purpose of entering Harmonia in the All Things Agentic Hackathon.
+</Note>
+
+Startups rarely suffer from a shortage of things worth saying.
+
+Founder interviews contain hard-won lessons. Product demos explain why a feature exists. Customer conversations reveal the language buyers actually use. Podcasts, webinars, launch notes, documents, and recordings hold stories that could build trust for months.
+
+The familiar advice is to create a strategy and publish consistently. But strategy is usually not where the work breaks down.
+
+Execution is.
+
+Someone still has to inspect the source, find the strongest moments, preserve the meaning, adapt each idea to the right platform, coordinate review, schedule the work, publish it, and confirm that the final result actually exists. For a small startup, that fragmented process can become a second full-time job.
+
+We built [Harmonia](https://useharmonia.xyz) to take responsibility for that execution layer without asking the team to surrender control.
+
+## From content dump to content operation
+
+Harmonia is an asynchronous social-content production system for startups and small businesses.
+
+A team defines its goals, audience, voice, and operating constraints, then connects material it already owns or is authorized to use: a YouTube video, direct upload, audio file, document, webpage, pasted text, or an approved snapshot of its brand library.
+
+Harmonia turns that material into one durable content job:
+
+```text
+source → evidence → strategy → plan → production → review → approval → effect → verification
+```
+
+The job is not one long model response. It is persisted work with explicit stages, typed handoffs, visible failures, and resumable state.
+
+Harmonia fingerprints and extracts the source, transcribes timed media, identifies evidence-backed moments, develops a four-week strategy, waits for strategy approval, creates an editorial plan, and produces reviewed, platform-native artifacts.
+
+One grounded idea can become an X post or thread, LinkedIn post, article, newsletter, caption, carousel specification, quote card, diagram, editorial calendar, short clip, reel, or digest-verified content pack. The format changes; the source lineage does not.
+
+<CardGroup cols={3}>
+  <Card title="Open Harmonia" icon="arrow-up-right-from-square" href="https://useharmonia.xyz">
+    See the live product experience.
+  </Card>
+  <Card title="Explore the architecture" icon="diagram-project" href="/architecture">
+    Follow state, authority, effects, and verification.
+  </Card>
+  <Card title="Inspect the repository" icon="github" href="https://github.com/danielAsaboro/harmonia">
+    Review the implementation and tests.
+  </Card>
+</CardGroup>
+
+## The agent team
+
+The creative work is divided among bounded Google ADK specialists rather than hidden inside one general-purpose prompt.
+
+- **Nimi** uses Gemini 3.5 Flash to analyze multimodal evidence and identify bounded moments, quotes, visual signals, and content angles.
+- **Ryan** turns the source, business goals, and eligible prior learning into a grounded four-week strategy.
+- **Temi**, using Gemini 3.5 Flash-Lite, converts an approved strategy into a structured editorial plan and selects eligible production work.
+- **Noni** creates platform-native content from approved briefs and their referenced evidence.
+- **Dara** reviews grounding, brand voice, platform fit, clarity, safety, and calls to action, allowing at most one issue-bound revision.
+- **Maya** composes trusted A2UI operator surfaces from bounded references to persisted state.
+- **Nova** answers operational questions through narrowly scoped, read-only tools.
+
+Their skill libraries include editorial methods shaped by two years of hands-on content-marketing work. The specialists are free to exercise judgment inside their roles, but none of them can approve content, mutate workflow truth, change credentials, or publish simply because a generated response says to do so.
+
+That separation is central to Harmonia: models handle the work where ambiguity creates value; deterministic systems handle the work where ambiguity creates risk.
+
+## Intelligence is not authority
+
+Modern models are useful when several answers could be defensible. Given a founder interview, a model can identify themes, compare angles, surface promising moments, and draft variations for different audiences.
+
+The same flexibility is dangerous at the point of consequence.
+
+There should not be several creative interpretations of whether a payload matches the one a person approved. A persuasive explanation cannot repair a failed transaction. A model's confidence is not evidence that a provider accepted a post.
+
+Harmonia therefore follows an authority gradient:
+
+```text
+Interpret → Propose → Authorize → Execute → Prove
+```
+
+As the workflow approaches an external consequence, acceptable model authority decreases and required deterministic assurance increases.
+
+| Stage | Owner |
+|---|---|
+| Interpret source material | Gemini and ADK specialists |
+| Propose strategy and content | Gemini and ADK specialists |
+| Validate schemas and provenance | Deterministic application code |
+| Persist workflow truth | Firestore |
+| Deliver asynchronous work | Pub/Sub |
+| Authorize consequential effects | Authenticated human |
+| Execute the exact approved command | Deterministic worker |
+| Establish what happened | Independent verifier |
+
+This does not make the agent less capable. It makes the system easier to trust, recover, and operate.
+
+## One approval boundary
+
+An operator can work through the dashboard, conversational A2UI console, or allow-listed Telegram interface. Those surfaces do not get separate definitions of approval.
+
+Natural language may help find the relevant job or open a decision surface, but typing “approve” cannot publish by itself. The operator must see the exact action, destination, payload, risk, and cost. Approval binds to that persisted action and its canonical digest. If a material field changes, the old decision no longer applies.
+
+The same rule applies whether an action is immediate, scheduled, retried, or initiated through another interface. Every path converges on the same authority and effect machinery.
+
+The operating model is simple:
+
+> The model proposes. Policy checks. A human authorizes. Harmonia executes and verifies.
+
+## Three ways the obvious design fails
+
+The authority model sounds straightforward after it has been written down. It was not straightforward while building the system. Several designs looked convenient, tested well in isolation, and still crossed the wrong boundary.
+
+### Natural-language approval is not exact authorization
+
+The first failure hid inside a friendly chat interaction.
+
+An operator could type “approve,” a model could classify that intent, locate a pending action, and move the workflow forward. The experience felt smooth because the operator did not need to leave the conversation. It was also unsafe.
+
+The model was no longer merely helping the operator navigate. Its probabilistic interpretation could influence whether an exact external action was considered authorized. A system allowed to misunderstand a sentence was being placed in the same chain of trust as the person accountable for the consequence.
+
+The corrected boundary separates interpretation from authorization. Natural language can identify the likely job, explain the pending decision, and open the confirmation surface. It cannot manufacture the approval itself. The final interaction must be authenticated and bound to the current action type, destination, canonical payload digest, cost, risk, and expiry.
+
+Approval of an idea is not approval of every later representation of that idea. If the draft, destination, media, or any material field changes, the old approval no longer applies.
+
+### Every trigger must reach the same effect boundary
+
+The second failure came from treating scheduled work as a separate convenience path.
+
+Immediate actions followed one approval and execution route. Scheduled actions could approach the provider through another. Both paths appeared reasonable when viewed independently. Together, they meant that the safety of a post depended on which trigger reached it.
+
+This is a common systems smell. Chat, dashboards, cron jobs, webhooks, retries, and administrative tools arrive at different times, so each tends to acquire a private shortcut to the provider. Once that happens, the application no longer has one definition of authorization, one idempotency policy, or one place where effects can be audited.
+
+Harmonia materializes immediate and scheduled effects as the same immutable command. Different interfaces may propose or display an action, but none of them bypass the shared command, claim, execution, receipt, and verification path.
+
+### Delivery is not authority
+
+The third failure came from asynchronous delivery itself.
+
+Pub/Sub can redeliver. Two workers can overlap. A process can disappear after completing part of a stage. A delayed message can arrive after the underlying job has changed. None of those events grants permission to repeat an action.
+
+A delivery is only a wake signal. The worker must reconstruct the current state and authority from Firestore, validate the command identity, and obtain durable ownership before it acts. Treating receipt of a message as permission would turn transport behavior into business authority.
+
+These failures were not model-quality problems. A larger model or more forceful prompt would not repair them. They were authority and distributed-systems problems exposed by giving an agent the ability to affect the world.
+
+## Durable execution, not durable chat
+
+Long-running agents need more than intelligence. They need durable state, recovery, and accountability.
+
+Firestore is Harmonia's source of workflow truth. Pub/Sub carries restartable work between the Next.js control plane and the private Python worker. Cloud Storage holds immutable binary artifacts. Vertex AI Agent Engine hosts bounded cognitive work. Memory Bank can supply eligible, workspace-scoped context, but it cannot redefine job state or become approval.
+
+That distinction matters when a worker stops, a message is delivered twice, or a human approves work hours later. Process memory is disposable; the job is not.
+
+Every important artifact has an identity and digest. Every external action has a stable operation identity and idempotency key. A worker must claim ownership before crossing a provider boundary.
+
+```text
+authenticated approval
+  → immutable command
+  → atomic claim
+  → provider or artifact effect
+  → receipt
+  → independent read-back
+```
+
+If another worker already owns the attempt, the new delivery waits. If the action already completed, Harmonia returns the original receipt instead of calling the provider again. If the outcome is genuinely unknown, the action becomes visibly uncertain and requires reconciliation.
+
+Unknown does not mean safe to repeat.
+
+## The duplicate-post trap
+
+The hardest case appears between Harmonia and an external provider.
+
+Suppose a worker sends an approved social post. The provider accepts it. Before the worker can persist the final receipt, the process crashes. Pub/Sub later redelivers the message.
+
+What is the state of the action?
+
+Firestore does not contain a conclusive receipt, so the action appears unfinished. The provider may already contain the post. Repeating the request might repair an attempt that never happened—or publish a duplicate. The system does not know which.
+
+A two-state model of `success` and `failure` cannot represent this honestly. Harmonia needs an explicit uncertain state.
+
+The effect protocol is:
+
+```text
+authenticated approval
+  → immutable command and payload digest
+  → atomic claim
+  → provider effect
+  → immutable receipt
+  → independent verification
+```
+
+The immutable command binds the action, destination, exact payload identity, authorization reference, operation identity, and stable idempotency key. Before crossing the provider boundary, the worker atomically claims that identity.
+
+```text
+result = claim(idempotency_key)
+
+if result == execute:
+    provider_result = perform_exact_effect(command)
+    finalize_receipt(provider_result)
+elif result == already_applied:
+    return original_receipt
+elif result == in_progress:
+    retry_later
+elif result == uncertain:
+    require_reconciliation
+```
+
+`execute` grants one worker ownership of the attempt. `in_progress` means another live worker owns it, so the current delivery must not call the provider. `already_applied` means a finalized receipt exists; Harmonia returns that original receipt instead of producing another effect.
+
+`uncertain` is deliberately inconvenient. The previous owner disappeared without establishing a conclusive result. It may have failed before the provider call, during the call, or immediately afterward. Harmonia stops and asks for reconciliation rather than translating missing information into permission to try again.
+
+This decision can reduce availability. It may require a verifier or operator to inspect the provider. But a public, paid, or destructive effect should not be repeated merely because the application lost certainty. Safety sometimes requires refusing to guess.
+
+## Proof is part of the product
+
+Many agent demonstrations end when the model says “done.” Harmonia treats that as the beginning of verification, not the end of the workflow.
+
+A receipt records what the executor observed while performing an action. Verification then checks the resulting state through an independent path: reading an exported artifact back and comparing its digest, or querying an official provider interface and matching the observed result.
+
+The proposer and executor are not allowed to be the only witnesses of success.
+
+Harmonia correlates the job, stage, specialist handoff, approval, operation, claim, receipt, verification, and trace. Metadata-only observability connects those records without copying prompts, transcripts, drafts, customer media, or private reasoning into telemetry.
+
+Failures remain failures. Ambiguous effects remain unresolved. Local fixtures and emulator tests remain local evidence rather than being presented as authenticated provider success.
+
+That honesty is not separate from the product. It is part of what makes the operation accountable.
+
+## Evidence has levels
+
+Building Harmonia forced us to be precise about what different kinds of evidence can establish.
+
+An automated unit test can prove a validation rule for the tested inputs. An emulator-backed integration test can demonstrate Firestore transactions, tenant isolation, stage recovery, or duplicate suppression under controlled conditions. A production build can show that the application compiles. A reachable URL can prove that a web revision responds.
+
+None of those facts, by itself, proves that an authenticated agent workflow completed on Google Cloud or that an external provider accepted and retained an effect.
+
+For a live claim, the evidence must follow one job across the relevant boundaries:
+
+```text
+source identity
+  → persisted job and stage
+  → Pub/Sub delivery
+  → Agent Engine and model invocation
+  → specialist output and validation
+  → human approval
+  → effect ownership
+  → provider or artifact receipt
+  → independent verification
+  → correlated trace
+```
+
+That is why Harmonia distinguishes several statuses that are often collapsed in demos:
+
+| Status | What it establishes |
+|---|---|
+| Implemented | The capability exists in the repository |
+| Locally tested | Its contracts pass under local or emulator conditions |
+| Deployed | A specific revision exists in a target environment |
+| Authenticated success | Real credentials and provider infrastructure completed the operation |
+| Independently verified | A separate read established the resulting state |
+
+The distinctions protect both judges and operators. A polished interface should not turn a fixture into provider evidence, and a model should not be allowed to promote its own assertion into operational truth.
+
+## Five questions for any action-taking agent
+
+The architecture is specific to Harmonia, but the underlying questions apply to agents in finance, support, operations, healthcare, developer tooling, and any other environment where generated output can create consequences.
+
+### 1. Does this step require judgment or authority?
+
+Judgment compares ambiguous possibilities. Authority changes what another system or person must accept as true. Models are useful for judgment; authority needs an explicit trust boundary. If the distinction stays implicit, a recommendation can quietly become a decision.
+
+### 2. Can a probabilistic output directly cause a consequence?
+
+If a classifier, generated argument, or free-form tool call can immediately publish, spend, delete, message, or change credentials, interpretation and authority have been coupled. Insert deterministic validation and, where appropriate, authenticated human confirmation of the exact action.
+
+### 3. What exact payload was authorized?
+
+Bind approval to a canonical payload digest, destination, action type, risk, cost, and expiry. If any material field changes, require a new decision. Otherwise, a stale approval can authorize something the person never saw.
+
+### 4. What happens when the outcome is unknown?
+
+Every external provider has a boundary where the caller can lose certainty. Design that state before production. If the only outcomes are success and failure, ambiguous effects will be forced into the wrong category and may trigger an unsafe retry.
+
+### 5. Which independent path proves completion?
+
+Do not let the proposer or executor be the only witness of success. Re-read the post, artifact, transaction, message, or external state and preserve the evidence. Without independent verification, an internally coherent agent can remain externally wrong.
+
+## Models, media, and interfaces
+
+Harmonia uses role-specific Gemini 3.5 Flash and Flash-Lite policies for its core reasoning work. Gemini 3.5 Flash Image provides a budget-controlled image path. The repository also implements approval- and budget-gated Veo 3.1 Fast and Lyria 3 Clip actions; optional paid-media capabilities remain disabled unless their configuration, policy, and evidence requirements are satisfied.
+
+Deterministic ffmpeg paths cut, caption, reframe, and assemble clips and reels. Official integration code covers authorized YouTube sources, Google Drive brand libraries, Google Calendar, Telegram, X, LinkedIn, Instagram, and YouTube destinations, subject to each workspace's credentials and provider requirements.
+
+The public experience combines:
+
+- a live product and authenticated dashboard;
+- a conversational, upload-capable A2UI workspace;
+- visible jobs, proposals, receipts, assets, agent activity, and operational state;
+- an interactive architecture explorer; and
+- public documentation for the product, agents, platform, operations, and reference contracts.
+
+## What building Harmonia taught us
+
+The hardest part was not producing text. It was deciding what the agents must never control.
+
+Creative work benefits from contextual judgment. Tenant scope, cost, authorization, retries, and external effects require exact boundaries. No prompt can replace those boundaries, because these are authority and distributed-systems problems rather than model-quality problems.
+
+We also learned that memory needs restraint. Useful cross-job context requires scope, provenance, and eligibility. Raw source material, prompts, drafts, failures, and unverified claims should not silently become long-term memory.
+
+Finally, implementation and evidence are different claims. Tests can demonstrate state-machine behavior, transaction boundaries, and duplicate suppression. A reachable web revision proves a deployed web experience. Authenticated cloud and provider success require their own correlated evidence.
+
+## What we built
+
+During the hackathon, we built:
+
+- a seven-specialist Google ADK team with role-specific models, skills, typed handoffs, and explicit authority limits;
+- a resumable, multi-source pipeline spanning analysis, strategy approval, editorial planning, multi-format production, review, effect approval, execution, receipts, and verification;
+- a Next.js control plane and private Python/Pydantic worker connected through Firestore and Pub/Sub;
+- a live product, public Mintlify documentation, interactive architecture explorer, dashboard, A2UI workspace, and Telegram boundary;
+- deterministic content-pack exports and media rendering, plus official-provider publishing adapters designed around independent read-back;
+- tenant-scoped uploads, brand-library snapshots, cost controls, observability, replay, retention, and visible failure recovery; and
+- deployment and evidence tooling that distinguishes implemented, locally tested, deployed, and authenticated-success states.
+
+Harmonia gives a small startup a content operation that can continue working asynchronously while preserving human authority over the decisions that carry real responsibility.
+
+The strategy may begin the work. Harmonia carries it through execution.
+
+**One source goes in. A verified content operation comes out.**
+
+---
+
+Harmonia was created during the contest period using Gemini 3.5, Google ADK, Google GenAI SDK, and Google Cloud services. Product ideas were informed by an earlier, unsubmitted social-media automation experiment; its previous non-Google implementation stack was not copied into Harmonia.
+
+<CardGroup cols={2}>
+  <Card title="Read the system architecture" icon="sitemap" href="/architecture/overview">
+    See how the control plane, worker, agents, state, and effects fit together.
+  </Card>
+  <Card title="Evaluate Harmonia" icon="flask" href="/evaluation">
+    Inspect the tests, evidence boundaries, and verification workflow.
+  </Card>
+</CardGroup>

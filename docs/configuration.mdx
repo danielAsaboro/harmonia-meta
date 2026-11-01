@@ -1,0 +1,155 @@
+---
+title: "Configuration"
+description: "Operator-facing runtime configuration, defaults, requirements, and source-of-truth boundaries."
+---
+
+## Web application (Next.js)
+
+This page documents supported operator-facing configuration. It deliberately excludes shell-local implementation variables inside deployment scripts (for example computed URLs, temporary file paths, and image tags) and platform-injected variables such as `PORT`, `K_SERVICE`, and `K_REVISION`. The executable validators in `src/lib/config.ts` and `agent/harmonia_agent/config.py` remain authoritative; `.env.example` is the local template, while `infra/setup.sh` and `infra/deploy.sh` fail closed on cloud-only inputs.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `MODEL_API_KEY` | for real AI | — | Meta Model API bearer key for contextual answers and production planning |
+| `META_API_BASE_URL` | no | `https://api.meta.ai/v1` | Meta Model API base URL |
+| `INTERNAL_API_TOKEN` | yes | — | Bearer token the worker must present to internal routes |
+| `AGENT_SERVICE_URL` | yes | — | Private FastAPI worker URL used for managed ADK A2UI presentation planning |
+| `MODEL_ID` | no | `muse-spark-1.3` | Meta Chat Completions model id |
+| `FIRESTORE_EMULATOR_HOST` | local dev | — | e.g. `127.0.0.1:8081`; unset = real Firestore |
+| `GOOGLE_CLOUD_PROJECT` | cloud | `harmonia-local` | Project id |
+| `GCS_BUCKET` | production media | local `.data/artifacts` | Cloud Storage bucket for generated assets and direct resumable chat uploads; configure bucket CORS for the web origin |
+| `MALWARE_SCANNER_URL` | production uploads | deployed automatically | IAM-private Harmonia ClamAV endpoint; upload completion stays fail-closed when absent |
+| `MALWARE_SCANNER_TOKEN` | production setup override | generated automatically | Secondary scanner credential mounted from Secret Manager; never exposed to clients |
+| `YOUTUBE_API_KEY` | recommended | — | Data API metadata during YouTube source extraction (ffprobe duration fallback otherwise) |
+| `GOOGLE_CLIENT_ID` | Google Calendar or YouTube OAuth | — | Server-side OAuth web-client ID; Calendar requests only `calendar.app.created` |
+| `GOOGLE_CLIENT_SECRET` | Google Calendar or YouTube OAuth | — | Server-side OAuth web-client secret; never exposed to the browser |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | yes | — | Public Identity Platform web configuration value |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | yes | — | Identity Platform authentication domain |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | yes | — | Identity Platform project |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | yes | — | Registered web application identifier |
+| `DEFAULT_WORKSPACE_BUDGET_USD` | no | `100.00` | Workspace-wide reservation and usage ceiling |
+| `HARMONIA_TIME_ORIGIN` | no | host time | Optional UTC origin for replayable or accelerated workflows; does not change the operating-system clock |
+| `HARMONIA_TIME_SPEED` | no | `1` | Server-time multiplier applied relative to `HARMONIA_TIME_ORIGIN`; must be positive |
+
+## Worker (FastAPI)
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `WEB_INTERNAL_URL` | yes | — | Base URL of the web app's internal API |
+| `INTERNAL_API_TOKEN` | yes | — | Must match the web app's token |
+| `PUBSUB_STAGE_TOPIC` | no | `harmonia-stages` | Stage trigger topic |
+| `PUBSUB_PRODUCTION_TOPIC` | no | `harmonia-production` | Paid production-operation trigger topic |
+| `PROACTIVE_SCAN_SECONDS` | no | `60` | How often the proactive agent looks for due checks |
+| `PROACTIVE_<NAME>_INTERVAL_SECONDS` | no | per check | Override a single proactive check's cadence (see [Proactive Agent](/proactive-agent)) |
+| `MODEL_PRICING_VERSION` | no | `2026-08-23` | Immutable rate-catalog version; unknown versions fail startup |
+| `DEFAULT_JOB_BUDGET_USD` | no | `5.00` | Maximum reserved plus observed model cost per job |
+| `DEFAULT_JOB_APPROVAL_THRESHOLD_USD` | no | `0.25` | Cost threshold surfaced for operator policy |
+| `MODEL_API_KEY` | for media | — | Meta Model API bearer key for transcription and image generation |
+| `META_API_BASE_URL` | no | `https://api.meta.ai/v1` | Meta Model API base URL |
+| `TRANSCRIBER_MODEL_ID` | no | `muse-voice-transcribe-1.0` | Muse Voice Transcribe model for timed media transcripts |
+| `IMAGE_MODEL_ID` | no | `muse-image-1.0` | Muse Image model for `generate_image` |
+| `IMAGE_MAX_COST_USD` | no | `0.500000` | Explicit per-image reservation (Muse Image lists $0.01 per image) |
+| `HARMONIA_TELEMETRY_ENABLED` | cloud | `false` | Enable native ADK exports to Cloud Logging, Cloud Monitoring, and Cloud Trace |
+| `HARMONIA_TELEMETRY_SAMPLE_RATE` | no | `1.0` | Parent-based trace sampling ratio from 0 to 1 |
+| `HARMONIA_EVAL_EVIDENCE_ROOT` | live evaluation only | — | Absolute private directory that contains all live evaluation outputs; public-repository paths are refused |
+| `OTEL_SERVICE_NAME` | no | `harmonia-agent` | Service label used by the trace backend |
+| `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT` | yes in cloud | `NO_CONTENT` | Prevent prompt and response content capture |
+| `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS` | yes in cloud | `false` | Disable ADK legacy content-bearing span attributes |
+| `COORDINATOR_MODEL_ID` | no | `gemini-3.5-flash-lite` | Low-cost coordinator routing model |
+| `STRATEGIST_MODEL_ID` | no | `gemini-3.5-flash` | Ryan's synthesis model |
+| `STRATEGIST_TIMEOUT_SECONDS` | no | `300` | Bounded Ryan strategy invocation timeout |
+| `ANALYST_MODEL_ID` | no | `gemini-3.5-flash` | Nimi's multimodal video/audio/text model |
+| `COPYWRITER_MODEL_ID` | no | `gemini-3.5-flash` | Noni's skill-capable writing model |
+| `EDITOR_MODEL_ID` | no | `gemini-3.5-flash` | Dara's constraint-preserving editor model |
+| `PLANNER_MODEL_ID` | no | `gemini-3.5-flash-lite` | Temi's typed editorial-planning model |
+| `PRESENTER_MODEL_ID` | no | `gemini-3.5-flash` | Maya's reference-only A2UI composition model |
+| `AGENT_ENGINE_RESOURCE` | yes | — | Full `projects/.../locations/.../reasoningEngines/...` resource; Agent Engine is the only runtime |
+| `MEMORY_BANK_ENABLED` | managed deploy | `true` | Exact-scope Memory Bank retrieval and eligible-fact generation; cloud deploy fixes this to `true` |
+| `MEMORY_BANK_RESOURCE` | managed deploy | Agent Engine resource | Reasoning-engine resource that owns the Memory Bank |
+| `GENERATIVE_MEDIA_ENABLED` | no | `false` | Add approval-gated Veo and Lyria proposals |
+| `ALLOW_GLOBAL_LYRIA` | with generative media | `false` | Explicitly acknowledge the approved policy exception required by Lyria's global endpoint |
+| `VERTEX_MEDIA_LOCATION` | no | `us-central1` | Veo Vertex region; must match the deployment residency region |
+
+Every role model variable also accepts a matching `*_TIMEOUT_SECONDS` override, for example `ANALYST_TIMEOUT_SECONDS` and `PLANNER_TIMEOUT_SECONDS`. The default is 120 seconds unless a role declares a larger bounded default. Timeouts limit one specialist invocation; they do not authorize an additional effect attempt.
+
+The pricing catalog uses decimal arithmetic and labels estimates with its version. A configured model without a catalog entry is not budget-authorized. Image calls reserve the configured maximum instead of being represented as free.
+
+Gemini roles use token estimates. Veo 3.1 Fast records one generation at `$0.08`; Lyria 3 Clip records one generation at `$0.04`, using the same immutable pricing version. The dashboard compares these labeled units without manufacturing a fake common unit.
+
+Telemetry contains identifiers, stage and role names, model names, usage units, costs, validation outcomes, and errors. It excludes prompts, responses, transcripts, draft text, and media bytes. These are execution/delegation traces, not private model reasoning.
+
+Cloud telemetry additionally requires Application Default Credentials and worker permissions for Logging, Monitoring, and Trace writes. Harmonia sets both ADK content-capture controls to their safe values at process configuration; do not override them in a deployed revision. The dashboard's safe activity projection is written independently through the authenticated internal API and retained under `workspaces/{workspaceId}/brands/{brandId}/agent_activity`.
+
+## Dev-only flags
+
+| Variable | Effect |
+|---|---|
+| `HARMONIA_DEV_AUTH_BYPASS=1` | Development only: the login button creates a deterministic emulator-backed local session without initializing Firebase. Refused when `NODE_ENV=production`. |
+
+## Model evaluation and promotion
+
+The public `agent/evals/contracts.evalset.json` contains source-neutral ADK contract fixtures. Keep
+authorized videos, transcripts, prompts, credentials, and result files in the private parent
+workspace. A live run is explicit and refuses mock mode:
+
+```bash
+cd agent
+HARMONIA_REAL_EVAL=1 \
+HARMONIA_EVAL_EVIDENCE_ROOT="$(cd ../../submission/evidence && pwd)" \
+./.venv/bin/python -m harmonia_agent.evaluation_runner \
+  --evalset ../../resources/private-evals/harmonia.evalset.json \
+  --output ../../submission/evidence/harmonia-eval-results.json
+```
+
+Create a private comparison-manifest JSON array. Each item contains `evalArtifact`,
+`evalArtifactSha256`, `usageExport`, and `usageExportSha256`. The eval artifact identifies its run,
+role, candidate model, case outcomes/latencies, usage-record IDs, and policy/pricing versions; the
+usage export contains exactly those immutable usage records. Then generate the report:
+
+```bash
+./.venv/bin/python -m harmonia_agent.evaluation_report \
+  --input ../../submission/evidence/role-evaluation-records.json \
+  --format markdown
+```
+
+A cheaper model is ineligible when it misses the quality floor recorded in its role policy. The
+report refuses a caller-supplied floor that differs from that record. A model with unknown pricing
+is also ineligible. Each comparison record derives pass rate and p95 latency from case evidence,
+derives cost from linked immutable usage records, and carries the private eval output digest. Change
+a role's catalog default only after a recorded comparison uses the same policy and pricing versions.
+Mock or scripted runs never count as model-promotion evidence.
+
+Promotion is not an edit to a prompt or an automatic model decision. The private operator workflow
+uses `harmonia_agent.model_governance` to append four hash-chained records: a candidate derived with
+`candidate_from_comparison`, an independent human review, a promotion, and—when needed—an exact
+rollback to the candidate's recorded previous model. A proposer cannot approve their own candidate;
+an unreviewed, rejected, stale, or already-promoted candidate cannot activate. The append operation
+uses an exclusive lock plus `fsync`, and every read verifies sequence and the full digest chain.
+
+The ledger must live under the private evidence root, be access-controlled with the originating ADK
+and usage exports, and be captured with the deployment revision. Promotion records do not mutate
+source code, prompts, or deployed configuration by themselves: an administrator applies the reviewed
+model ID through the documented role environment variable and records that deployment separately.
+Rollback likewise restores the exact recorded previous model and requires a non-empty incident reason.
+This is governed adaptation, not autonomous self-modifying code.
+
+The manifest is a private operator evidence ledger, not a cryptographic signature service. Its
+digests detect mutation relative to the recorded ledger; they do not make a newly fabricated
+artifact truthful. Keep the manifest write path access-controlled, retain the originating ADK run
+and Firestore export, and require human review before changing a catalog default.
+
+## Authenticated evidence capture
+
+Use the [authenticated evidence runbook](./evidence-runbook.mdx) for the three-phase production
+protocol. Evidence capture refuses mock AI, mock effects, emulators, unsafe file paths, missing
+human approval, and inconsistent verification. Raw captures remain outside the public repository;
+the public CLI verifies only a redacted bundle:
+
+```bash
+npm run verify:evidence -- /absolute/private/bundle.json
+```
+
+## Secrets policy
+
+Deployment-wide application credentials and workspace OAuth records stay server-side and never enter Git or browser responses. Scope every integration to minimum permissions. Telegram configuration is stored per workspace and is returned only to the trusted worker.
+
+Google Calendar does not accept manually pasted tokens. Register `/api/oauth/google-calendar/callback` for each deployed origin and use the normal OAuth connection flow. See [How to sync content with Google Calendar](/google-calendar).

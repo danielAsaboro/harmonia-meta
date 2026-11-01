@@ -1,0 +1,53 @@
+---
+title: "How to capture Google Cloud deployment evidence"
+description: "Capture judge-visible proof of Agent Engine, Memory Bank, Cloud Run, Firestore, Pub/Sub, and correlated execution."
+---
+
+This guide produces the evidence required to say that Harmonia ran on Google Cloud. A successful local build or emulator run is not cloud evidence.
+
+## Before recording
+
+Use one dedicated Google Cloud project and one selected region. Enable Memory Bank, deploy both Cloud Run services, and complete one real authorized Harmonia job. Use a fresh job identifier that can be followed across every surface.
+
+Prepare browser tabs for:
+
+1. the signed-in Harmonia dashboard at its `run.app` URL;
+2. Cloud Run services and revisions for `harmonia-web` and `harmonia-agent`;
+3. Vertex AI Agent Engine execution or logs for the same job;
+4. Memory Bank showing a write from a verified outcome and a later retrieval in the same workspace/brand scope;
+5. Pub/Sub delivery metrics for `harmonia-stages-agent-push`;
+6. the workspace-scoped Firestore job, events, approval, receipt, verification, and usage records;
+7. Cloud Trace or the telemetry backend filtered to the job's trace ID.
+
+Redact customer content and account identifiers before recording. Do not open raw configuration or credential views.
+
+## Capture a resumable asynchronous run
+
+Create a job from an authorized source and show its job ID. Let at least one Pub/Sub-driven stage complete, then display the persisted Firestore stage and event timestamp. Restart the private worker revision or allow a safe redelivery, and show the same job resuming from durable state without creating a duplicate external receipt.
+
+The proof is the correlation among the job ID, Pub/Sub delivery, Firestore state, Agent Engine invocation, and idempotent receipt—not narration alone.
+
+## Capture cross-session memory
+
+Complete a job through approval, independent verification, and learn. Show that Memory Bank receives only an eligible fact such as an operator decision or verified outcome under the job's workspace and brand scope.
+
+Start a separate later job in the same workspace and show its fresh Agent Engine invocation retrieving that fact. Then show a different workspace producing no retrieval for the same query. This demonstrates persistent cross-session context and tenant isolation. If the two jobs have not actually been separated by weeks, describe the architecture as week-capable; do not claim elapsed-time evidence that was not captured.
+
+## Capture the sovereignty and security boundary
+
+Show the selected Cloud Run region, Firestore location, staging-bucket location, Agent Engine/Memory Bank/Veo resource locations, and Pub/Sub message-storage policy. They must match. If Lyria is enabled, show the approved global-processing policy exception; otherwise show that it is disabled. Show the two service identities and their distinct roles, the human approval boundary, and a metadata-only trace whose attributes contain no prompt, transcript, draft, or media content.
+
+## Completion criteria
+
+The evidence is complete only when the video visibly includes:
+
+- a working `run.app` URL;
+- both Cloud Run services and their revisions;
+- one real Agent Engine invocation;
+- one Memory Bank write and a later scoped retrieval;
+- Pub/Sub activity and durable Firestore state for the same job;
+- one approval receipt and independently verified outcome;
+- one correlated metadata-only trace;
+- matching regional locations and Pub/Sub storage policy.
+
+Store full-resolution screenshots, command output, job IDs, trace IDs, revision names, timestamps, and the final video under the private submission evidence directory. Until those artifacts exist, authenticated Google Cloud execution remains unverified.

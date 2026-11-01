@@ -1,0 +1,310 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "Harmonia",
+  "description": "Product, operator, and engineering documentation for Harmonia, the governed social media agent for startups.",
+  "colors": {
+    "primary": "#5F8F22",
+    "light": "#B9FF66",
+    "dark": "#17221D"
+  },
+  "logo": {
+    "light": "/brand/harmonia-mark.png",
+    "dark": "/brand/harmonia-mark.png",
+    "href": "https://useharmonia.xyz"
+  },
+  "favicon": "/brand/harmonia-mark.png",
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "family": "Inter"
+  },
+  "background": {
+    "decoration": "gradient",
+    "color": {
+      "light": "#F4F3E9",
+      "dark": "#0D1511"
+    }
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "system"
+  },
+  "search": {
+    "prompt": "Search Harmonia docs..."
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "seo": {
+    "indexing": "navigable",
+    "metatags": {
+      "og:site_name": "Harmonia Docs",
+      "og:image": "https://docs.useharmonia.xyz/brand/harmonia-banner.png",
+      "twitter:card": "summary_large_image",
+      "twitter:image": "https://docs.useharmonia.xyz/brand/harmonia-banner.png"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/danielAsaboro/harmonia"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open Harmonia",
+      "href": "https://useharmonia.xyz"
+    }
+  },
+  "footer": {
+    "socials": {
+      "website": "https://useharmonia.xyz",
+      "github": "https://github.com/danielAsaboro/harmonia"
+    },
+    "links": [
+      {
+        "header": "Start",
+        "items": [
+          { "label": "Product overview", "href": "/product/overview" },
+          { "label": "Quickstart", "href": "/quickstart" },
+          { "label": "Architecture", "href": "/architecture" }
+        ]
+      },
+      {
+        "header": "Operate",
+        "items": [
+          { "label": "Approval and audit", "href": "/approval-and-audit" },
+          { "label": "Failure recovery", "href": "/failure-recovery" },
+          { "label": "Observability", "href": "/observability" }
+        ]
+      }
+    ]
+  },
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"]
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Product",
+        "icon": "sparkles",
+        "groups": [
+          {
+            "group": "Overview",
+            "root": "product/overview", "directory": "card",
+            "pages": ["index", "content-execution", "architecture", "architecture/overview", "architecture-explorer", "evaluation"]
+          },
+          {
+            "group": "Workflow",
+            "pages": ["pipeline"]
+          },
+          {
+            "group": "Operator surfaces",
+            "pages": ["a2ui-console", "interfaces"]
+          },
+          {
+            "group": "Autonomy",
+            "pages": ["proactive-agent"]
+          },
+          {
+            "group": "Visual maps",
+            "pages": [
+              "diagrams/production-flow",
+              "diagrams/authority-boundaries",
+              "diagrams/state-ownership",
+              "diagrams/effect-lifecycle",
+              "diagrams/agent-handoffs",
+              "diagrams/deployment-topology"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "icon": "compass",
+        "groups": [
+          {
+            "group": "Getting started",
+            "root": "guides/overview", "directory": "card",
+            "pages": ["quickstart", "development"]
+          },
+          {
+            "group": "Integrations",
+            "pages": ["google-calendar"]
+          }
+        ]
+      },
+      {
+        "tab": "Agents",
+        "icon": "people-group",
+        "groups": [
+          {
+            "group": "Team",
+            "root": "agents/overview", "directory": "card",
+            "pages": ["agent-platform"]
+          },
+          {
+            "group": "Research and strategy",
+            "pages": ["agents/nimi", "agents/ryan"]
+          },
+          {
+            "group": "Planning and production",
+            "pages": ["agents/temi", "agents/noni", "agents/dara"]
+          },
+          {
+            "group": "Experience and liaison",
+            "pages": ["agents/maya", "agents/nova"]
+          },
+          {
+            "group": "Agent runtime",
+            "pages": ["reference/agent-runtime-inventory", "session-memory", "models-cost-evaluation", "tool-contracts"]
+          }
+        ]
+      },
+      {
+        "tab": "Platform",
+        "icon": "layer-group",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["platform/overview"]
+          },
+          {
+            "group": "UI",
+            "root": "platform/ui/overview", "directory": "card",
+            "pages": ["platform/ui/nextjs", "platform/ui/a2ui"]
+          },
+          {
+            "group": "Agents and AI",
+            "root": "platform/agents/overview", "directory": "card",
+            "pages": [
+              "platform/agents/google-adk",
+              "platform/agents/gemini",
+              "platform/agents/noni-runtime",
+              "platform/agents/agent-engine",
+              "platform/agents/memory-bank"
+            ]
+          },
+          {
+            "group": "Security and identity",
+            "root": "platform/security/overview", "directory": "card",
+            "pages": [
+              "platform/security/firebase-auth",
+              "platform/security/iam-service-accounts",
+              "platform/security/secret-manager"
+            ]
+          },
+          {
+            "group": "Storage and messaging",
+            "root": "platform/data/overview", "directory": "card",
+            "pages": [
+              "platform/data/firestore",
+              "platform/data/pubsub",
+              "platform/data/cloud-storage"
+            ]
+          },
+          {
+            "group": "Runtime and automation",
+            "root": "platform/runtime/overview", "directory": "card",
+            "pages": ["platform/runtime/cloud-run", "platform/runtime/cloud-scheduler"]
+          },
+          {
+            "group": "Media",
+            "root": "platform/media/overview", "directory": "card",
+            "pages": ["platform/media/ffmpeg", "platform/media/vertex-generative-media"]
+          },
+          {
+            "group": "Integrations",
+            "root": "platform/integrations/overview", "directory": "card",
+            "pages": [
+              "platform/integrations/x-api",
+              "platform/integrations/telegram",
+              "platform/integrations/google-calendar-api",
+              "platform/integrations/hacker-news-algolia",
+              "platform/integrations/youtube"
+            ]
+          },
+          {
+            "group": "Logging and monitoring",
+            "root": "platform/observability/overview", "directory": "card",
+            "pages": [
+              "platform/observability/opentelemetry",
+              "platform/observability/cloud-trace",
+              "platform/observability/structured-logging",
+              "platform/observability/monitoring-metrics",
+              "platform/observability/usage-budget"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Operations",
+        "icon": "shield-check",
+        "groups": [
+          {
+            "group": "Workflow reliability",
+            "root": "operations/overview", "directory": "card",
+            "pages": ["operational-model", "operational-control-plane", "failure-recovery", "state-ownership", "record-replay"]
+          },
+          {
+            "group": "Authority and safety",
+            "pages": ["approval-and-audit", "resident-autonomy"]
+          },
+          {
+            "group": "Observability",
+            "pages": ["observability"]
+          },
+          {
+            "group": "Deployment",
+            "pages": ["deployment"]
+          }
+        ]
+      },
+      {
+        "tab": "Optimisation",
+        "icon": "gauge-high",
+        "groups": [
+          {
+            "group": "Long-running agents",
+            "pages": ["optimization/context-memory-continuity"]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "icon": "book",
+        "groups": [
+          {
+            "group": "Configuration",
+            "root": "reference/overview", "directory": "card",
+            "pages": ["configuration", "reference/environment"]
+          },
+          {
+            "group": "Integration reference",
+            "pages": ["google-calendar-reference", "reference/api-routes", "reference/upload-media"]
+          },
+          {
+            "group": "Workflow contracts",
+            "pages": [
+              "reference/job-state-machine",
+              "reference/agent-contracts",
+              "reference/effect-contracts",
+              "reference/error-taxonomy",
+              "reference/firestore-data",
+              "reference/authority-matrix",
+              "reference/pricing-budget",
+              "reference/receipts-verification"
+            ]
+          },
+          {
+            "group": "Evidence",
+            "pages": ["cloud-proof", "evidence-runbook", "glossary"]
+          }
+        ]
+      }
+    ]
+  }
+}

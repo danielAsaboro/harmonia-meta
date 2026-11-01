@@ -1,0 +1,16 @@
+---
+title: "Operations overview"
+description: "Operate Harmonia through failure, recovery, approval, replay, observability, and deployment."
+---
+
+Operations begins from persisted truth. A model response, log line, Pub/Sub delivery, or external API response is not by itself proof that a job advanced or an effect succeeded.
+
+<CardGroup cols={2}>
+  <Card title="Operating model" href="/operational-model">Understand workers, outboxes, retries, and ownership.</Card>
+  <Card title="Operational control plane" href="/operational-control-plane">Use the needs-you inbox, resumable job shells, durable controls, and batch execution.</Card>
+  <Card title="Recover failures" href="/failure-recovery">Classify failures and resume safely.</Card>
+  <Card title="Audit authority" href="/approval-and-audit">Trace digest-bound human decisions.</Card>
+  <Card title="Inspect telemetry" href="/observability">Correlate jobs, operations, traces, and usage.</Card>
+</CardGroup>
+
+Use [State ownership](/state-ownership) when two systems disagree and [Record and replay](/record-replay) when validating idempotency or reproducing an execution.

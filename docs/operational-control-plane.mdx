@@ -1,0 +1,32 @@
+---
+title: "Operational control plane"
+description: "Operator attention, resumable live state, durable job controls, connector capabilities, and large-batch execution."
+---
+
+Harmonia keeps Firestore as workflow authority and Pub/Sub as trigger transport. The operational control plane is a projection over that durable state; it is not a second workflow engine.
+
+## Needs-you inbox and job shells
+
+The operational feed returns a current snapshot plus sequence-numbered changes. The projection combines pending action and strategy approvals, policy failures, credential and budget gaps, missing assets, resident-agent escalation, and uncertain effects. Each item links to the existing authoritative resolution surface. See [API routes](/reference/api-routes) for the request and response contract.
+
+Every job is reduced to a compact shell: lifecycle, stage, control state, control epoch, bounded progress, liveness, last progress time, and attention counts. Lifecycle precedence is deliberately safety-biased: uncertain effects, operator work, pause/cancel, failure, scheduling, settlement, then active work.
+
+The dashboard polls with its last sequence cursor. Firestore allocates contiguous feed sequences and stores the current projection, so a reconnect does not depend on process memory or transient browser state.
+
+## Pause, resume, and cancel
+
+Control commands carry a unique command ID, action, and expected control epoch. The server derives the authenticated actor and atomically stores a command receipt with the updated control state. Duplicate command IDs return the original receipt; changed payloads or stale epochs fail closed. Cancellation additionally requires exact job-scoped confirmation.
+
+Pause and cancellation are cooperative controls. New stage and effect claims check the durable control state before execution. Work already past an external dispatch boundary is not declared cancelled; it continues through observation or uncertain-outcome reconciliation.
+
+## Business connector contract
+
+Connector descriptors declare capabilities, effect types, required scopes, provider idempotency, verification behavior, and regional constraints. Active descriptors currently cover X, Google Calendar, and content-pack export. The contract separates connection validation, command preparation, execution, verification, and unknown-outcome reconciliation so future integrations cannot collapse these safety boundaries into one opaque call.
+
+## Large-batch data plane
+
+A data batch points at an immutable `gs://` manifest with digest, byte count, and item count. Work item IDs are deterministic over batch, partition, source digest, and processor version. Initialization is chunked across Firestore writes and remains visibly `initializing` or `failed` if interrupted; retrying the same manifest resumes deterministically.
+
+The dispatcher publishes at most `maxInFlight` eligible items to the configured data-work topic. A visibility window counts recently published items against that limit before a worker claims them. Duplicate publications remain safe: workers must claim each item with a hashed owner token, lease, and monotonically increasing epoch. Stale finalizers are fenced out. Retry exhaustion becomes `dead_lettered`; fan-in records `complete`, policy-qualified `partial`, `failed`, or `cancelled` from literal persisted item states.
+
+This is a bounded foundation, not a claim that Harmonia has already processed a production-scale dataset. The repository and emulator suites verify contracts and Firestore concurrency; live cloud throughput still requires deployment evidence.

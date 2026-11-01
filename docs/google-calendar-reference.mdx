@@ -1,0 +1,132 @@
+---
+title: "Google Calendar sync reference"
+description: "OAuth scope, API routes, event projection, persisted states, idempotency, errors, and verification behavior."
+---
+
+## Authorization
+
+<Note>
+  This page is reference material. For the operator workflow, use [How to sync content with Google Calendar](/google-calendar).
+</Note>
+
+| Property | Value |
+|---|---|
+| Connection ID | `google-calendar` |
+| OAuth flow | Authorization Code with PKCE |
+| Scope | `https://www.googleapis.com/auth/calendar.app.created` |
+| Token storage | Workspace-scoped Firestore connection document; server-side only |
+| Mutation authority | Browser session authenticated by Google sign-in; internal bearer tokens are rejected |
+| Manual token setup | Rejected; scoped OAuth consent is required |
+
+The deployment-wide OAuth client uses `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Reauthorization preserves the stored calendar identity and an existing refresh token when the token response omits one.
+
+## API routes
+
+<Tabs>
+  <Tab title="Connection status">
+
+### `GET /api/calendar/google`
+
+Returns the active workspace’s connection state.
+
+```json
+{
+  "connected": true,
+  "reauthorizationRequired": false,
+  "calendarId": "provider-generated-id",
+  "calendarTitle": "Harmonia Content Calendar",
+  "connectedAt": "2026-08-25T10:00:00.000Z"
+}
+```
+
+Expired credentials are not reported as connected.
+
+  </Tab>
+  <Tab title="Mutate an event">
+
+### `POST /api/calendar/google`
+
+Body:
+
+```json
+{
+  "itemId": "content-item-id",
+  "operation": "sync"
+}
+```
+
+`operation` accepts:
+
+| Value | Behavior |
+|---|---|
+| `sync` | Inserts or updates the deterministic event, then verifies it by read-back. The item must be `scheduled` or `awaiting_final_review` and have `scheduledFor`. |
+| `remove` | Deletes the deterministic event when present, then verifies `404` or `410`. Repeated removal is valid. |
+
+Responses use `400` for malformed requests, `401` or `403` for missing or invalid operator sessions, `404` for an unknown content item, `409` for an invalid content-item state, and `502` when Google synchronization, provisioning, or verification fails.
+
+  </Tab>
+</Tabs>
+
+## App-created calendar
+
+The first sync provisions a secondary calendar named `Harmonia Content Calendar`. Firestore records a provisioning claim before calling Google.
+
+| Provisioning state | Behavior |
+|---|---|
+| no claim, no calendar ID | one request claims provisioning and may create the calendar |
+| `claimed` | concurrent requests fail without calling Google |
+| `uncertain` | automatic creation remains locked because the previous outcome may have committed |
+| calendar ID present | Harmonia reads that calendar; it does not create another one when the stored calendar is missing |
+
+An ambiguous create is intentionally not retried because Google Calendar does not accept a client-selected calendar ID.
+
+<Warning>
+  An `uncertain` provisioning claim is fail-closed state, not an instruction to retry. Inspect the Google account before changing or reconnecting the integration.
+</Warning>
+
+## Event projection
+
+| Field | Value |
+|---|---|
+| `id` | first 32 hexadecimal characters of SHA-256 over workspace, brand, and content-item identity; valid within Google’s base32hex event-ID alphabet |
+| `summary` | `Harmonia ·` followed by target platform labels |
+| `description` | content text plus Harmonia item and job IDs |
+| `start.dateTime` | `ContentItem.scheduledFor` |
+| `end.dateTime` | start plus 30 minutes |
+| `transparency` | `transparent` |
+| private extended properties | workspace, brand, content-item, and job IDs |
+
+The deterministic event ID makes inserts retry-safe. A `409` after an ambiguous insert converges only when strict read-back matches the intended event.
+
+Updates use the current Google ETag in `If-Match`. A `412` after an ambiguous update converges only when strict read-back matches; otherwise the operation fails visibly.
+
+## Persisted sync state
+
+`ContentItem.googleCalendarSync` contains:
+
+| Field | Meaning |
+|---|---|
+| `status` | `synced`, `update_required`, `removed`, or `failed` |
+| `calendarId` | app-created calendar identifier |
+| `eventId` | deterministic event identifier |
+| `etag` | last verified Google event ETag |
+| `htmlLink` | last verified Google event URL |
+| `sourceUpdatedAt` | Harmonia content revision projected into Google |
+| `verifiedAt` | successful read-back timestamp |
+| `lastAttemptAt` | most recent mutation attempt |
+| `failureReason` | sanitized operator-visible failure text |
+
+Failure state preserves the previous ETag, link, source revision, and verification timestamp. If content changes concurrently with a successful sync, persistence records `update_required`; a verified removal remains `removed`.
+
+## Retry and verification rules
+
+- Network failures, `429`, and `5xx` responses receive at most three bounded attempts on convergence-safe requests.
+- Calendar provisioning receives one attempt and locks on an uncertain outcome.
+- Validation, authorization, permission, and ordinary conflict failures are not retried.
+- A sync is successful only when `events.get` matches ID, summary, description, start, end, transparency, and private properties.
+- A removal is successful only when `events.get` reports `404` or `410`.
+- Offline tests do not prove a live Google account, valid consent screen, deploy-time credentials, or provider availability.
+
+<Card title="Live evidence checklist" icon="clipboard-check" href="/evidence-runbook#google-calendar-evidence">
+  See the exact artifacts required before presenting Google Calendar synchronization as live hackathon evidence.
+</Card>

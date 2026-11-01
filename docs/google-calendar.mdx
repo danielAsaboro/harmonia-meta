@@ -1,0 +1,144 @@
+---
+title: "How to sync content with Google Calendar"
+description: "Connect Google Calendar and explicitly add, update, or remove scheduled Harmonia content."
+---
+
+Use this guide to place Harmonia’s content schedule in a dedicated calendar in the signed-in operator’s Google Calendar account.
+
+<Info>
+  Harmonia uses Google’s `calendar.app.created` scope. It can manage only the secondary calendar it creates—not the operator’s unrelated calendars or events.
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="What gets synchronized" icon="arrows-rotate">
+    Scheduled time, platform labels, post text, and private Harmonia item references.
+  </Card>
+  <Card title="What stays manual" icon="hand-pointer">
+    Every Add, Update, and Remove operation requires an explicit click by the signed-in operator.
+  </Card>
+</CardGroup>
+
+## Before you begin
+
+You need:
+
+- a Google Cloud project with the Google Calendar API enabled;
+- an OAuth 2.0 Web application client;
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` configured on the Harmonia web service; and
+- an authorized redirect URI for every Harmonia origin:
+
+```text
+https://YOUR_ORIGIN/api/oauth/google-calendar/callback
+```
+
+The OAuth consent screen must allow the single scope Harmonia requests:
+
+```text
+https://www.googleapis.com/auth/calendar.app.created
+```
+
+This scope lets Harmonia create and manage its own secondary calendar. It does not grant access to unrelated calendars or events.
+
+## Connect Google Calendar
+
+<Steps>
+  <Step title="Open connected accounts">
+    Go to **Dashboard → Settings** and find **Google Calendar**.
+  </Step>
+  <Step title="Start scoped OAuth">
+    Select **Connect with OAuth 2.0**. Harmonia sends the browser to Google; tokens never pass through client-side application state.
+  </Step>
+  <Step title="Review consent">
+    Approve the app-created-calendar permission. If the consent screen asks for access to all calendars, stop—the configured scope is wrong.
+  </Step>
+  <Step title="Return to Harmonia">
+    Confirm that Google Calendar is shown as connected for the current workspace.
+  </Step>
+</Steps>
+
+Harmonia creates **Harmonia Content Calendar** on the first approved item sync, not during OAuth. A durable provisioning claim prevents concurrent first-sync requests from creating multiple calendars.
+
+## Add a scheduled item
+
+<Steps>
+  <Step title="Schedule a draft">
+    Give the content item a future time in Harmonia’s content calendar.
+  </Step>
+  <Step title="Review the projection">
+    Open the item and check its post text, platforms, and scheduled time.
+  </Step>
+  <Step title="Approve the external mutation">
+    In **Google Calendar**, select **Add to Google Calendar**.
+  </Step>
+  <Step title="Confirm verification">
+    Wait for a verified timestamp and an **Open verified event** link. A green connection badge alone is not proof that an event exists.
+  </Step>
+</Steps>
+
+The click is the approval for this external calendar mutation. The background worker and internal service token cannot call the mutation route.
+
+Harmonia creates a transparent 30-minute event at the content item’s scheduled time. It records success only after reading the event back from Google and matching its identity, time, text, platforms, and private Harmonia references.
+
+## Update a synchronized item
+
+Editing the post text, platforms, schedule, or status does not silently alter Google Calendar. Harmonia marks the item **update required**.
+
+<Steps>
+  <Step title="Open the stale item">
+    The item shows **update required** after its text, platforms, schedule, or status changes.
+  </Step>
+  <Step title="Review and approve">
+    Check the new projection, then select **Update Google Calendar**.
+  </Step>
+  <Step title="Confirm the new verification">
+    Verify that the timestamp advances and the Google event link remains available.
+  </Step>
+</Steps>
+
+If the item changes while the Google request is running, Harmonia retains **update required** instead of claiming the older projection is current.
+
+## Remove an event
+
+<Steps>
+  <Step title="Open a synchronized item">
+    Confirm that you are removing the correct external event; the Harmonia content item will remain.
+  </Step>
+  <Step title="Approve removal">
+    Select **Remove from Google Calendar**.
+  </Step>
+  <Step title="Confirm verified absence">
+    Wait for Harmonia to report **removed**. Harmonia verifies Google returns `404` or `410` before storing that state.
+  </Step>
+</Steps>
+
+Removal deletes only the Google event. It does not cancel or delete the Harmonia content item. Repeating removal is an idempotent no-op whose absence is verified again.
+
+## Recover from a failure
+
+<AccordionGroup>
+  <Accordion title="Authorization expired" icon="key">
+    Reconnect under Settings. Reauthorization preserves the existing Harmonia calendar identity and keeps the prior refresh token when Google omits a new one.
+  </Accordion>
+  <Accordion title="Update required" icon="rotate">
+    The Harmonia item changed after its last verified sync. Review the projection and select **Update Google Calendar**.
+  </Accordion>
+  <Accordion title="Synchronization failed" icon="triangle-exclamation">
+    Retry from the item drawer. Harmonia preserves the previous verified event link, ETag, source revision, and timestamp while showing the failure.
+  </Accordion>
+  <Accordion title="Provisioning outcome uncertain" icon="circle-question">
+    Inspect Google Calendar before reconnecting. Harmonia locks provisioning because a lost response might still have created the calendar; automatically retrying could create a duplicate.
+  </Accordion>
+  <Accordion title="Harmonia calendar removed in Google" icon="calendar-xmark">
+    Confirm that the app-created calendar is gone before reconnecting. Harmonia does not silently replace a missing calendar.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Disconnecting removes Harmonia’s stored credentials. It does not delete the user-owned secondary calendar or any events already in it.
+</Warning>
+
+## Disconnect
+
+Select **Disconnect** under Settings to remove Harmonia’s workspace-scoped credentials. Disconnecting does not delete the user-owned secondary calendar or its events.
+
+For endpoint, state, retry, and verification details, see [Google Calendar sync reference](/google-calendar-reference).

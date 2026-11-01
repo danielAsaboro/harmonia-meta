@@ -1,0 +1,44 @@
+---
+title: "Bounded autonomy and operational KPIs"
+description: "Where Harmonia reasons, where deterministic code controls execution, where humans retain authority, and how the demo is measured."
+---
+
+Harmonia uses **bounded agency inside a durable workflow**. Gemini/ADK handles ambiguous media understanding and creative judgment. Deterministic code owns state transitions, validation, policy, cost reservation, idempotency, effects, and verification. A human owns consequential authorization. This hybrid design deliberately limits nondeterminism where correctness and accountability matter.
+
+## Authority by stage
+
+| Stage | Primary mode | What may vary | What cannot vary / stopping condition |
+|---|---|---|---|
+| collect_sources | deterministic workflow | provider availability and snapshot contents | sealed manifest, bounded source validation, and visible operator resolution for unsupported/unauthorized sources |
+| extract_sources | agentic cognition inside deterministic workflow | Gemini media segments | normalized artifact schema, exact source digest, typed locators, budget, timeout, and visible failure contract |
+| understand | agentic cognition | Nimi's grounded moments and trend/meme angles | supplied evidence bounds, schema, and role policy |
+| strategize | agentic cognition | Ryan's four-week strategy and source-grounded briefs | strict context/evidence IDs, provenance validation, and a fail-closed allow-listed strategy-skill trace |
+| awaiting_strategy_approval | deterministic authority | exact strategy decision | authenticated actor, canonical digest, expiry, and one-revision limit |
+| plan | agentic cognition inside deterministic workflow | Temi's skill-guided sequencing, cadence, supported channel/format, windows, deadlines, dependencies, and priorities using request-bound snapshot reads | deterministic snapshot assembly/persistence, strict trace and plan validation, canonical digests, deterministic eligible-item selection; no mutation or effect authority |
+| draft | separate agentic Noni and Dara batch calls inside a deterministic bounded loop | typed multi-format content and structured editorial judgment | exact approved output plan; one original batch plus at most one issue-bound revision; exact lineage and evidence; every artifact must pass review; no effect authority |
+| awaiting approval | human authority | approve or reject each proposed action | no external effect until a durable human decision exists |
+| publish/export | deterministic workflow | provider response | official X post/thread or LinkedIn publication requires exact approval; internal artifact export is digest-bound and idempotent |
+| verify | deterministic workflow | observed external/stored state | fresh official API read or dual-object byte reread; content packs require already-verified constituents |
+| learn/memory | deterministic eligibility plus bounded context | eligible preference/outcome facts | evidence-linked workspace/brand scope; failure cannot erase an effect receipt |
+
+Chat and Telegram are control surfaces, not the autonomous core. The asynchronous pipeline continues in the background and every surface reaches the same policy and approval boundary.
+
+The dashboard's operational projection is also a control surface, not workflow truth. It compiles Firestore jobs, approvals, connection health, resident attention, and unknown effects into a reconnectable needs-you inbox and compact job shells. Epoch-fenced pause, resume, and cancellation commands update durable control state; workers enforce that state when admitting new stage or effect claims.
+
+Resident autonomy extends that core with Heartbeat, Micro-reflection, Dream Cycle, and Wakeup Call. It does not extend model authority: verified live evidence and deterministic bounds decide what may be learned; protected changes require humans; reversible automatic tuning is restricted to an explicit allowlist. Replay and fixtures remain historical development inputs and cannot promote configuration.
+
+The autonomous core is the persisted job/effect-command pipeline driven by Pub/Sub. The full-deployment script configures an OIDC-authenticated Cloud Scheduler invocation to run the lease-protected durable tick once per minute; stage-outbox recovery, scheduled work, proactive checks, and retention are isolated arms. Telegram interaction uses the authenticated webhook surface. The current web-only preview has not deployed this runtime.
+
+## Demo KPI contract
+
+| KPI | Definition | Evidence source | Current status |
+|---|---|---|---|
+| hands-off processing time | persisted job creation → first `awaiting_approval` event | Firestore job/events with one trace | pending authenticated run |
+| approval latency | durable approval timestamp → effect receipt timestamp | decision + receipt | pending authenticated run |
+| approved-output yield | approved actions with verified outcomes ÷ approved actions | decisions, receipts, verification | pending authenticated run |
+| publish/verify success | verified real effects ÷ attempted approved effects | effect and independent readback/digest | pending authenticated run |
+| duplicate-effect prevention | replay returns `already_applied` with the original receipt and creates no second effect | replay record + receipt/API readback | required by evidence verifier; pending authenticated run |
+| cost per verified asset | reconciled observed model/media USD ÷ verified output count | immutable usage records + verification | pending authenticated run |
+| operator steps eliminated | observed manual baseline steps minus actual Harmonia operator actions | time-stamped operator baseline worksheet + run events | pending a measured baseline; never inferred from code |
+
+The verifier computes consistency from redacted records; authenticated Cloud Run, Agent Engine, Firestore, Pub/Sub, model, effect, and verification exports establish provenance. Until that run exists, numeric KPI values remain explicitly pending rather than estimated or fabricated.

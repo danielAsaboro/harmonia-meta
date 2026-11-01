@@ -1,0 +1,29 @@
+---
+title: "Evaluate Harmonia"
+description: "A practical path for testing contracts, agent quality, authority boundaries, and end-to-end evidence."
+---
+
+Evaluation has three layers: deterministic contract tests, offline agent-quality fixtures, and authenticated evidence runs. Passing an earlier layer does not prove a later one.
+
+## 1. Contract and application checks
+
+Run `npm test -- --run`, `npm run lint`, `npx tsc --noEmit`, and `npm run build`. These verify schemas, state transitions, APIs, UI behavior, documentation, and production compilation without claiming a cloud effect.
+
+## 2. Agent evaluations
+
+Run the Python suite under `agent/tests/`. Cases cover grounded output, missing evidence, invented references, authority overreach, incomplete contracts, revision boundaries, and eligible Memory Bank context. The evaluators in `agent/harmonia_agent/evaluation_contracts.py` fail closed on prohibited or ungrounded output.
+
+## 3. Vertical-slice evidence
+
+Follow [Evidence runbook](/evidence-runbook). Use an authorized real source, authenticated providers, exact approval digests, immutable receipts, and independent read-back verification. Never substitute fixtures or mock mode for authenticated proof.
+
+## Interpreting results
+
+| Result | Establishes | Does not establish |
+|---|---|---|
+| Unit tests pass | Local contract behavior | Provider availability |
+| Build passes | Production compilation | Deployment success |
+| Authenticated invocation | Provider accepted one request | End-to-end correctness |
+| Receipt plus verification | Applied effect was independently observed | Future reliability |
+
+Record known gaps explicitly and link evidence to immutable identifiers rather than screenshots alone.

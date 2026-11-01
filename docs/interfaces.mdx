@@ -1,0 +1,68 @@
+---
+title: "Operator Interfaces"
+description: "Dashboard, chat console, and Telegram — one pipeline behind every surface."
+---
+
+Harmonia exposes the same job submission, status, drafting, and approval surface through three interfaces. None of them bypasses an action that policy marks approval-required; safe internal artifact actions remain explicitly `not_required` on every surface.
+
+## Dashboard
+
+- **Console** — conversational home; create jobs, check status, list typed artifacts, approve
+- **Proposals** — inbox for the proactive agent's autonomous topic ideas
+- **Editorial plan** — the complete persisted Temi plan and exact deterministic item lifecycle: planned → selected → drafting → reviewed → awaiting_approval. Approval, scheduling, external calendar synchronization, and publishing are downstream effects; they are not Temi plan-item states. Google Calendar Add/Update/Remove remains an explicit operator action available only after content is separately scheduled and the scoped connection is active.
+- **Monitoring** — searchable event log, job table, asset gallery, receipts ledger
+- **Settings** — typed company, audience, positioning, campaign, channel, and safety context that bounds Ryan's strategy
+- **Notifications** — bell with unread counts for approvals needed, proposals, failures, learnings
+
+## Chat console
+
+The full Console uses `POST /api/chat/stream` for durable, replayable NDJSON events and A2UI surfaces. `POST /api/chat` remains the JSON compatibility contract used by Telegram and contextual Drawer requests.
+
+The Console supports direct resumable uploads for images, video, audio, and documents. Jobs can begin from an authorized YouTube or public web URL, a ready uploaded file, pasted factual context, or an operator brief. The interface shows upload progress, agent activity, tool status, task plans, queues, safe reasoning summaries, generated assets, and explicit confirmation cards. It never renders raw chain-of-thought.
+
+Natural-language control:
+
+| Say | Intent |
+|---|---|
+| "turn \<youtube url\> into clips" | `create_job` from video |
+| "turn this report into a launch thread" + upload | `create_job` from a document |
+| "create posts from \<public url\>" | `create_job` from a webpage |
+| "make posts about our billing launch" (≥20 chars) | `create_job` from topic brief |
+| "status" / "status of job \<id\>" | `status` |
+| "show artifacts for \<id\>" | `list_artifacts` |
+| "approve [job \<id\>]" | `approve` |
+
+Existing action confirmations call the same `/api/jobs/{jobId}/actions/{actionId}/decision` endpoint as the dashboard. A generic A2UI confirmation can reference only a server-created, tenant-scoped, expiring `pending_operation`; unknown handlers, stale decisions, and replays fail closed.
+
+Intent parsing uses Gemini structured output. Conversations persist per surface so history renders in the console.
+
+### Agent-answered questions
+
+Anything outside the fixed intent grammar routes to **Nova**, the skill-enabled
+ADK liaison (`nova_liaison`). Nova loads exactly one of five filesystem skills
+— `trend-scan`, `job-status`, `signal-watch`, `posting-schedule`, or
+`engagement-insights` — before using its read-only tools. Each typed answer is
+bound to the actual tool trace and displays the evidence ID for every factual
+claim. Typed absence and dependency errors remain visible; derived posting
+windows include confidence and limitations. Nova cannot approve, schedule,
+publish, retry jobs, create receipts, or mutate Firestore.
+
+The floating Drawer deliberately stays smaller: it reuses the trusted message, attachment, and confirmation renderers while retaining the JSON chat contract.
+
+## Chat with any item
+
+Every dashboard page has the floating chat drawer, and any record can become the conversation's context: job detail headers, calendar item drawers, and proposal cards carry an **Ask AI** button that opens the drawer scoped to that exact record (a violet context chip shows what is in scope).
+
+Questions are answered **strictly from that record's data** — stage, drafts, actions, verification results, schedules, published URLs — never invented. Contextual chat is read-only: it explains and navigates; it never mutates. Actions like approvals still flow through the normal gates.
+
+```json
+POST /api/chat
+{
+  "message": "why is this stuck?",
+  "context": { "kind": "job", "id": "<jobId>" }
+}
+```
+
+## Telegram bot
+
+The same intents run over the official Bot API, using one workspace-owned bot connection and one allowed chat. Settings registers the webhook through `setWebhook`; ordinary allow-listed messages enter the canonical chat router; replies use `sendMessage`. Ryan proposals receive expiring, digest-bound inline controls. Approval is a one-tap authenticated callback; rejection opens a bounded ForceReply prompt and records the decision only after the operator supplies notes. Nonces and feedback prompts are single-consumption Firestore records. A plain "approve" message only lists pending actions. Automated tests cover this contract, but a real bot exchange is still an external evidence gate.

@@ -1,0 +1,23 @@
+---
+title: "Glossary"
+description: "Shared vocabulary for Harmonia's agents, workflow, authority, evidence, and operations."
+---
+
+| Term | Meaning |
+|---|---|
+| Action | A proposed unit of work attached to a job; it is not authority to execute. |
+| Agentic | Produced through model reasoning and therefore not deterministic. |
+| Approval digest | SHA-256 identity binding a decision to the exact payload shown to an operator. |
+| Effect | A change outside pure reasoning, such as publishing, exporting, rendering, or calendar mutation. |
+| Effect claim | A leased, idempotent right for one worker attempt to execute a command. |
+| Evidence reference | An identifier that points to supplied source, performance, memory, or operator context. |
+| Firestore truth | The durable workflow record used to decide what may happen next. |
+| Memory Bank fact | Eligible cross-job context with provenance; never approval or authorization. |
+| Operation ID | Identifier for one logical operation across retries and telemetry. |
+| Receipt | Immutable record of what an executor reports it did. |
+| Replay | Re-execution or reconstruction that must preserve idempotency and provenance. |
+| Strategy approval | Human decision bound to Ryan's exact strategy digest; separate from effect approval. |
+| Trace ID | Correlation identifier spanning application, worker, and telemetry events. |
+| Verification | Independent read-back of the externally observable result linked to its receipt. |
+
+See [Authority matrix](/reference/authority-matrix) for who may perform each decision and [Receipts and verification](/reference/receipts-verification) for the evidence chain.

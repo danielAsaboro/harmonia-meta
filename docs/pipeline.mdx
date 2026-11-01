@@ -1,0 +1,93 @@
+---
+title: "The Pipeline"
+description: "Stage by stage: collect sources, extract sources, understand, strategize, approve strategy, plan, draft, approve effects, publish, verify, learn."
+---
+
+Harmonia's pipeline is a linear stage machine. Each completed stage persists its payload and atomically records the next trigger in a Firestore outbox. Pub/Sub publication is claimed and finalized from that outbox; the durable tick recovers pending delivery after a crash.
+
+```mermaid
+flowchart LR
+    Q[queued] > I[collect_sources] > T[extract_sources] > U[understand] > S[strategize] > SA[awaiting_strategy_approval] > P0[plan] > D[draft] > A[awaiting_approval]
+    A -- approved --> P[publish] > V[verify] > L[learn] > C[complete]
+    A -- rejected/skipped --> C2[complete]
+```
+
+## collect_sources
+
+Loads the sealed source manifest and its independent source records. Direct inputs and the exact selected brand-library snapshot remain distinguishable, and a failed source pauses at `awaiting_source_resolution` instead of being discarded.
+
+## extract_sources
+
+Normalizes every ready source behind one typed artifact contract. Gemini 3.5 Flash creates timed segments for authorized audio and video; deterministic extractors normalize documents, web pages, and pasted text. Each segment carries a source ID, digest, and typed locator. A replacement or exclusion seals a new manifest revision before execution resumes.
+
+## understand
+
+Nimi receives the typed source package and returns `SourceAnalysis`. Deterministic validation checks
+source identity, evidence bounds, provenance, confidence, and analysis-only authority before persisting
+the complete object and canonical digest. Ryan receives that exact persisted analysis. See
+[Nimi](/agents/nimi) for its method and [agent contracts](/reference/agent-contracts) for the handoff.
+
+## strategize
+
+Ryan turns the persisted analysis and bounded operator, performance, and eligible Memory Bank context
+into one four-week `ContentStrategy` with grounded briefs. Application code validates its evidence
+lineage and authority, then persists the proposal, version, and canonical digest. See
+[Ryan](/agents/ryan) for the strategy method.
+
+## awaiting_strategy_approval
+
+An authenticated human decision must match the current strategy digest. One rejection with required
+operator feedback permits strategy version 2; a second rejection terminates the job. Temi cannot run
+for a missing, rejected, expired, or mismatched approval. Dashboard, chat, and allow-listed Telegram
+decisions use the same tenant-scoped transaction.
+
+## plan
+
+Application code persists one immutable planning snapshot containing capabilities, commitments,
+capacity, cadence policy, posting-window observations, assets, dependencies, and calendar projection.
+Temi receives its exact ID and digest alongside the unchanged approved strategy and Nimi analysis.
+After validating and persisting Temi's plan, deterministic code selects one eligible item for
+production. Temi never mutates an external calendar. See [Temi](/agents/temi).
+
+## draft (typed artifact production)
+
+Noni receives only the selected editorial item, exact Ryan brief, and referenced Nimi evidence. Dara
+reviews every requested typed artifact against immutable input. Deterministic code permits at most one issue-bound
+Noni revision, validates the complete batch, and prepares effect proposals from accepted content. See
+[Noni](/agents/noni) and [Dara](/agents/dara); the full skills and tools inventory is
+[here](/reference/agent-runtime-inventory).
+
+Every action lands with `requiresApproval`, risk level, and its own idempotency key material.
+
+## optional media production plan
+
+Accepted content can be expanded into a versioned production plan for clips, reels, generated b-roll, soundtrack, captions, and deterministic composition. The plan binds every scene to authorized source excerpts or approved conditioning artifacts, records exact estimated and maximum cost, and remains inert until the operator seals and approves the current revision. Revision, explanation, status, approval confirmation, and cost-free rerender requests are available through the same conversational surface.
+
+Paid provider operations are isolated behind the production outbox and immutable mandate. Provider operation identities, submitted source digests, generated artifacts, and failures are persisted independently. A cost-free rerender may reuse verified provider artifacts but cannot create another paid operation or alter publication authority.
+
+## awaiting_approval
+
+Hard gate for X and LinkedIn publishing, image generation, and paid Veo/Lyria generation. Approvals arrive through the dashboard queue, chat confirmation, or a Telegram inline-button callback — all through the same decision engine. Conversational intent can locate and explain a decision, but cannot manufacture approval. Deterministic content-artifact export and local ffmpeg rendering remain internal actions with `approvalState: not_required`.
+
+## publish
+
+Executes policy-authorized actions in dependency order, checking effect claims and receipts first for idempotency. Dependencies are part of the immutable command digest and are rechecked transactionally before claim ownership is granted. Approval-required actions must carry the exact matching decision; internal artifact actions execute under their deterministic safe-action mandate:
+
+| Action | Effect |
+|---|---|
+| `publish_x_post` | POST to X API v2 `/2/tweets`; receipt carries post id + URL |
+| `publish_x_thread` | Ordered, resumable X reply chain with each confirmed post id durably checkpointed |
+| `publish_linkedin_post` | Official LinkedIn API post to an exact connected destination |
+| `export_content_artifact` | Immutable canonical JSON plus deterministic Markdown; both byte streams are hash-verified |
+| `generate_image` | Approval-gated Muse Image (`POST /v1/images/generations`) PNG bytes into the asset store |
+| `render_clip` / `render_reel` | Real ffmpeg cuts/captions/reframes into the asset store |
+
+Failures are classified: permanent errors stop the job visibly, transient errors nack for redelivery.
+
+## verify
+
+Independent re-fetch of every executed action: X posts and threads re-read by id, LinkedIn posts re-read through the official API, and both exported artifact byte streams re-read and hash-checked. Results are immutable verification records — the receipt says what we *did*, verification says what is *true*.
+
+## learn
+
+Measures published posts via public metrics, derives evidence-linked takeaways, and stores eligible facts for future Nimi analysis and Ryan strategy inputs.

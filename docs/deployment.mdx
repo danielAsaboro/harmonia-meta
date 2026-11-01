@@ -1,0 +1,138 @@
+---
+title: "Deployment"
+description: "Target production topology on Google Cloud Run, Firestore, and Pub/Sub."
+---
+
+<Info>
+Harmonia's local stack uses the official Firestore and Pub/Sub emulators and exercises the same application contracts. Emulator success is not Google Cloud deployment evidence. This page describes the target topology; use the post-deploy checks and evidence runbook to prove a particular deployment.
+</Info>
+
+## Target topology
+
+| Component | Service |
+|---|---|
+| Next.js web app | Cloud Run (with Firestore + Pub/Sub access) |
+| ADK worker | Cloud Run service with separate Pub/Sub **push subscriptions** to `/pubsub/push` and `/pubsub/production`, authenticated via OIDC service account |
+| Cognitive runtime | Vertex AI Agent Engine (mandatory in the managed worker; no in-process fallback) |
+| Long-term context | Agent Engine Memory Bank, exact workspace + brand scope |
+| State | Cloud Firestore (native mode) |
+| Stage triggers | Pub/Sub topic `harmonia-stages` |
+| Paid production triggers | Pub/Sub topic `harmonia-production` |
+| Media assets | Cloud Storage (`GCS_BUCKET`) |
+
+Firestore also owns the durable runtime's tenant-scoped `operations`, `event_inbox`,
+`stage_outbox`, `effect_commands`, `artifacts`, `context_projections`, and `recovery_work`
+collections. `infra/setup.sh` creates the composite index used to page expired operation
+leases deterministically; `firestore.indexes.json` is the reviewable source definition.
+
+## Provisioning outline
+
+```bash
+gcloud services enable run.googleapis.com firestore.googleapis.com \
+  pubsub.googleapis.com storage.googleapis.com aiplatform.googleapis.com cloudtrace.googleapis.com \
+  telemetry.googleapis.com monitoring.googleapis.com logging.googleapis.com
+
+gcloud firestore databases create --location=<region>
+
+gcloud pubsub topics create harmonia-stages
+```
+
+`infra/setup.sh` also creates regional staging and durable-media buckets. The media bucket uses uniform access, grants object access only to the two runtime service accounts, and is injected as `GCS_BUCKET` by `infra/deploy.sh`. Deployment configures CORS for the resulting Cloud Run web origin so direct resumable uploads do not depend on ephemeral container storage.
+
+`infra/setup.sh` provisions a generated `malware-scanner-token` and a dedicated scanner service
+account. `infra/deploy.sh` builds and deploys the repository's ClamAV scanner as an IAM-private Cloud
+Run service, grants invocation only to the web runtime, and mounts the shared token as a second
+application-level authentication boundary. Upload completion remains fail-closed for unavailable,
+timed-out, malformed, truncated, or incomplete scan results. Capture the ClamAV engine and definition
+version from a real clean scan before presenting uploaded-media operation as production evidence.
+
+Create one runtime service account for each Cloud Run service. The worker needs `roles/cloudtrace.agent`, `roles/logging.logWriter`, and `roles/monitoring.metricWriter`; preserve the existing least-privilege data, messaging, and asset permissions. The web identity can sign only as itself for short-lived upload/download URLs. The Pub/Sub service agent receives token-creator authority only on that web identity so the private worker push subscription can authenticate with OIDC.
+
+Setup also creates `harmonia-scheduler`. Deployment grants it `roles/run.invoker` only on the private
+agent service and converges the `harmonia-durable-autonomy` Cloud Scheduler job to an every-minute
+OIDC POST. Do not enable the legacy resident loops in Cloud Run; stage-outbox recovery, scheduled
+publishing, proactive checks, and retention are driven by this durable external tick and protected by workspace leases.
+
+Deployment also converges `harmonia-durable-recovery`, a separate OIDC-authenticated five-minute
+wake for model-free recovery. Its scan limit, deadline, retry ceiling, and cost ceiling are explicit
+environment values. The split makes missed-work recovery independently observable and prevents a
+slow cognitive arm from delaying lease repair. Concurrent tick and recovery delivery is safe because
+recovery rechecks leases transactionally and emits idempotent recovery-work identities.
+
+Resident Heartbeat, Dream, and Wakeup schedules are separate and disabled by default. They are provisioned only when `HARMONIA_ENABLE_RESIDENT_AUTONOMY=1`; `HARMONIA_WORKSPACE_TIMEZONE` controls their timezone. This repository state is not evidence that those jobs are deployed. Keep the flag off during local and recorded-replay development.
+
+## Deploying
+
+Both services use digest-pinned base images and exact dependency inputs:
+
+- Web app: standalone Next.js image from `Dockerfile`
+- Worker: Python image from `agent/Dockerfile` and `agent/requirements.lock`
+
+`infra/deploy.sh` builds each image once with the source commit as its tag, resolves the Artifact Registry SHA-256 digest, and deploys that exact `tag@digest`. It then fails closed unless Cloud Run reports a revision and image digest, emitting one `RELEASE_IDENTITY` line per service for the private release log. The script does not deploy mutable tags or reuse a separately rebuilt demo image.
+
+Set the [configuration](/configuration) secrets as Cloud Run environment variables (Secret Manager for tokens). With `PUBSUB_EMULATOR_HOST` unset, both clients connect to real Google Cloud services automatically.
+
+The deployment script sends each role model ID separately, including `COPYWRITER_MODEL_ID` for Noni and `PRESENTER_MODEL_ID` for Maya. Noni defaults to Gemini 3.5 Flash because ADK skill loading is part of the writing contract.
+
+Noni's brief-scoped public research uses Meta Model API `web_search` with the same
+`MODEL_API_KEY` and needs no separate search credentials. Verified prior-publication
+search remains available through the authenticated tenant-scoped internal API.
+
+Deploy a fresh cognitive-hierarchy revision for every rollout that changes ADK agents, schemas, **or skill definitions** (`agent/harmonia_agent/skills/` — the liaison's skills load from the deployed package at import time), then point the Cloud Run worker at the returned resource:
+
+```bash
+cd agent
+./.venv/bin/python -m harmonia_agent.agent_engine_deploy \
+  --project "$PROJECT_ID" \
+  --location "$REGION" \
+  --staging-bucket "gs://$PROJECT_ID-harmonia-agent-staging" \
+  --service-account "harmonia-agent@$PROJECT_ID.iam.gserviceaccount.com"
+```
+
+Set the returned full `AGENT_ENGINE_RESOURCE` and `MEMORY_BANK_RESOURCE` (they may identify the same reasoning engine) before running `infra/deploy.sh`. The Cloud Run script does not update Agent Engine and must never be given a pre-change resource after the hierarchy gains a specialist such as `maya_presenter`. Cloud deployment always enables Memory Bank and fails before rollout when either managed resource is absent. Workspace and brand scopes come from each authenticated job rather than deployment configuration. To expose paid media proposals, set `GENERATIVE_MEDIA_ENABLED=true`. The worker identity already receives Vertex prediction access in `infra/setup.sh`; Memory Bank retrieval/generation and Veo/Lyria calls fail visibly if unavailable.
+
+`REGION` controls regional infrastructure placement, not end-to-end data residency. Setup verifies the Firestore database and Agent Engine staging bucket location and applies a Pub/Sub message-storage policy with in-transit enforcement. Agent Engine, Memory Bank, and Veo resources must match that region. Transcription and image generation call the Meta Model API (`META_API_BASE_URL`, bearer `MODEL_API_KEY` from the `model-api-key` secret). Transcription decodes media locally with ffmpeg to mono 16-bit 24 kHz WAV and uploads it to Muse Voice Transcribe in clips of at most 590 seconds, so media bytes leave Google Cloud for Meta. Lyria uses a global endpoint and remains disabled unless `ALLOW_GLOBAL_LYRIA=true`. These controls are not a regulatory certification or a guarantee that model inference stays in one region.
+
+The deployed worker does not contain process-resident scheduler, polling, or proactive supervisors. Cloud Scheduler drives the durable tick, and Firestore workspace leases plus stage/effect claims make concurrent delivery safe.
+
+Enable Google as the Identity Platform provider and register the deployed web origin and redirect domain. Pass the registered web application's public Identity Platform configuration to `infra/deploy.sh`. A user's first Google sign-in creates the owner workspace automatically.
+
+
+## Health and observability
+
+- `GET /healthz` on the worker reports model id and registered stages
+- Worker and web health responses report only non-secret durable protocol/compiler capabilities;
+  the worker also reports recovery bounds so a deployed revision can be checked against policy
+- Pub/Sub push delivery has explicit 10-second minimum and 10-minute maximum retry delay, seven-day
+  retention, five delivery attempts, and a regional dead-letter topic
+- The job event log, receipts ledger, and verification records in Firestore provide end-to-end audit trails
+- Every stage failure is classified permanent vs transient; transient failures rely on Pub/Sub redelivery
+- W3C context crosses Pub/Sub and internal HTTP, correlating web, stage, agent, model, and validation spans
+- Firestore usage records retain the trace ID, operation ID, role, model, usage units, cost estimate, and pricing version
+- `/api/metrics` aggregates model calls and estimated cost by role/model using integer microdollars
+- Google ADK exports structured logs, standard agent/tool/token metrics, and invocation/tool/model spans to the corresponding Google Cloud backends when telemetry is enabled
+- **Monitoring → Agent activity** reads a tenant-scoped, metadata-only Firestore projection with server-side filters and opaque cursor pagination
+
+Configure a Firestore TTL policy for the `agent_activity` collection group using `retentionDeleteAfter` as the expiration field. The application writes a 30-day expiry timestamp, but Firestore does not delete expired documents until the TTL policy exists.
+
+Content capture must remain disabled in every deployed revision. Raw prompts, responses, transcripts, draft text, and media bytes are excluded; observability records the execution graph and explicit validation/delegation metadata, not private reasoning.
+
+## Post-deploy verification checklist
+
+Completing deployment commands is not acceptance. A deployment becomes claimable only when the observed resources and one authenticated run satisfy this checklist:
+
+1. Create a job from the deployed dashboard URL and watch it reach `awaiting_approval`.
+2. Read one job usage record and copy its `traceId`.
+3. Locate the same trace in Cloud Trace; confirm the Pub/Sub stage, Agent Engine invocation, memory lookup, agent/model generation, and validation spans are correlated.
+4. Confirm span attributes contain identifiers and usage metadata but none of the job's source or generated text.
+5. Compare the usage record's estimate with `/api/metrics`; keep platform estimates distinct from observed billing data.
+6. Approve an action and confirm its receipt and independent verification record.
+7. Approve one Veo or Lyria proposal, confirm its cost reservation, provider-operation record, stored asset digest, usage record, and independent verification.
+8. Interrupt a worker after a durable boundary, invoke `harmonia-durable-recovery`, and confirm the
+   replacement attempt resumes with a newer epoch while the stale token is rejected.
+
+<Warning>
+Authenticated multimodal Gemini, Agent Engine, Memory Bank, Veo, Lyria, and Cloud telemetry execution are not verified merely by deploying this code. Capture a correlated trace plus its persisted sessions, memory operation, media operation, and usage records before presenting those integrations as live evidence.
+
+Follow [How to capture Google Cloud deployment evidence](/cloud-proof) before recording the submission video.
+</Warning>

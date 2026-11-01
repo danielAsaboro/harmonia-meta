@@ -1,0 +1,50 @@
+---
+title: "Development"
+description: "Use explicit test fixtures, local emulators, and verification suites without confusing them with provider evidence."
+---
+
+## Test boundaries
+
+Unit tests inject explicit collaborators at function boundaries. Shipped runtime code has no provider-success fixture mode: Gemini and official publisher calls either execute with real credentials or fail visibly. Firestore and Pub/Sub emulators exercise durable state and delivery locally; they do not constitute provider or deployment evidence.
+
+## Emulator-based workflow
+
+`scripts/dev.sh` pins both emulators to fixed ports and exports:
+
+```bash
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8081
+PUBSUB_EMULATOR_HOST=127.0.0.1:8082
+GOOGLE_CLOUD_PROJECT=harmonia-local   # any project id works against emulators
+```
+
+The worker consumes stage triggers through a pull loop against the Pub/Sub emulator — the same dispatch path as the Cloud Run push receiver in production.
+
+## Test suites
+
+```bash
+# Web: lint, types, unit tests (vitest)
+npm run lint && npx tsc --noEmit && npm test
+
+# Worker: pytest
+cd agent && ./.venv/bin/python -m pytest tests -q
+```
+
+Worker tests set non-secret dummy configuration via `agent/tests/conftest.py` and inject provider responses only inside individual tests.
+
+## Useful local endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/proposals` | Proactive proposal inbox feed |
+| `GET /api/content-items` | Calendar items |
+| `GET /api/notifications` | Bell notifications |
+| `POST /api/chat` | Chat surface (`{message, surface}`) |
+| `POST /api/chat/stream` | Durable Console stream (`{message, surface, attachmentIds}`), NDJSON response |
+| `POST /api/chat/attachments/session` | Create a validated resumable upload session |
+| `POST /api/chat/attachments/{id}/complete` | Verify bytes, quarantine, scan, and mark ready only on a clean verdict |
+| `GET /api/chat/runs/{id}/events?after=N` | Replay persisted stream events after sequence `N` |
+| `GET /api/internal/insights` | Verified engagement and eligible context fed into Nimi/Ryan |
+
+Internal routes require service authentication plus workspace and brand headers. Dashboard routes require a verified Google session and derive the workspace from server-side membership.
+
+Cloud Storage direct uploads require bucket CORS to permit the deployed web origin to `PUT` the allowed content types and expose resumable-upload response headers. The application never sends Cloud Storage credentials to the browser; it returns only the single-object resumable session URL. With `GCS_BUCKET` unset, the authenticated local upload route stores bytes in `.data/artifacts`.

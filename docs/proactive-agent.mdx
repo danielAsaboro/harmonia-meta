@@ -1,0 +1,63 @@
+---
+title: "Proactive Agent"
+description: "How Harmonia monitors trends, engagement, calendar health and failures on its own — and proposes next steps."
+---
+
+Harmonia is not just reactive. A background agent inside the worker scans a registry of independent checks; each check runs on its own cadence with its last-run marker persisted (via the agent-state API), so restarts never double-fire daily work. Neither proposals nor notifications can publish anything — operator approval is always required.
+
+## The check registry
+
+| Check | Cadence | What it does |
+|---|---|---|
+| `trend_scan` | hourly | Front-page Hacker News signals -> 2-3 topic proposals with why-now reasons + sources |
+| `engagement_watch` | 6h | Outliers among published posts (>=2x median likes) -> follow-up proposals |
+| `publish_pulse` | hourly | Fresh metrics for posts less than 48 hours old; likes spikes fire momentum proposals immediately |
+| `morning_briefing` | daily | Digest: today's scheduled posts, pending approvals, waiting proposals, failed jobs (+ Telegram push) |
+| `stale_drafts_nudge` | daily | Draft items idle >7 days get a review nudge |
+| `failure_watchdog` | daily | Permanently failed jobs resurface as critical notifications until resolved |
+| `calendar_gap_scan` | weekly | Upcoming scheduled posts vs your weekly target; gaps -> fill ideas grounded in your goals + learnings |
+| `recycle_winners` | weekly | Top post older than ~3 weeks -> refreshed re-post concept |
+
+Every interval is env-overridable (`PROACTIVE_<NAME>_INTERVAL_SECONDS`), and each check fails independently: one broken source never blocks the others.
+
+## Where ideas come from
+
+- **Trend scan**: official Hacker News Algolia API (`https://hn.algolia.com/api/v1/search?tags=front_page`). Each proposal must cite the backing signal URLs.
+- **Trend, calendar-gap, and recycle proposals**: the proactive worker derives bounded proposals from observed signals, operator goals, and verified winners. Accepted learning inputs re-enter Ryan through the same `StrategistInput`; Ryan has no separate idea, gap, recycle, or final-post contract.
+- **Engagement watch / publish pulse / recycle**: derived from real public metrics of posts Harmonia published.
+
+## The proposal inbox
+
+Proposals appear in the dashboard under **Proposals** (sparkle icon in the nav rail), each showing source badge, status, reason, source links, and suggested post. New proposals also fire bell notifications.
+
+| Decision | Effect |
+|---|---|
+| **Approve & create job** | Composes topic + angle + reason + sources into an operator brief and starts a standard concept job through the normal pipeline — including its own approval gate before anything publishes |
+| **Dismiss** | Marks the proposal rejected; it never resurfaces |
+
+```mermaid
+sequenceDiagram
+    participant W as Proactive agent (worker)
+    participant S as External sources
+    participant Web as Web API
+    participant DB as Firestore
+    participant O as Operator
+    W->>S: fetch signals / insights
+    W->>W: coordinator delegates to strategist (Gemini or explicit mock)
+    W->>Web: POST /api/internal/proposals
+    Web->>DB: save proposals (dedup by id)
+    Web->>O: bell notifications
+    O->>Web: POST /api/proposals/decide {approved}
+    Web->>DB: create concept job (brief)
+    Web->>Web: publish understand stage trigger
+    Note over Web: pipeline proceeds; publishing still gated
+```
+
+## Configuration
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PROACTIVE_SCAN_SECONDS` | `60` | How often the agent looks for due checks |
+| `PROACTIVE_<NAME>_INTERVAL_SECONDS` | per check (see table) | Override any single check's cadence |
+
+Telegram briefing push uses the current workspace's Telegram connection. A workspace without a connection is skipped and logged without affecting other tenants.

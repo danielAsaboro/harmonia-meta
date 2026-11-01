@@ -1,0 +1,62 @@
+---
+title: "Approvals & Audit"
+description: "The approval gate, idempotency receipts, and independent verification."
+---
+
+## The approval gate
+
+Harmonia never takes a side-effecting external action without explicit operator approval. Actions proposed by the planner carry `requiresApproval: true` and `approvalState: pending`; only an operator decision moves them to `approved`, and only approved actions execute at the publish stage.
+
+All approval paths converge on one decision engine:
+
+- Dashboard approval queue (job detail view)
+- Chat: "approve" or "approve job \<id\>" on the dashboard surface
+- Telegram: parsed intent alone can *never* approve — the bot renders inline buttons and only the callback executes
+
+Scheduling is treated as approval for calendar items in `auto` mode; `approval` mode items additionally require a final review when they come due.
+
+Google Calendar synchronization has a separate, narrower approval boundary. Scheduling a Harmonia item does not mutate Google Calendar. Only the signed-in operator’s **Add**, **Update**, or **Remove** button calls `/api/calendar/google`; the worker’s internal bearer token is rejected. The route records success only after Google API read-back. See the [Google Calendar sync reference](/google-calendar-reference).
+
+This calendar verification record is stored on the content item rather than in the publishing receipt ledger. It proves the latest calendar projection or verified absence; it does not prove that a social post was published.
+
+## Claim-before-effect execution
+
+After approval, every worker must atomically claim the action's stable idempotency key before calling an external provider. The durable claim records the action, operation ID, trace ID, lease, and attempt. Only the worker receiving `execute` may call the provider.
+
+Commands may also carry immutable dependencies. A content-pack command, for example, depends on the constituent artifact-export commands. Those command IDs are included in the command digest, and the claim transaction refuses execution until every dependency has an applied receipt. Ordering in a worker loop is not treated as proof that a prerequisite completed.
+
+- `in_progress` means another live worker owns the claim; the delivery can retry without touching the provider.
+- `already_applied` returns the original receipt identity and suppresses the provider call.
+- `uncertain` means a claim expired without a receipt. Harmonia fails closed and requires operator reconciliation; it never automatically repeats an effect whose outcome is unknown.
+
+Receipt finalization atomically links the claim, immutable receipt, and action state. A receipt is evidence of an effect; it is not a substitute for the pre-effect claim.
+
+The Firestore concurrency integration test runs against a real Firestore emulator when `FIRESTORE_EMULATOR_HOST` is configured. The pure state-machine tests always run; authenticated production evidence remains required before making a live-cloud concurrency claim.
+
+## Idempotent receipts
+
+Every executed action writes a receipt containing:
+
+```json
+{
+  "actionType": "publish_x_post",
+  "idempotencyKey": "sha256(jobId + actionId + payload)",
+  "outcome": "applied | already_applied | rejected | failed",
+  "artifact": { "kind": "x_api", "url": "...", "fetchedAt": "..." },
+  "detail": { "id": "1800000000000001", "url": "..." }
+}
+```
+
+The publish stage claims the idempotency key before executing. A retried or re-delivered action with a finalized claim yields `already_applied` with the original receipt identity—never a duplicate tweet, image, or clip and never a new replay record. Operators can trigger **Prove duplicate suppression** in the audit UI; that control calls the same claim boundary, persists a replay observation, and is prohibited from executing an effect.
+
+## Independent verification
+
+Verification re-fetches evidence through a different path than execution:
+
+| Artifact | Method |
+|---|---|
+| Published post | GET from X API v2 by post id |
+| Content artifact or content pack | independent byte reread and exported-object digest comparison |
+| Image / clip / reel | byte-digest comparison against the asset store |
+
+Each result records target, method, evidence (with fetch timestamp), and a boolean. Jobs also assemble an **evidence packet** listing verified artifacts and any unresolved gaps — failures stay visible forever; nothing converts an error into simulated success.
