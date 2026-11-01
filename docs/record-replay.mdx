@@ -1,0 +1,26 @@
+---
+title: "Authenticated record and replay"
+description: "Capture, sanitize, review, and replay authenticated runs without fabricating evidence or mutating durable state."
+---
+
+Harmonia separates three unmistakable modes: `fixture` for deterministic tests, `recorded_replay` for local development from a prior sanitized authenticated run, and `live` for real authenticated execution. Firestore remains authoritative in `live`; replay is an inert, process-local historical projection.
+
+## End-to-end flow
+
+1. A deliberately selected `live` run writes normal durable job, ADK handoff, A2UI, approval, delivery, receipt, verification, usage, and trace records.
+2. The operator exports selected observations to private parent-level evidence storage. Source text requires explicit capture authorization.
+3. `npm run replay:record -- --input <private-input.json> --output <private-output.json>` projects allowlisted fields, rejects the entire capture if forbidden material appears, computes deterministic terminal state, and signs a `private_candidate` bundle.
+4. A human reviews the sanitized candidate. Public inclusion is a separate explicit decision that changes provenance to `approved_public_bundle`; it is never inferred.
+5. The local replay import endpoint validates the strict schema, sequence, release policy, terminal-state digest, and bundle integrity before creating a bounded in-memory session.
+6. Playback supports start, speed, pause, resume, stop, and reconnect using `after=<exclusive-sequence>`.
+7. The UI permanently displays “Recorded authenticated run — replay mode”, capture date, and bundle ID. Replay is not fresh provider or deployment evidence.
+
+Replay APIs never write Firestore or call approval, retry, OAuth, publishing, effect, receipt, or credential paths. Replayed approvals and receipts are historical observations, not capabilities.
+
+## Golden scenarios
+
+Success, awaiting approval, rejection, transient recovery, permanent failure, duplicate-effect suppression, scheduled autonomy, Memory Bank retrieval, and Telegram approval begin as `not_captured`. Do not fabricate a missing scenario. Promote one only after that behavior occurs authentically and passes sanitization and review.
+
+## Before the first capture
+
+Run the focused replay tests, the complete application suite, lint, TypeScript, production build, agent tests, and infrastructure tests. Only then resume one meaningful authenticated run. Verify replay reaches the same sanitized terminal-state digest, and scale costly cloud resources down afterward.

@@ -1,0 +1,50 @@
+---
+title: "State ownership and retention"
+description: "The authoritative owner, scope, lifetime, writers, readers, and retention boundary for every Harmonia state store."
+---
+
+Harmonia separates model context from operational truth. A model may receive a bounded snapshot and produce a typed handoff, but it cannot authorize a side effect or overwrite the durable workflow by changing conversation or session state.
+
+| Store | Scope | Lifetime | Writers | Readers | Retention | Source of truth |
+|---|---|---|---|---|---|---|
+| Invocation state | one managed cognition call | until the call ends | web/worker seeds validated JSON; ADK `output_key` and event `state_delta` add handoffs | coordinator and selected specialists | discarded after validation | no; typed transport only |
+| Managed ADK session | hashed workspace/user/job/operation/specialist | restart-resumable cognitive operation | Agent Engine event lifecycle only | managed runner for that operation | provider/deployment session lifecycle; job erasure remains Firestore/storage scoped | no; never workflow authority |
+| Firestore job | workspace + brand + job | workflow plus explicit retention policy | authenticated web internal routes and deterministic state machine | dashboard, worker, chat, evidence collector | terminal jobs receive a 90-day deletion deadline; holds block erasure | **yes** for stage, status, Temi's immutable planning snapshot and digest, the complete Temi editorial plan and digest/lineage, selected item lifecycle, artifacts, budget, and failure |
+| Approval decisions | workspace + job + action | durable audit record | authenticated decision engine after explicit operator input | publish stage, UI, evidence collector | retained with the job/audit record | **yes** for human authority |
+| Receipts and verification | workspace + job + action/idempotency key | durable and replay-relevant | deterministic executor writes receipt; independent verifier writes verification | worker, UI, monitoring, evidence collector | retained through judging and deployment audit policy | **yes** for effects and observed outcome |
+| Usage and reservations | workspace + job + operation | durable, immutable after finalization | budget service and provider usage normalizer | dispatcher, monitoring, evidence verifier | deployment accounting policy | **yes** for authorized/observed cost |
+| Chat history | workspace + authenticated user + interface + conversation | bounded conversational continuity | dashboard or allow-listed Telegram path | the same scoped operator/interface/conversation | maximum 300 messages; pruning stores metadata-only turn/time and linked-ID boundaries | no; cannot grant approval or reconstruct job state |
+| Memory Bank | exact workspace + brand | cross-session eligible knowledge | learn path writes only typed, evidence-linked decisions and verified outcomes | bounded analysis/strategy/drafting retrieval with fact IDs and Firestore provenance | provider/deployment policy, maximum five facts per retrieval/write | no; advisory context never grants authority |
+| Secrets | deployment or workspace integration | until rotation/revocation | deployment operator or authenticated connection flow | server-side minimum-permission adapters | secret-manager/rotation policy | **yes** for credentials; never copied to state, telemetry, chat, or evidence bundles |
+| Private evidence | one authorized demo/evaluation run | submission and judging evidence period | read-only collector and operator capture procedure | submission team and judges as authorized | private parent workspace; frozen at submission deadline | yes for claims, paired with authenticated provider exports |
+
+## Write rules
+
+- Retrieved session objects are read-only. Harmonia copies serializable input into a new seed object only on deterministic session creation, consumes only event `state_delta`, and validates required output keys. Firestore—not the managed session—governs recovery and authority.
+- Firestore mutations go through authenticated typed routes and deterministic transitions. Models cannot write approval, receipt, verification, credentials, or budget authority.
+- Nimi returns an agentic analysis proposal only. Deterministic code validates it against the exact typed source package, computes its canonical digest, and persists the complete `SourceAnalysis` and provenance in Firestore before Ryan can run. Memory Bank facts remain advisory inputs and never become authority.
+- Deterministic code first persists a canonical planning snapshot from tenant-scoped Firestore truth. Temi can read only that exact snapshot and returns an agentic proposal bound to its digest. Deterministic code validates the proposal against the snapshot and approved Ryan strategy, computes the plan digest, persists the complete plan, and selects exactly one eligible item. Noni receives only that selected item, its exact Ryan brief, and referenced Nimi evidence. Firestore persists Noni's original/revision drafts, Dara's structured reviews, the exact accepted draft, and a canonical trace digest before any approval-bound effect can advance.
+- Chat summaries contain counts, time boundaries, and durable job/run identifiers only. They never contain transcripts, drafts, approval decisions, credentials, or generated claims.
+- Memory facts carry workspace, brand, job, evidence kind, and durable record ID. Cross-scope or legacy untyped memories fail visibly instead of entering prompts.
+- Memory Bank context is advisory and never authorizes a plan item, selected item, schedule, approval, policy exception, or effect.
+- Retryable failures remain visible with a typed category/code and stop after the central attempt limit. A completed external effect remains governed by its receipt and verification even if later memory or reporting work fails.
+
+## Erasure lifecycle
+
+Terminal success and permanent failure set `retentionDeleteAfter` to 90 days. The authenticated
+internal retention tick deletes due jobs in bounded batches. An administrator may request earlier
+erasure through `DELETE /api/jobs/{jobId}`, but must submit the exact job ID plus a reason. Active
+jobs, retention holds, and jobs with scheduled, awaiting-review, or publishing content items fail
+closed.
+
+Erasure first writes a resumable tombstone, then removes tenant-scoped GCS/local objects, the source
+upload, asset metadata, denormalized event/notification/proposal records, derived content items, and
+the job document with every Firestore subcollection. The final tombstone contains IDs, actor, reason,
+timestamps, and `contentErased: true`; it contains no transcript, prompt, draft, media, credential, or
+effect payload. Storage deletion validates the configured bucket and exact workspace/brand prefix.
+
+Workspace owners can erase an entire workspace only with the literal confirmation `DELETE
+{workspaceId}` and a reason. The operation refuses active jobs, retention holds, and pending external
+work, removes all workspace-scoped storage objects and the Telegram webhook route, recursively erases
+the workspace document, and leaves only a top-level metadata tombstone. `npm run security:sbom`
+produces a CycloneDX 1.5 production SBOM from the committed lockfile, independent of checkout layout.

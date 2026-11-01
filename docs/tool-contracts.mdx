@@ -1,0 +1,37 @@
+---
+title: "Agent tool contracts"
+description: "The complete least-privilege contract for tools exposed to Harmonia's ADK liaison."
+---
+
+Only Nova, the read-only liaison, receives these tools. No model-accessible tool can approve, publish, retry a job, mutate credentials or budgets, delete data, or write Firestore. The deterministic workflow owns all effects.
+
+Every call returns exactly:
+
+```json
+{"status":"success|error","data":{},"error":null,"evidence":[]}
+```
+
+On failure, `data` is null, `evidence` is empty, and `error` contains only a stable `code`, category, safe message, and `retryable` boolean. Provider bodies, credentials, transcripts, drafts, and prompts are never returned. Mock-mode results explicitly carry `provenance: mock` and cannot be submission evidence.
+
+The Pydantic envelope rejects extra fields and impossible states: success requires data and forbids an error, while failure requires one typed error and forbids data or evidence. Nova preserves the final tool error's exact code, category, safe message, and retryability. Runtime failures use declared stable codes rather than raw exception text.
+
+| Tool | Input → output data | Scope / permission | Timeout / retry | Stable errors | Effect | Skills |
+|---|---|---|---|---|---|---|
+| `fetch_trend_signals` | limit 1–10 → public signals/count | public, read-only | 20s; one transient retry | dependency unavailable | none | trend scan, signal watch |
+| `search_trend_signals` | non-empty query, limit 1–10 → matching signals/count | public, read-only | 20s; one transient retry | invalid query, dependency unavailable | none | trend scan, signal watch |
+| `get_engagement_insights` | none → measured posts/takeaways | active workspace, read-only | 30s; one transient retry | authorization, dependency unavailable | none | engagement insights, posting schedule |
+| `get_operator_feed` | none → pending items/job health/goals/recent posts | active workspace, read-only | 30s; one transient retry | authorization, dependency unavailable | none | signal watch, posting schedule |
+| `get_job_status` | workspace job ID → redacted status summary | active workspace, read-only | 30s; one transient retry | invalid ID, not found, authorization, dependency unavailable | none | job status |
+| `suggest_posting_windows` | none → UTC windows and measured basis | active workspace, read-only | 30s; one transient retry | insufficient history, authorization, dependency unavailable | none | posting schedule |
+
+Skills require Nova to load exactly one matching skill first, call only its
+allow-listed read tools, use `data` only on success, and cite exact
+`evidenceId` values returned during that invocation. Deterministic callbacks
+record the actual sequence and envelopes; the output validator rejects unknown
+references, false `no_data`, hidden errors, invalid retries, and mutation or
+approval claims. Story and measured-post claims use record-level evidence;
+dataset evidence supports only aggregate claims.
+
+## MCP decision
+
+MCP is deliberately deferred. The core slice has no measured capability gap that justifies another runtime and credential boundary. A future adoption must use an authenticated remote server, explicit tool allow-list/filter, tenant-scoped credentials, the same envelope, and a read-only first capability; its failure cannot block the content pipeline.

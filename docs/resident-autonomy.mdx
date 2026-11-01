@@ -1,0 +1,40 @@
+---
+title: "Governed resident autonomy"
+description: "Operate Heartbeat, Dream Cycle, Wakeup Call, experiments, and rollback without widening model authority."
+---
+
+## Status
+
+| Capability | Implemented | Configured | Deployed | Authenticated evidence |
+|---|---:|---:|---:|---:|
+| Durable cycles, leases, recovery, agendas | yes | local | no | no |
+| Heartbeat, Dream, Wakeup endpoints | yes | disabled | no | no |
+| Bounded experiments and rollback | yes | local | no | no |
+| Autonomous operations dashboard | yes | local | no | no |
+
+This is an implementation statement, not deployment proof. No resident schedule or authenticated resident cycle has been captured.
+
+## How the control plane works
+
+Firestore owns tenant-scoped cycle identities, leases, observations, agendas, attention requests, experiments, and configuration revisions. Cloud Scheduler is only a wake source. The hourly Heartbeat runs cheap recovery and health arms independently. Micro-reflection projects allowlisted scalar facts after durable outcomes. The nightly Dream Cycle may synthesize typed reflections only from authorized, verified live evidence and only after reserving budget. The morning Wakeup Call reuses persisted Dream output and builds a durable agenda.
+
+Models cannot approve, publish, change credentials, alter code or prompts, expand permissions, modify budgets, write arbitrary configuration, or bypass policy. Firestore remains workflow truth; Memory Bank is eligible cross-job context, never authorization. Deterministic gates remain authoritative even when ADK, Agent Engine, Memory Bank, or Model Armor participates.
+
+Replay, fixtures, mocks, synthetic records, unverified claims, unauthorized sources, raw prompts, logs, source content, and private reasoning are excluded from learning and promotion. Recorded autonomy events are permanently historical and never count as fresh provider or deployment evidence.
+
+## Enable schedules
+
+Resident schedules are disabled by default:
+
+```bash
+HARMONIA_ENABLE_RESIDENT_AUTONOMY=0
+HARMONIA_WORKSPACE_TIMEZONE=Etc/UTC
+```
+
+Set the enable flag to `1` only for an authorized deployment. `infra/deploy.sh` then converges three OIDC-authenticated Scheduler jobs: hourly Heartbeat, nightly Dream, and morning Wakeup. The existing every-minute durable effect tick stays separate. Cloud Run remains private; do not grant public invoker.
+
+If a paid cognitive arm lacks budget, that arm pauses while free maintenance continues. A missed wake may recover once inside its usefulness window. An expired effect-bearing lease becomes `uncertain`; it is never blindly replayed. Protected changes become proposals or attention requests. Automatic tuning is limited to bounded posting windows, format weights, fatigue suppression, retry/backoff, and approved-template preference, always with an immutable rollback pointer.
+
+## Verify before enabling
+
+Run the TypeScript and Python suites, lint, type checking, and production build. Inspect `/dashboard/monitoring?tab=autonomy` locally. Then deploy deliberately, confirm IAM/OIDC and tenant isolation, and capture one authenticated cycle. Until those checks exist, keep the status **not deployed** and **not evidenced**.

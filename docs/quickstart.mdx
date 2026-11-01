@@ -1,0 +1,67 @@
+---
+title: "Quickstart"
+description: "Inspect Harmonia locally, then choose whether to configure authenticated Google execution."
+---
+
+## Prerequisites
+
+- Node.js 20+
+- Python 3.12+ (a 3.14 venv works)
+- `gcloud` CLI with the Firestore and Pub/Sub emulators (use a currently supported JRE)
+- `ffmpeg` and `ffprobe` on PATH
+- `yt-dlp` on PATH (for YouTube ingestion)
+
+## Choose a run mode
+
+Local inspection and authenticated execution are different claims:
+
+| Mode | Purpose | What it proves |
+|---|---|---|
+| Persisted fixture inspection | Review the studio, state transitions, approvals, assets, and failure presentation | UI and local data-contract behavior only |
+| Authenticated cognitive job | Invoke configured Google identity, Agent Engine, Gemini, and managed memory boundaries | Only the providers captured in that specific run |
+
+Fixtures are never submission evidence for a provider invocation or deployment. Authenticated execution can incur provider charges; inspect pricing and quota before enabling it.
+
+## Start the local services
+
+```bash
+./scripts/dev.sh
+```
+
+This single script starts everything:
+
+| Service | Port |
+|---|---|
+| Firestore emulator | 8081 |
+| Pub/Sub emulator | 8082 |
+| Next.js dashboard | 3000 |
+| ADK worker (FastAPI) | 8080 |
+
+The script sources `.env.local` if present. The web and worker must share a non-empty internal token:
+
+```bash
+INTERNAL_API_TOKEN=local-dev-token
+```
+
+## Run an authenticated cognitive job
+
+Before this path can succeed, configure the values documented in [Configuration](/configuration), including Google Identity Platform, application credentials, `AGENT_SERVICE_URL`, the shared `INTERNAL_API_TOKEN`, `AGENT_ENGINE_RESOURCE`, and the exact regional model and memory resources used by the worker. There is no in-process ADK fallback.
+
+Open [http://localhost:3000](http://localhost:3000) and send the console:
+
+```
+turn https://www.youtube.com/watch?v=jNQXAC9IVRw into clips
+```
+
+Watch the job progress through collect_sources → extract_sources → understand → strategize and stop for digest-bound strategy approval. A failed source pauses for explicit retry, removal, replacement, or reconnection. After approval, Temi plans and the production team drafts before the separate effect-approval boundary. In chat, an approval phrase opens the same deterministic confirmation; model-parsed text cannot authorize strategy or an effect by itself.
+
+After approval, only configured actions can execute. An export can be verified by digest; X requires authorized credentials and is verified by a fresh provider read. A failed or unavailable integration stays visible as an unresolved failure rather than becoming simulated success.
+
+## Run checks
+
+```bash
+npm run lint && npx tsc --noEmit && npm test
+cd agent && ./.venv/bin/python -m pytest tests -q
+```
+
+Next: read [Development](/development) to work fully offline, or jump to [Configuration](/configuration) for the full environment variable reference.
