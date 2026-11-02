@@ -1,0 +1,2 @@
+import { readFileSync } from "node:fs"; import { describe, expect, it } from "vitest";
+describe("resident autonomy documentation", () => { it("states boundaries and incomplete proof truthfully", () => { const doc = readFileSync("docs/resident-autonomy.mdx", "utf8"); for (const text of ["disabled by default", "not deployed", "not evidenced", "Micro-reflection", "Dream Cycle", "Wakeup Call", "uncertain", "rollback", "Replay", "budget", "Models cannot approve"]) expect(doc).toContain(text); }); });
