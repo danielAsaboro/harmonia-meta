@@ -143,7 +143,7 @@ from .dara_skills import (
 from .telemetry import current_trace_id, safe_attributes, tracer
 from .activity_models import AgentActivityRecord
 from .activity_projection import invocation_activity, tool_activity
-from .team_runtime import AgentEngineProviderError, AgentEngineTeamRuntime, LocalAdkTeamRuntime, TeamRuntime
+from .team_runtime import AdkTeamRuntime, TeamRuntime, TeamRuntimeProviderError
 from .handoff_protocol import (
     MAX_HANDOFF_REPAIR_ATTEMPTS,
     build_handoff,
@@ -2471,13 +2471,9 @@ async def _run_coordinator(
             ):
                 budget_reserver(reservation)
                 reserved.append(reservation)
-        managed_runtime = team_runtime or (
-            LocalAdkTeamRuntime(build_agent_team(models=resolved))
-            if os.environ.get("HARMONIA_LOCAL_ADK") == "1"
-            else AgentEngineTeamRuntime(resource_name=settings().agent_engine_resource)
-        )
+        managed_runtime = team_runtime or AdkTeamRuntime(build_agent_team(models=resolved))
         if invocation is not None:
-            managed_user_id = invocation.agent_engine_user_id()
+            managed_user_id = invocation.runtime_user_id()
         else:
             tenant = current_tenant()
             managed_user_id = f"{tenant.workspace_id}:system:proactive"
@@ -2525,11 +2521,11 @@ async def _run_coordinator(
                 "workspace.id": invocation.workspace_id if invocation else current_tenant().workspace_id,
                 "stage": invocation.stage if invocation else "proactive",
                 "agent": specialist,
-                "runtime": "agent_engine",
+                "runtime": "adk",
             }))
             invoke_span.add_event("harmonia.agent.delegate", safe_attributes({
                 "agent": specialist,
-                "runtime": "agent_engine",
+                "runtime": "adk",
             }))
             base_session_key = (
                 f"{invocation.operation_id}:{specialist}:"
@@ -2552,7 +2548,7 @@ async def _run_coordinator(
                             session_key=session_key,
                         )
                 except TimeoutError as exc:
-                    raise AgentEngineProviderError(
+                    raise TeamRuntimeProviderError(
                         "agent invocation exceeded its operation timeout", status=504,
                     ) from exc
 
@@ -3131,9 +3127,9 @@ def configured_memory(
     cfg = settings()
     if not cfg.memory_bank_enabled:
         return None
-    resource = cfg.memory_bank_resource or cfg.agent_engine_resource
+    resource = cfg.memory_bank_resource
     if not resource:
-        raise ValueError("MEMORY_BANK_RESOURCE or AGENT_ENGINE_RESOURCE is required")
+        raise ValueError("MEMORY_BANK_RESOURCE is required")
     tenant = current_tenant() if invocation is None else None
     return (
         VertexMemoryBank(resource_name=resource),

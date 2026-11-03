@@ -12,7 +12,7 @@ from harmonia_agent.agents import RoleModelInstances
 from harmonia_agent.role_models import RoleModelConfig
 from harmonia_agent.usage import InvocationContext, run_metered
 from harmonia_agent.telemetry import configure_telemetry
-from harmonia_agent.team_runtime import AgentEngineProviderError
+from harmonia_agent.team_runtime import TeamRuntimeProviderError
 from test_agent_team import ManagedRuntime, ScriptedDraftModel, _analysis, _production_input
 from harmonia_agent.tenant_context import tenant_scope
 from tests.test_ryan_strategy import strategy as _content_strategy
@@ -144,7 +144,7 @@ def test_team_quarantines_all_reservations_when_runtime_fails_after_dispatch():
             raise TimeoutError("managed runtime timeout")
 
     resolutions: list[dict] = []
-    with pytest.raises(AgentEngineProviderError, match="operation timeout") as raised:
+    with pytest.raises(TeamRuntimeProviderError, match="operation timeout") as raised:
         asyncio.run(_run_coordinator(
             "nimi_analyst",
             _analyst_input(),

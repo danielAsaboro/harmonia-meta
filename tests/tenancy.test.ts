@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   assertResourceWorkspace,
-  agentEngineUserId,
+  runtimeUserId,
   currentTenant,
   requireWorkspaceRole,
   runWithTenant,
@@ -59,7 +59,7 @@ describe("workspace isolation", () => {
   });
 
   it("namespaces managed Agent Engine users by workspace, user, and job", () => {
-    expect(agentEngineUserId(tenant, "job-1")).toBe("workspace-a:user-a:job-1");
+    expect(runtimeUserId(tenant, "job-1")).toBe("workspace-a:user-a:job-1");
   });
 
   it("rejects unrecognized membership roles", () => {

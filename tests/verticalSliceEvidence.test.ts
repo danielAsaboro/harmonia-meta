@@ -24,7 +24,6 @@ function validBundle() {
       webRevision: "harmonia-web-00001-abc",
       agentService: "harmonia-agent",
       agentRevision: "harmonia-agent-00001-def",
-      agentEngineResource: "projects/123/locations/us-central1/reasoningEngines/456",
       firestoreDatabase: "projects/harmonia-prod/databases/(default)",
       pubsubTopic: "projects/harmonia-prod/topics/harmonia-stages",
       mockAi: false,
@@ -56,14 +55,14 @@ function validBundle() {
     })),
     cognition: [
       {
-        role: "harmonia_coordinator", model: "gemini-3.5-flash-lite",
-        provider: "gemini", policyVersion: "gear-2026-11-03",
+        role: "harmonia_coordinator", model: "muse-spark-1.3",
+        provider: "meta", policyVersion: "gear-2026-11-03",
         usageRecordId: "usage-coordinator", operationId: "job-1:understand:0:harmonia_coordinator",
         traceId: workflowTraceId,
       },
       {
-        role: "nimi_analyst", model: "gemini-3.5-flash",
-        provider: "gemini", policyVersion: "gear-2026-11-03",
+        role: "nimi_analyst", model: "muse-spark-1.3",
+        provider: "meta", policyVersion: "gear-2026-11-03",
         usageRecordId: "usage-analyst", operationId: "job-1:understand:0:nimi_analyst",
         traceId: workflowTraceId,
       },
@@ -127,13 +126,10 @@ describe("vertical-slice evidence", () => {
     expect(failureCodes(bundle)).toContain("non_production_provenance");
   });
 
-  it("rejects missing or non-Gemini-3.5 cognition", () => {
+  it("rejects cognition from a non-Muse model", () => {
     const bundle = validBundle();
-    bundle.environment.agentEngineResource = "not-an-agent-engine-resource";
-    bundle.cognition[1].model = "gemini-2.5-flash";
-    expect(failureCodes(bundle)).toEqual(expect.arrayContaining([
-      "missing_agent_engine", "missing_required_gemini",
-    ]));
+    bundle.cognition[1].model = "gpt-5";
+    expect(failureCodes(bundle)).toEqual(expect.arrayContaining(["missing_required_muse"]));
   });
 
   it("requires internally consistent demonstrated-job KPIs", () => {

@@ -80,7 +80,7 @@ export function assertResourceWorkspace(
   }
 }
 
-export function agentEngineUserId(context: TenantContext, jobId: string): string {
+export function runtimeUserId(context: TenantContext, jobId: string): string {
   const subjectId = checkedId("subjectId", context.principal.subjectId);
   checkedId("jobId", jobId);
   const scope = validateTenantScope(context);

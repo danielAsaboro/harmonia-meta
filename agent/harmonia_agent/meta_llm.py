@@ -22,9 +22,8 @@ PROVIDER_ENDPOINTS: dict[str, tuple[str, str, str]] = {
 class MetaLlm(LiteLlm):
     """Muse models over OpenAI-compatible Chat Completions.
 
-    Agent Engine pickles the agent tree at deploy time, so the endpoint and key
-    are read from the runtime environment on every call instead of being stored
-    on the instance.
+    The endpoint and key are read from the runtime environment on every call
+    instead of being stored on the instance.
     """
 
     provider: Provider = "meta"

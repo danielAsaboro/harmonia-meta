@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .agent_errors import AgentContractError
 from .agents import AgentProtocolError, ask_with_team_detailed
 from .config import settings
-from .team_runtime import AgentEngineProviderError, AgentEngineProtocolError
+from .team_runtime import TeamRuntimeProviderError, TeamRuntimeProtocolError
 from .tenant_context import tenant_scope
 from .usage import InvocationContext
 
@@ -77,14 +77,14 @@ async def operator_ask(payload: OperatorQuestion, request: Request) -> OperatorA
             "code": exc.code, "category": "protocol", "message": exc.public_message,
             "retryable": False, "role": exc.role, **({"path": exc.path} if exc.path else {}),
         }) from exc
-    except (AgentProtocolError, AgentEngineProtocolError) as exc:
+    except (AgentProtocolError, TeamRuntimeProtocolError) as exc:
         raise HTTPException(status_code=502, detail={
             "code": "liaison_protocol_failed", "category": "protocol",
             "message": "Nova returned a response that did not satisfy its contract.", "retryable": False,
         }) from exc
-    except AgentEngineProviderError as exc:
+    except TeamRuntimeProviderError as exc:
         raise HTTPException(status_code=502, detail={
-            "code": "agent_engine_unavailable", "category": "dependency",
+            "code": "team_runtime_unavailable", "category": "dependency",
             "message": "The agent service is temporarily unavailable.", "retryable": True,
         }) from exc
     return OperatorAnswer(answer=answer, operationId=invocation.operation_id, traceId=trace_id, activity=activity)

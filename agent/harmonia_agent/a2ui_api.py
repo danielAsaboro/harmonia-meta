@@ -11,7 +11,7 @@ from .a2ui_models import SurfacePlan, UiContext
 from .a2ui_presenter import plan_surface
 from .agents import AgentProtocolError
 from .config import settings
-from .team_runtime import AgentEngineProviderError, AgentEngineProtocolError
+from .team_runtime import TeamRuntimeProviderError, TeamRuntimeProtocolError
 from .tenant_context import tenant_scope
 from .usage import InvocationContext
 
@@ -48,8 +48,8 @@ async def create_a2ui_plan(context: UiContext, request: Request) -> SurfacePlan:
     try:
         with tenant_scope(workspace_id, brand_id):
             return await plan_surface(context, invocation=invocation)
-    except (AgentProtocolError, AgentEngineProtocolError) as exc:
+    except (AgentProtocolError, TeamRuntimeProtocolError) as exc:
         raise HTTPException(status_code=502, detail=f"presentation protocol failed: {exc}") from exc
-    except AgentEngineProviderError as exc:
-        raise HTTPException(status_code=502, detail=f"Agent Engine unavailable: {exc}") from exc
+    except TeamRuntimeProviderError as exc:
+        raise HTTPException(status_code=502, detail=f"Agent team unavailable: {exc}") from exc
 

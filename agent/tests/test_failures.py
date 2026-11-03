@@ -7,7 +7,7 @@ from harmonia_agent.agents import AgentProtocolError
 from harmonia_agent.failures import FailureCategory, normalize_failure
 from harmonia_agent.memory_bank import MemoryProviderError
 from harmonia_agent.model_catalog import UnknownModelPrice
-from harmonia_agent.team_runtime import AgentEngineProviderError
+from harmonia_agent.team_runtime import TeamRuntimeProviderError
 from harmonia_agent.web_client import (
     ConnectionAuthorizationError,
     EffectClaimInProgress,
@@ -158,7 +158,7 @@ def test_retryable_failures_stop_after_the_central_attempt_limit():
 
 
 def test_agent_engine_quota_exhaustion_is_a_transient_provider_failure():
-    result = envelope(AgentEngineProviderError("quota exhausted", status=429))
+    result = envelope(TeamRuntimeProviderError("quota exhausted", status=429))
     assert result.category == FailureCategory.PROVIDER_TRANSIENT
     assert result.code == "provider_request_failed"
     assert result.retryable is True

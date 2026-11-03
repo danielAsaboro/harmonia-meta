@@ -12,7 +12,7 @@ from .agent_errors import AgentContractError
 from .agents import AgentProtocolError, route_intent_with_team
 from .config import settings
 from .intent_routing import IntentRoute, IntentRoutingInput
-from .team_runtime import AgentEngineProviderError, AgentEngineProtocolError
+from .team_runtime import TeamRuntimeProviderError, TeamRuntimeProtocolError
 from .tenant_context import tenant_scope
 from .usage import InvocationContext
 
@@ -43,14 +43,14 @@ async def route_operator_intent(payload: IntentRoutingInput, request: Request) -
             "code": exc.code, "category": "protocol", "message": exc.public_message,
             "retryable": False, "role": exc.role, **({"path": exc.path} if exc.path else {}),
         }) from exc
-    except (AgentProtocolError, AgentEngineProtocolError) as exc:
+    except (AgentProtocolError, TeamRuntimeProtocolError) as exc:
         code, message = _safe_protocol_failure(exc)
         raise HTTPException(status_code=502, detail={
             "code": code, "category": "protocol", "message": message, "retryable": False,
         }) from exc
-    except AgentEngineProviderError as exc:
+    except TeamRuntimeProviderError as exc:
         raise HTTPException(status_code=502, detail={
-            "code": "agent_engine_unavailable", "category": "dependency",
+            "code": "team_runtime_unavailable", "category": "dependency",
             "message": "Harmonia's reasoning service is temporarily unavailable.", "retryable": True,
         }) from exc
 
@@ -60,7 +60,7 @@ def _safe_protocol_failure(exc: Exception) -> tuple[str, str]:
     reason = str(exc)
     if "required state key: intent_route" in reason or "returned no state delta" in reason:
         return (
-            "agent_engine_missing_route_state",
+            "team_runtime_missing_route_state",
             "The reasoning service completed without Harmonia's required route state.",
         )
     if "live platform connection lookup failed" in reason:

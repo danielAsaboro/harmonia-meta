@@ -8,7 +8,7 @@ provider-observed provenance: the ``web_search_call`` count, the raw search
 Validators accept a model-cited source only when that provenance contains it.
 
 The API key is read from the runtime environment on every call; tools hold no
-credentials because Agent Engine pickles the agent tree.
+credentials.
 """
 
 from __future__ import annotations

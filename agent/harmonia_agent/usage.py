@@ -33,7 +33,7 @@ class InvocationContext(BaseModel):
     def role_operation_id(self, role: str) -> str:
         return f"{self.operation_id}:{role}"
 
-    def agent_engine_user_id(self) -> str:
+    def runtime_user_id(self) -> str:
         return f"{self.workspace_id}:{self.user_id}:{self.job_id}"
 
 

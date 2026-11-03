@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from harmonia_agent import intent_api, main
 from harmonia_agent.intent_routing import IntentRoute
-from harmonia_agent.team_runtime import AgentEngineProviderError
+from harmonia_agent.team_runtime import TeamRuntimeProviderError
 from harmonia_agent.agents import AgentProtocolError
 
 
@@ -54,7 +54,7 @@ def test_route_endpoint_returns_strict_harmonia_route(monkeypatch):
 
 def test_route_redacts_agent_engine_provider_failure(monkeypatch):
     async def unavailable(*_args, **_kwargs):
-        raise AgentEngineProviderError("provider authentication details must stay private")
+        raise TeamRuntimeProviderError("provider authentication details must stay private")
 
     monkeypatch.setattr(intent_api, "route_intent_with_team", unavailable)
     response = TestClient(main.app, raise_server_exceptions=False).post(
@@ -66,7 +66,7 @@ def test_route_redacts_agent_engine_provider_failure(monkeypatch):
 
     assert response.status_code == 502
     assert response.json()["detail"] == {
-        "code": "agent_engine_unavailable",
+        "code": "team_runtime_unavailable",
         "category": "dependency",
         "message": "Harmonia's reasoning service is temporarily unavailable.",
         "retryable": True,
@@ -86,4 +86,4 @@ def test_route_reports_missing_managed_state_without_exposing_payload(monkeypatc
     )
 
     assert response.status_code == 502
-    assert response.json()["detail"]["code"] == "agent_engine_missing_route_state"
+    assert response.json()["detail"]["code"] == "team_runtime_missing_route_state"

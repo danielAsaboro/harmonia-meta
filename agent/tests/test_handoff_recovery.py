@@ -15,7 +15,7 @@ from harmonia_agent.handoff_protocol import (
     repair_request,
 )
 from harmonia_agent.tenant_context import tenant_scope
-from harmonia_agent.team_runtime import AgentEngineProviderError
+from harmonia_agent.team_runtime import TeamRuntimeProviderError
 
 
 def _input() -> AnalystInput:
@@ -87,14 +87,14 @@ class QuotaRecoveringRuntime:
     async def invoke(self, **kwargs):
         self.calls.append(kwargs)
         if len(self.calls) == 1:
-            raise AgentEngineProviderError("quota exhausted", status=429)
+            raise TeamRuntimeProviderError("quota exhausted", status=429)
         return _valid_state()
 
 
 def test_provider_quota_failure_is_not_retried_outside_the_adk_transport() -> None:
     runtime = QuotaRecoveringRuntime()
     with tenant_scope("workspace-test", "brand-test"):
-        with pytest.raises(AgentEngineProviderError) as raised:
+        with pytest.raises(TeamRuntimeProviderError) as raised:
             asyncio.run(_run_coordinator(
                 "nimi_analyst", _input(), model="muse-test", team_runtime=runtime,
             ))
@@ -107,7 +107,7 @@ def test_provider_failure_preserves_the_original_status_without_custom_retries()
     runtime = QuotaRecoveringRuntime()
     runtime.invoke = always_quota = _AlwaysQuota(runtime.calls)
     with tenant_scope("workspace-test", "brand-test"):
-        with pytest.raises(AgentEngineProviderError) as raised:
+        with pytest.raises(TeamRuntimeProviderError) as raised:
             asyncio.run(_run_coordinator(
                 "nimi_analyst", _input(), model="muse-test", team_runtime=runtime,
             ))
@@ -122,7 +122,7 @@ class _AlwaysQuota:
 
     async def __call__(self, **kwargs):
         self.calls.append(kwargs)
-        raise AgentEngineProviderError("quota exhausted", status=429)
+        raise TeamRuntimeProviderError("quota exhausted", status=429)
 
 
 def test_every_agent_receives_the_shared_handoff_protocol() -> None:

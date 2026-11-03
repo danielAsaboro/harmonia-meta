@@ -56,7 +56,7 @@ from .memory_bank import (
     eligible_job_memories,
 )
 from .failures import FailureCategory, FailureEnvelope, normalize_failure
-from .team_runtime import AgentEngineProtocolError, AgentEngineProviderError
+from .team_runtime import TeamRuntimeProtocolError, TeamRuntimeProviderError
 from .telemetry import current_trace_id, inject_context, safe_attributes, tracer
 from .usage import InvocationContext
 from .effect_executor import execute_effect_command, production_adapters

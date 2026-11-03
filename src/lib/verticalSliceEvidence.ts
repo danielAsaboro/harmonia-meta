@@ -29,7 +29,6 @@ const environmentSchema = z.object({
   webRevision: z.string().min(1),
   agentService: z.string().min(1),
   agentRevision: z.string().min(1),
-  agentEngineResource: z.string().min(1),
   firestoreDatabase: z.string().min(1),
   pubsubTopic: z.string().min(1),
   mockAi: z.boolean(),
@@ -69,7 +68,7 @@ const eventSchema = z.object({
 const cognitionSchema = z.object({
   role: z.string().min(1),
   model: z.string().min(1),
-  provider: z.literal("gemini"),
+  provider: z.enum(["meta", "baseten"]),
   policyVersion: z.string().min(1),
   usageRecordId: z.string().min(1),
   operationId: z.string().min(1),
@@ -264,21 +263,11 @@ export function verifyVerticalSliceEvidence(input: unknown): EvidenceVerificatio
     ));
   }
 
-  if (!/^projects\/[^/]+\/locations\/[^/]+\/reasoningEngines\/[^/]+$/.test(
-    bundle.environment.agentEngineResource,
-  )) {
+  if (!bundle.cognition.every((entry) => /^(?:muse-(?:spark|wonder)-\d|meta-models\/muse-spark-open-)/.test(entry.model))) {
     failures.push(failure(
-      "missing_agent_engine",
-      "environment.agentEngineResource",
-      "A concrete Vertex AI Agent Engine resource is required.",
-    ));
-  }
-
-  if (!bundle.cognition.every((entry) => /^gemini-3\.(?:[5-9]|\d{2,})(?:-|$)/.test(entry.model))) {
-    failures.push(failure(
-      "missing_required_gemini",
+      "missing_required_muse",
       "cognition",
-      "Every cognition record must use Gemini 3.5 or newer.",
+      "Every cognition record must use a Muse model.",
     ));
   }
 

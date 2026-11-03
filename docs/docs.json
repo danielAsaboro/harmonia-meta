@@ -184,7 +184,6 @@
               "platform/agents/google-adk",
               "platform/agents/gemini",
               "platform/agents/noni-runtime",
-              "platform/agents/agent-engine",
               "platform/agents/memory-bank"
             ]
           },
