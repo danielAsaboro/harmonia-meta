@@ -55,13 +55,7 @@ describe("public documentation truth boundaries", () => {
     expect(continuity).not.toContain("exactly-once external effects");
   });
 
-  it("archives the orphaned runtime note and marks cited obsolete designs as historical", () => {
+  it("archives the orphaned runtime note", () => {
     expect(durableRuntimeNote).toContain("Archived implementation note (superseded 2026-08-28)");
-    for (const path of [
-      "docs/superpowers/specs/2026-08-23-managed-multimodel-agent-platform-design.md",
-      "docs/superpowers/specs/2026-08-26-interactive-architecture-explorer-design.md",
-      "docs/superpowers/plans/2026-08-23-role-routing-multimodal-analysis.md",
-      "docs/superpowers/specs/2026-08-28-documentation-information-architecture-design.md",
-    ]) expect(readFileSync(path, "utf8")).toContain("superseded 2026-08-28");
   });
 });

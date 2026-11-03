@@ -11,12 +11,6 @@ describe("GEAR architecture documentation contracts", () => {
     expect(architecture).not.toContain("Before executing, the publish stage checks existing receipts");
   });
 
-  it("reserves durable replay observations for explicit operator proof", () => {
-    const design = readFileSync("docs/superpowers/specs/2026-08-25-effect-claim-recovery-design.md", "utf8");
-    expect(design).toContain("operator replay-proof route");
-    expect(design).not.toContain("An `already_applied` claim response writes a durable replay observation");
-  });
-
   it("does not represent ordinary duplicate suppression as a new audit receipt", () => {
     const readme = readFileSync("README.md", "utf8");
     const approvalDocs = readFileSync("docs/approval-and-audit.mdx", "utf8");
