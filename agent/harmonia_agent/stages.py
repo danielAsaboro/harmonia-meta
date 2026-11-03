@@ -62,6 +62,7 @@ from .usage import InvocationContext
 from .effect_executor import execute_effect_command, production_adapters
 from .extraction import extract_docx, extract_html, extract_image, extract_media, extract_pdf, extract_text
 from .extraction.security import assert_public_url
+from .source_guard import screen_segments
 from .operation_context import current_operation, operation_scope
 from .web_client import (
     EffectClaimInProgress,
@@ -364,6 +365,9 @@ async def run_understand(job_id: str) -> None:
             })
     if not source_segments:
         raise RuntimeError("normalized source manifest has no evidence segments")
+    # Untrusted source text may address the agents; quarantined segments never reach Nimi.
+    screen = screen_segments(source_segments[:500])
+    source_segments = screen.kept
     source_digest = hashlib.sha256(_canonical_typed_bytes([
         {"sourceId": source["sourceId"], "contentDigest": source["contentDigest"]}
         for source in normalized_sources
@@ -375,7 +379,7 @@ async def run_understand(job_id: str) -> None:
         sourceDigest=source_digest,
         title=title,
         operatorInstructions=[str(item.get("instruction"))[:300] for item in (job.get("steeringInstructions") or []) if item.get("instruction")],
-        sourceSegments=source_segments[:500],
+        sourceSegments=source_segments,
         performanceObservations=performance,
         memoryFacts=[],
         researchRequest=(job.get("config") or {}).get("analysisResearchRequest"),
@@ -404,6 +408,7 @@ async def run_understand(job_id: str) -> None:
             for evidence_id, values in run_result.searchEvidence.items()
         ],
         "searchProvenance": run_result.searchProvenance,
+        "sourceScreen": screen.summary(),
     })
 
 

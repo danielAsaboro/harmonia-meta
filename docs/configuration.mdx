@@ -56,6 +56,9 @@ This page documents supported operator-facing configuration. It deliberately exc
 | `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS` | yes in cloud | `false` | Disable ADK legacy content-bearing span attributes |
 | `COORDINATOR_MODEL_ID` | no | `muse-spark-1.3` | Low-cost coordinator routing model |
 | `STRATEGIST_MODEL_ID` | no | `muse-wonder-1.0` | Ryan's synthesis model |
+| `GLIMMER_BASE_URL` | no | unset | OpenAI-compatible Muse Glimmer server for the source screen, such as `http://localhost:11434/v1` (Ollama) or `https://api.together.xyz/v1`; unset means the deterministic rules screen alone |
+| `GLIMMER_MODEL` | no | `muse-glimmer` | Model name on that server (`meta-models/Muse-Glimmer-30B` on Together AI) |
+| `GLIMMER_API_KEY` | no | `ollama` | Bearer token for a hosted Glimmer provider |
 | `STRATEGIST_TIMEOUT_SECONDS` | no | `300` | Bounded Ryan strategy invocation timeout |
 | `ANALYST_MODEL_ID` | no | `muse-spark-1.3` | Nimi's multimodal video/audio/text model |
 | `COPYWRITER_MODEL_ID` | no | `muse-spark-1.3` | Noni's skill-capable writing model |

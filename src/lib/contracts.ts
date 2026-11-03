@@ -307,6 +307,18 @@ export const analysisSubmissionSchema = z.object({
     url: z.string().url().refine((value) => value.startsWith("https://") || value.startsWith("http://")),
   }).strict()).max(8),
   searchProvenance: searchProvenanceSchema.nullable(),
+  sourceScreen: z.object({
+    version: z.string().min(1).max(60),
+    screenedSegments: z.number().int().nonnegative(),
+    quarantined: z.array(z.object({
+      segmentId: z.string().min(1).max(200),
+      sourceId: z.string().max(200),
+      rule: z.string().min(1).max(60),
+      by: z.string().min(1).max(120),
+    }).strict()).max(500),
+    strippedCharacters: z.number().int().nonnegative(),
+    modelScreen: z.string().min(1).max(160),
+  }).strict().optional(),
 }).strict();
 
 export const analysisResearchRequestSchema = analysisSubmissionSchema.shape.researchRequest.unwrap();

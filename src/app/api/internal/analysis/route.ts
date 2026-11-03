@@ -18,6 +18,16 @@ export async function POST(req: Request) {
       body.jobId, body.analysis, body.analysisDigest,
       body.researchRequest, body.searchEvidence, body.searchProvenance,
     );
+    const screen = body.sourceScreen;
+    if (screen && (screen.quarantined.length || screen.strippedCharacters)) {
+      const rules = [...new Set(screen.quarantined.map((item) => item.rule))].join(", ");
+      const screenedBy = screen.modelScreen.startsWith("glimmer:") ? `rules and ${screen.modelScreen.slice(8)}` : "rules";
+      await appendEvent(body.jobId, "understand",
+        `source screen (${screenedBy}): withheld ${screen.quarantined.length} of ${screen.screenedSegments} segment(s) from the agents`
+        + (rules ? ` (${rules})` : "")
+        + (screen.strippedCharacters ? `; removed ${screen.strippedCharacters} invisible character(s)` : ""),
+        "system");
+    }
     const job = await getJob(body.jobId);
     await saveCampaignOutputPlan(body.jobId, proposeOutputPlan(body.jobId, job.config.desiredOutputs, job.config.allowedOutputs, body.analysis));
     const message = `analysis: ${body.analysis.moments.length} grounded moment(s), ${body.analysis.angles.length} grounded angle(s), with ${body.modelUsed}`;
