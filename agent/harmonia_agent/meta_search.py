@@ -26,6 +26,7 @@ from google.adk.tools.tool_context import ToolContext
 from google.genai import types
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from . import meta_api
 from .meta_llm import PROVIDER_ENDPOINTS
 from .model_catalog import estimate_text_cost, estimate_web_search_cost
 from .provider_schema import meta_output_schema
@@ -98,7 +99,7 @@ def _endpoint() -> tuple[str, str]:
 
 
 def _http_client() -> httpx.AsyncClient:
-    return httpx.AsyncClient(timeout=WEB_SEARCH_TIMEOUT_SECONDS)
+    return httpx.AsyncClient(timeout=WEB_SEARCH_TIMEOUT_SECONDS, transport=meta_api.AsyncRetryTransport())
 
 
 def _provenance(body: dict[str, Any], *, model_id: str) -> tuple[str, WebSearchProvenance]:

@@ -35,6 +35,9 @@ class MetaLlm(LiteLlm):
             model=f"openai/{model_id}",
             provider=provider,
             reasoning_effort=reasoning_effort,
+            # LiteLLM backs off on 429/5xx; Meta's error-handling guide marks
+            # 429, 500 and 503 retryable.
+            num_retries=kwargs.pop("num_retries", 3),
             **kwargs,
         )
         self._additional_args.pop("provider", None)

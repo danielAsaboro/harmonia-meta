@@ -18,14 +18,13 @@ from pathlib import Path
 
 import httpx
 
+from . import meta_api, youtube
 from .config import settings
 from .model_catalog import PRICING_VERSION
 from .telemetry import current_trace_id, safe_attributes, tracer
 from .usage import InvocationContext, UsageRecord
 from .web_client import report_usage, reserve_budget, resolve_budget_reservation
-from . import youtube
 
-DEFAULT_META_API_BASE_URL = "https://api.meta.ai/v1"
 DEFAULT_TRANSCRIBER_MODEL = "muse-voice-transcribe-1.0"
 DEFAULT_IMAGE_MODEL = "muse-image-1.0"
 # docs/meta-model-api/pricing-rate-limits.md: Muse Voice Transcribe is $0.18 per
@@ -50,15 +49,7 @@ def _resolve_without_masking(
 
 
 def _http_client(timeout: float) -> httpx.Client:
-    api_key = os.environ.get("MODEL_API_KEY")
-    if not api_key:
-        raise RuntimeError("MODEL_API_KEY is required for Meta Model API media calls")
-    base_url = os.environ.get("META_API_BASE_URL") or DEFAULT_META_API_BASE_URL
-    return httpx.Client(
-        base_url=base_url.rstrip("/"),
-        headers={"Authorization": f"Bearer {api_key}"},
-        timeout=httpx.Timeout(timeout, connect=10.0),
-    )
+    return meta_api.client(timeout, purpose="Meta Model API media calls")
 
 
 def model_used() -> str:

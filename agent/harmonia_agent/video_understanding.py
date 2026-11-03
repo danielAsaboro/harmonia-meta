@@ -23,12 +23,12 @@ from typing import Any, Callable
 
 import httpx
 
+from . import meta_api
 from .model_catalog import PRICING_VERSION, estimate_text_cost
 from .telemetry import current_trace_id, safe_attributes, tracer
 from .usage import InvocationContext, UsageRecord
 from .web_client import report_usage, reserve_budget, resolve_budget_reservation
 
-DEFAULT_META_API_BASE_URL = "https://api.meta.ai/v1"
 MAX_OBSERVATIONS = 20
 PROXY_WIDTH = 480
 MAX_PROXY_BYTES = 45_000_000
@@ -126,15 +126,7 @@ def _output_text(body: dict[str, Any]) -> str:
 
 
 def _http_client(timeout: float) -> httpx.Client:
-    api_key = os.environ.get("MODEL_API_KEY")
-    if not api_key:
-        raise RuntimeError("MODEL_API_KEY is required for Muse Spark video understanding")
-    base_url = os.environ.get("META_API_BASE_URL") or DEFAULT_META_API_BASE_URL
-    return httpx.Client(
-        base_url=base_url.rstrip("/"),
-        headers={"Authorization": f"Bearer {api_key}"},
-        timeout=httpx.Timeout(timeout, connect=10.0),
-    )
+    return meta_api.client(timeout, purpose="Muse Spark video understanding")
 
 
 def _observe(client: httpx.Client, model: str, video: bytes) -> tuple[str, dict[str, Any]]:

@@ -20,6 +20,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from opentelemetry import context as otel_context
 
+from . import meta_api
 from .config import settings
 from .a2ui_api import router as a2ui_router
 from .ask_api import router as ask_router
@@ -144,7 +145,7 @@ async def resident_heartbeat() -> dict[str, Any]:
     for scope in await asyncio.to_thread(get_workspaces):
         with tenant_scope(scope["workspaceId"], scope["brandId"]):
             feed = await asyncio.to_thread(get_feed)
-            result = await run_heartbeat(scheduled_at=scheduled_at, claim_cycle=claim_autonomy_cycle, finalize_cycle=finalize_autonomy_cycle, stage_outbox=run_stage_outbox_tick, recover_missed=recover_missed, inspect_stuck=lambda: list(feed.get("failedJobs") or []), provider_health=lambda: {"status": "configured"}, budget_health=lambda: {"available": False, "reason": "no cognitive arm due"}, maintenance=lambda: run_retention_tick(20))
+            result = await run_heartbeat(scheduled_at=scheduled_at, claim_cycle=claim_autonomy_cycle, finalize_cycle=finalize_autonomy_cycle, stage_outbox=run_stage_outbox_tick, recover_missed=recover_missed, inspect_stuck=lambda: list(feed.get("failedJobs") or []), provider_health=meta_api.fetch_status, budget_health=lambda: {"available": False, "reason": "no cognitive arm due"}, maintenance=lambda: run_retention_tick(20))
             results.append({"workspaceId": scope["workspaceId"], **result})
     return {"ok": True, "scheduledAt": scheduled_at, "workspaces": results}
 

@@ -27,12 +27,12 @@ from typing import Any, Callable
 
 import httpx
 
+from . import meta_api
 from .model_catalog import PRICING_VERSION
 from .telemetry import current_trace_id, safe_attributes, tracer
 from .usage import InvocationContext, UsageRecord
 from .web_client import report_usage, reserve_budget, resolve_budget_reservation
 
-DEFAULT_META_API_BASE_URL = "https://api.meta.ai/v1"
 DEFAULT_SEGMENTATION_MODEL = "sam-3.1"
 SAM_USD_PER_FRAME = Decimal("0.20") / Decimal(1000)
 SAM_MIN_BILLED_FRAMES = 50
@@ -222,15 +222,7 @@ def _segment(client: httpx.Client, model: str, subject: str, video: bytes) -> tu
 
 
 def _http_client(timeout: float) -> httpx.Client:
-    api_key = os.environ.get("MODEL_API_KEY")
-    if not api_key:
-        raise RuntimeError("MODEL_API_KEY is required for SAM 3.1 segmentation")
-    base_url = os.environ.get("META_API_BASE_URL") or DEFAULT_META_API_BASE_URL
-    return httpx.Client(
-        base_url=base_url.rstrip("/"),
-        headers={"Authorization": f"Bearer {api_key}"},
-        timeout=httpx.Timeout(timeout, connect=10.0),
-    )
+    return meta_api.client(timeout, purpose="SAM 3.1 segmentation")
 
 
 def track_subject_crop(
