@@ -11,7 +11,6 @@ Route handlers live under `src/app/api/`. Exact request schemas are enforced in 
 | Operational control | `/api/operations/shell`, `/api/jobs/{id}/control`, steering nudge/apply/redo routes | Authenticated operator; pause/resume/cancel require workspace admin |
 | Chat | `/api/chat`, history, streams, runs, attachments, operation decisions | Authenticated operator chat |
 | Content and calendar | `/api/content-items`, approvals, `/api/calendar`, `/api/calendar/google` | Authenticated operator UI |
-| Media production | `/api/production-plans`, plan revision/seal/decision routes | Authenticated operator UI and chat |
 | Settings and OAuth | `/api/settings/*`, `/api/oauth/{platform}/*` | Authenticated workspace admin |
 | Evidence and operations | `/api/receipts`, `/api/events`, `/api/metrics`, `/api/observability` | Authenticated operator UI |
 | Telegram | `/api/telegram/webhook/{routeToken}` | Official Telegram webhook |

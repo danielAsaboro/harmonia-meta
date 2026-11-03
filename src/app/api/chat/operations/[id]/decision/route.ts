@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { operatorTenantHandler } from "@/lib/auth";
-import { claimPendingOperationDecision, decidePendingOperation, failPendingOperationDecision, finalizePendingOperationDecision, getPendingOperation } from "@/lib/pendingOperations";
+import { decidePendingOperation, getPendingOperation } from "@/lib/pendingOperations";
 import { resolveDecision } from "@/lib/decisions";
 import { decideStrategy } from "@/lib/firestore";
 import { dispatchStageOutboxRecord } from "@/lib/stageOutboxDispatcher";
-import { approveProductionPlan, getProductionPlan } from "@/lib/productionPlanStore";
 
 const decisionSchema = z.object({ decision: z.enum(["approved", "rejected"]) }).strict();
 
@@ -15,37 +14,6 @@ async function post(req: Request, { params }: { params: Promise<{ id: string }> 
   try {
     const pending = await getPendingOperation(id);
     if (!pending) throw new Error("operation not found");
-    if (pending.handler === "decide_production_plan") {
-      const operation = await claimPendingOperationDecision(id, parsed.data.decision);
-      const { actionId: planId, payloadDigest } = operation.arguments;
-      if (typeof planId !== "string" || typeof payloadDigest !== "string") {
-        await failPendingOperationDecision(id, "operation is not production-plan-bound");
-        throw new Error("operation is not production-plan-bound");
-      }
-      if (parsed.data.decision !== "approved") {
-        await failPendingOperationDecision(id, "production rejection requires feedback through the production plan decision control");
-        throw new Error("production rejection requires feedback through the production plan decision control");
-      }
-      let outcome: unknown;
-      try {
-        const current = await getProductionPlan(planId);
-        outcome = current?.state === "approved" && current.currentPlanDigest === payloadDigest
-          ? { reconciled: true, planId, planDigest: payloadDigest }
-          : await approveProductionPlan(planId, {
-            planDigest: payloadDigest,
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          });
-      } catch (error) {
-        await failPendingOperationDecision(id, error instanceof Error ? error.message : String(error));
-        throw error;
-      }
-      // Finalization is deliberately outside the mandate try/catch. If this
-      // write is interrupted after approval, the processing lease expires and
-      // redelivery reconciles the matching approved digest instead of falsely
-      // recording a failed confirmation.
-      const finalized = await finalizePendingOperationDecision(id, parsed.data.decision);
-      return Response.json({ operation: finalized, outcome });
-    }
     const operation = await decidePendingOperation(id, parsed.data.decision);
     if (operation.handler === "decide_strategy") {
       const { jobId, payloadDigest } = operation.arguments;

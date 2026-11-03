@@ -82,30 +82,29 @@ describe("Meta chat completions", () => {
     await expect(answerFromContext("q", {})).rejects.toThrow("Meta returned no contextual answer content");
   });
 
-  it("authors production drafts with a strict json_schema response_format", async () => {
-    const draft = {
-      goal: "Show the workflow", audience: "founders", tone: ["clear"], platform: "x",
-      aspectRatio: "16:9", resolution: "720p", frameRate: 24,
-      scenes: [{ purpose: "Reveal", prompt: "A calm product reveal", durationSec: 4 }],
-      soundtrack: { include: false, prompt: null },
-    };
-    const fetchMock = vi.fn().mockResolvedValue(completion(JSON.stringify(draft)));
+  it("sends a strict json_schema response_format without temperature", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(completion(JSON.stringify({ goal: "Show the workflow", tags: ["clear"] })));
     vi.stubGlobal("fetch", fetchMock);
-    const { authorProductionPlan } = await import("@/lib/productionPlanAuthor");
+    const { createChatCompletion } = await import("@/lib/metaChatCompletion");
 
-    const plan = await authorProductionPlan({
-      job: { id: "job-1" }, workspaceId: "w1", brandId: "b1", request: "Make a short film",
-      pricing: { version: "v1", veo31FastUsdPerSecond: "0.080000", lyria3ClipFixedUsd: "0.040000" },
+    const text = await createChatCompletion({
+      purpose: "test",
+      messages: [{ role: "user", content: "Return JSON" }],
+      timeoutMs: 1_000,
+      responseFormat: { type: "json_schema", json_schema: { name: "Draft", strict: true, schema: {
+        type: "object", additionalProperties: false,
+        properties: { goal: { type: "string" }, tags: { type: "array", items: { type: "string" } } },
+        required: ["goal", "tags"],
+      } } },
     });
 
-    expect(plan.soundtrack).toBeUndefined();
-    expect(plan.estimatedCostUsd).toBe("0.320000");
+    expect(JSON.parse(text)).toEqual({ goal: "Show the workflow", tags: ["clear"] });
     const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body));
     expect(body.model).toBe("muse-spark-1.3");
     expect(body).not.toHaveProperty("temperature");
     expect(body.response_format).toMatchObject({
       type: "json_schema",
-      json_schema: { name: "ProductionCreativeDraft", strict: true },
+      json_schema: { name: "Draft", strict: true },
     });
     // Strict subset: every object is closed and requires every declared property.
     const visit = (node: unknown): void => {

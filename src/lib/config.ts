@@ -6,7 +6,6 @@ const envSchema = z.object({
   FIRESTORE_JOB_COLLECTION: z.string().default("jobs"),
   PUBSUB_STAGE_TOPIC: z.string().default("harmonia-stages"),
   PUBSUB_DATA_TOPIC: z.string().default("harmonia-data-work"),
-  PUBSUB_PRODUCTION_TOPIC: z.string().default("harmonia-production"),
   INTERNAL_API_TOKEN: z.string().min(1),
   AGENT_SERVICE_URL: z.string().url(),
   MODEL_API_KEY: z.string().min(1).optional(),

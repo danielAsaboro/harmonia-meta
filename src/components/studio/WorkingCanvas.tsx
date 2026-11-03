@@ -16,7 +16,6 @@ import { StudioEmpty, StudioFailure, StudioLoading } from "./StudioStates";
 import { OutputCorrection } from "./OutputCorrection";
 import { WrittenWorkspace } from "./WrittenWorkspace";
 import { ApprovalDock } from "./ApprovalDock";
-import { ProductionWorkspace } from "./ProductionWorkspace";
 import { JobBriefCard } from "./JobBriefCard";
 import { SinceLastVisit } from "./SinceLastVisit";
 import { EditorialCalendar } from "./EditorialCalendar";
@@ -40,11 +39,9 @@ interface WorkingCanvasProps {
   onDecide?: (jobId: string, actionId: string, decision: "approved" | "rejected") => Promise<void> | void;
   onOperationDecision?: (operationId: string, decision: "approved" | "rejected") => Promise<void> | void;
   onRequestSurfaceRevision?: (message: string) => Promise<void> | void;
-  onSealProductionPlan?: (planId: string, planDigest: string) => Promise<void> | void;
-  onDecideProductionPlan?: (planId: string, planDigest: string, decision: "approved" | "rejected", feedback?: string) => Promise<void> | void;
 }
 
-export function WorkingCanvas({ job, events, receipts, loading, error, selectedArtifactId, onSelectedArtifactChange, onRetry, supplemental, operations = [], operationsLive = false, approvalBusy = false, onDecide, onOperationDecision, onRequestSurfaceRevision, onSealProductionPlan, onDecideProductionPlan }: WorkingCanvasProps) {
+export function WorkingCanvas({ job, events, receipts, loading, error, selectedArtifactId, onSelectedArtifactChange, onRetry, supplemental, operations = [], operationsLive = false, approvalBusy = false, onDecide, onOperationDecision, onRequestSurfaceRevision }: WorkingCanvasProps) {
   const [view, setView] = useState<CanvasView>("board");
   const [a2uiActionError, setA2uiActionError] = useState<string | null>(null);
   const [proofOpen, setProofOpen] = useState(false);
@@ -55,7 +52,7 @@ export function WorkingCanvas({ job, events, receipts, loading, error, selectedA
         : selectedArtifactId?.startsWith("audio:") ? "audio"
           : null;
   const visibleView = selectedView ?? view;
-  const reviewCount = (model?.pendingActions.length ?? 0) + (job?.productionPlan?.aggregate.state === "sealed" ? 1 : 0) + (job?.stage === "awaiting_strategy_approval" ? 1 : 0);
+  const reviewCount = (model?.pendingActions.length ?? 0) + (job?.stage === "awaiting_strategy_approval" ? 1 : 0);
   const operatorStatus = job ? operatorStatusForJob({ stage: job.stage, status: job.status, failed: Boolean(job.failure), reviewCount }) : null;
   let canvasOperations: unknown[] = [];
   let a2uiError: string | null = null;
@@ -95,7 +92,7 @@ export function WorkingCanvas({ job, events, receipts, loading, error, selectedA
         <span className="min-w-0 truncate text-xs text-[#77736b]">/ {job ? (job.sourceAnalysis?.summary || "Untitled content job").slice(0, 44) : "No campaign"} / Working set</span>
         <span className="ml-auto hidden rounded-full border border-black/10 px-2 py-1.5 text-[11px] text-[#77736b] sm:inline"><b className="text-[#33906a]">✓</b> autosaved</span>
         {job ? <button type="button" aria-label="Open proof and audit trail" aria-expanded={proofOpen} onClick={() => setProofOpen(true)} className="min-h-10 rounded-full border border-black/15 bg-white/60 px-3 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3157ff]">Proof</button> : null}
-        {reviewCount > 0 ? <button type="button" onClick={() => { const production = document.getElementById("production-plan-review"); if (job?.productionPlan?.aggregate.state === "sealed" && production) { const workflowDetails = production.closest("details"); if (workflowDetails instanceof HTMLDetailsElement) workflowDetails.open = true; production.scrollIntoView({ behavior: "smooth", block: "center" }); } else { const details = document.querySelector<HTMLDetailsElement>("[aria-label='Approval boundary'] > details"); if (details) details.open = true; } }} className="rounded-full bg-[#11110f] px-3 py-2.5 text-[11px] font-bold text-white">Review <b className="text-[#d8ff3e]">{reviewCount}</b></button> : null}
+        {reviewCount > 0 ? <button type="button" onClick={() => { const details = document.querySelector<HTMLDetailsElement>("[aria-label='Approval boundary'] > details"); if (details) details.open = true; }} className="rounded-full bg-[#11110f] px-3 py-2.5 text-[11px] font-bold text-white">Review <b className="text-[#d8ff3e]">{reviewCount}</b></button> : null}
       </header>
       <div className="flex-1 overflow-y-auto px-[22px] py-5">
         {loading ? <StudioLoading /> : null}
@@ -115,8 +112,8 @@ export function WorkingCanvas({ job, events, receipts, loading, error, selectedA
           {visibleView === "calendar" ? <EditorialCalendar job={job} /> : null}
           {visibleView === "sources" ? <SourcesWorkspace job={job} receipts={receipts} /> : null}
           {a2uiError ? <div className="mb-5"><StudioFailure message={`A2UI protocol error: ${a2uiError}`} permanent /></div> : null}
-          {canvasOperations.length || supplemental || job.productionPlan ? <details className="mt-5 rounded-[16px] border border-black/10 bg-white/55" open={job.productionPlan?.aggregate.state === "sealed"}>
-            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3157ff]">Workflow details <span className="ml-auto text-xs font-normal text-black/45">Progress, production plan, and agent presentation</span></summary>
+          {canvasOperations.length || supplemental ? <details className="mt-5 rounded-[16px] border border-black/10 bg-white/55">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3157ff]">Workflow details <span className="ml-auto text-xs font-normal text-black/45">Progress and agent presentation</span></summary>
             <div className="border-t border-black/10 p-4">
           {canvasOperations.length ? <HarmoniaA2uiHost key={`${job.id}:${job.stage}:${job.status}`} operations={canvasOperations} live={operationsLive} className="mb-5 flex w-full flex-col gap-3" onAction={(action) => {
             if (action.name !== "request_surface_revision") {
@@ -133,7 +130,6 @@ export function WorkingCanvas({ job, events, receipts, loading, error, selectedA
             void onRequestSurfaceRevision(surfaceRevisionRequest(actionJobId, draftId));
           }} /> : null}
           {supplemental ? <div className="mb-5">{supplemental}</div> : null}
-          <ProductionWorkspace job={job} busy={approvalBusy} onSeal={onSealProductionPlan} onDecide={onDecideProductionPlan} />
             </div>
           </details> : null}
           {a2uiActionError ? <div className="mt-5"><StudioFailure message={`A2UI action blocked: ${a2uiActionError}`} permanent /></div> : null}

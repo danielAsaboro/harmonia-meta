@@ -188,7 +188,6 @@ const NOTIFICATIONS = "notifications";
 const PROPOSALS = "proposals";
 const COST_RESERVATIONS = "cost_reservations";
 const USAGE_RECORDS = "usage_records";
-const MEDIA_OPERATIONS = "media_operations";
 const STAGE_EXECUTIONS = "stage_executions";
 const DELETION_TOMBSTONES = "deletion_tombstones";
 const STAGE_OUTBOX = "stage_outbox";
@@ -946,7 +945,7 @@ export interface TelegramDecisionNonceDoc {
   brandId: string;
   jobId: string;
   actionId: string;
-  target: "effect" | "strategy" | "strategy_feedback" | "production";
+  target: "effect" | "strategy" | "strategy_feedback";
   payloadDigest: string;
   decision: "approved" | "rejected";
   feedback?: string;
@@ -1535,7 +1534,6 @@ export interface BudgetReservation extends CostReservationState {
 
 export async function reserveJobBudget(
   input: Omit<BudgetReservation, "accepted" | "createdAt" | keyof CostReservationState>,
-  options: { approvalAuthorized?: boolean } = {},
 ): Promise<{ reserved: boolean; duplicate: boolean; budget: JobBudget }> {
   const ref = jobRef(input.jobId);
   const reservationRef = ref.collection(COST_RESERVATIONS).doc(input.operationId);
@@ -1559,7 +1557,7 @@ export async function reserveJobBudget(
       limitUsd: parseBudgetConfig(process.env).DEFAULT_WORKSPACE_BUDGET_USD,
       approvalThresholdUsd: budget.approvalThresholdUsd,
     };
-    const accepted = (options.approvalAuthorized || !exceedsApprovalThreshold(budget, input.estimatedCostUsd))
+    const accepted = !exceedsApprovalThreshold(budget, input.estimatedCostUsd)
       && canReserve(budget, input.estimatedCostUsd)
       && canReserve(workspaceBudget, input.estimatedCostUsd);
     const now = new Date();
@@ -1669,49 +1667,6 @@ export async function listUsageRecords(jobId: string): Promise<UsageRecord[]> {
     .orderBy("createdAt", "asc")
     .get();
   return snaps.docs.map((doc) => doc.data() as UsageRecord);
-}
-
-export interface MediaOperationRecord {
-  jobId: string;
-  actionId: string;
-  provider: "veo" | "lyria";
-  operationName: string;
-  createdAt: string;
-}
-
-export async function saveMediaOperation(
-  jobId: string,
-  actionId: string,
-  provider: "veo" | "lyria",
-  operationName: string,
-): Promise<MediaOperationRecord> {
-  const ref = jobRef(jobId).collection(MEDIA_OPERATIONS).doc(actionId);
-  return db().runTransaction(async (tx) => {
-    const existing = await tx.get(ref);
-    if (existing.exists) {
-      const record = existing.data() as MediaOperationRecord;
-      if (record.provider !== provider || record.operationName !== operationName) {
-        throw new Error(`media operation already recorded for action ${actionId}`);
-      }
-      return record;
-    }
-    const job = requireJobDoc(await tx.get(jobRef(jobId)));
-    const action = (job.actions ?? []).find((item) => item.id === actionId);
-    if (!action) throw new Error(`action ${actionId} not found on job ${jobId}`);
-    const record: MediaOperationRecord = {
-      jobId, actionId, provider, operationName, createdAt: new Date().toISOString(),
-    };
-    tx.set(ref, record);
-    return record;
-  });
-}
-
-export async function getMediaOperation(
-  jobId: string,
-  actionId: string,
-): Promise<MediaOperationRecord | null> {
-  const snap = await jobRef(jobId).collection(MEDIA_OPERATIONS).doc(actionId).get();
-  return snap.exists ? (snap.data() as MediaOperationRecord) : null;
 }
 
 export async function saveAnalysis(

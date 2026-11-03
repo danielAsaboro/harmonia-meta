@@ -3,7 +3,6 @@ import { getConfig } from "./config";
 import { injectTraceContext } from "./telemetry";
 import { eventPayloadDigest, type EventEnvelope } from "./eventInbox";
 import type { StageOutboxRecord } from "./stageOutbox";
-import type { ProductionOperationOutboxRecord } from "./productionPlanStore";
 import type { TenantScope } from "./tenancy";
 import { validateTenantScope } from "./tenancy";
 
@@ -72,47 +71,4 @@ export async function publishStage(
   const topic = pubsub().topic(getConfig().PUBSUB_STAGE_TOPIC);
   const messageId = await topic.publishMessage(buildStageMessage(scope, record));
   return messageId;
-}
-
-export async function publishProductionOperation(
-  scope: TenantScope,
-  record: ProductionOperationOutboxRecord,
-): Promise<string> {
-  return pubsub().topic(getConfig().PUBSUB_PRODUCTION_TOPIC).publishMessage(
-    buildProductionMessage(scope, record),
-  );
-}
-
-export function buildProductionMessage(
-  scope: TenantScope,
-  record: ProductionOperationOutboxRecord,
-): BuiltStageMessage {
-  const tenant = validateTenantScope(scope);
-  if (record.workspaceId !== tenant.workspaceId || record.brandId !== tenant.brandId) {
-    throw new Error("production outbox tenant mismatch");
-  }
-  const payload = {
-    workspaceId: tenant.workspaceId,
-    brandId: tenant.brandId,
-    planId: record.planId,
-    planRevision: record.planRevision,
-    planDigest: record.planDigest,
-    operationId: record.operationId,
-    internalRun: record.internalRun,
-  };
-  const attributes: Record<string, string> = {
-    workspaceId: tenant.workspaceId,
-    brandId: tenant.brandId,
-    planId: record.planId,
-    planRevision: String(record.planRevision),
-    planDigest: record.planDigest,
-    operationId: record.operationId,
-    internalRun: String(record.internalRun),
-    outboxId: record.id,
-  };
-  injectTraceContext(attributes);
-  return {
-    data: Buffer.from(JSON.stringify(payload)),
-    attributes,
-  };
 }

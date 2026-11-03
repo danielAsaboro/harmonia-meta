@@ -8,14 +8,12 @@ import {
   getTelegramWebhookRoute,
   decideStrategy,
 } from "@/lib/firestore";
-import { approveProductionPlan, getProductionPlan, getProductionPlanWorkspaceForJob } from "@/lib/productionPlanStore";
 import { resolveDecision } from "@/lib/decisions";
 import { runWithTenant } from "@/lib/tenancy";
 import { TelegramWebhookError, verifyTelegramWebhook } from "@/lib/telegramWebhook";
 import { promptTelegramStrategyFeedback } from "@/lib/telegramStrategyApproval";
 import { handleChat, type ChatResponse } from "@/lib/chatHandler";
 import { sendTelegramMessage } from "@/lib/telegramApi";
-import { sendTelegramProductionApproval } from "@/lib/telegramProductionApproval";
 
 const MAX_UPDATE_BYTES = 64 * 1024;
 
@@ -75,22 +73,7 @@ export async function POST(
         const reply = payload?.reply ?? payload?.error ?? `Harmonia could not process that request (${chatResponse.status}).`;
         let delivered = true;
         try {
-          if (payload?.intent === "approve_production_plan" && payload.jobId) {
-            const workspace = await getProductionPlanWorkspaceForJob(payload.jobId);
-            if (!workspace || workspace.aggregate.state !== "sealed") throw new Error("sealed production plan not found");
-            await sendTelegramProductionApproval({
-              connection,
-              workspaceId: route.workspaceId,
-              brandId: route.brandId,
-              jobId: workspace.aggregate.jobId,
-              planId: workspace.aggregate.id,
-              planDigest: workspace.aggregate.currentPlanDigest,
-              maximumCostUsd: workspace.revision.plan.maximumCostUsd,
-              expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-            });
-          } else {
-            await sendTelegramMessage({ botToken: connection.botToken, chatId: connection.chatId, text: reply });
-          }
+          await sendTelegramMessage({ botToken: connection.botToken, chatId: connection.chatId, text: reply });
         } catch {
           // The canonical chat mutation may already be durable. Acknowledge the
           // update so Telegram does not retry it and accidentally create a duplicate job.
@@ -140,24 +123,11 @@ export async function POST(
       await finalizeTelegramDecisionNonce(routeToken, verified.nonce, decisionId);
       return Response.json({ ok: true, duplicate: false, decisionId, awaitingFeedback: true });
     }
-    if (claim.nonce.target === "production" && claim.nonce.decision !== "approved") {
-      throw new TelegramWebhookError("invalid Telegram production decision", 409);
-    }
     const outcome = await runWithTenant({
       workspaceId: route.workspaceId,
       brandId: route.brandId,
       principal: verified.principal,
     }, async () => {
-      if (claim.nonce.target === "production") {
-        const current = await getProductionPlan(claim.nonce.actionId);
-        if (current?.state === "approved" && current.currentPlanDigest === claim.nonce.payloadDigest) {
-          return { reconciled: true, planId: claim.nonce.actionId, planDigest: claim.nonce.payloadDigest };
-        }
-        return approveProductionPlan(claim.nonce.actionId, {
-          planDigest: claim.nonce.payloadDigest,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        });
-      }
       if (claim.nonce.target === "strategy") {
         return await existingStrategyDecision(claim.nonce.jobId, claim.nonce.payloadDigest, claim.nonce.decision)
           ? { reconciled: true }
@@ -170,9 +140,7 @@ export async function POST(
         claim.nonce.jobId, claim.nonce.actionId, claim.nonce.decision, claim.nonce.payloadDigest,
       );
     });
-    const decisionId = claim.nonce.target === "production"
-      ? `${claim.nonce.jobId}:production:${claim.nonce.actionId}:${claim.nonce.payloadDigest}`
-      : claim.nonce.target === "strategy"
+    const decisionId = claim.nonce.target === "strategy"
       ? `${claim.nonce.jobId}:strategy:${claim.nonce.payloadDigest}`
       : `${claim.nonce.jobId}:approval:${claim.nonce.actionId}`;
     await finalizeTelegramDecisionNonce(routeToken, verified.nonce, decisionId);

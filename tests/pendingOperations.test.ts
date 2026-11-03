@@ -35,9 +35,9 @@ describe("pending operation decisions", () => {
     )).toThrow("payload-bound");
   });
 
-  test("claims production confirmation before side effects and finalizes only after success", () => {
+  test("claims a confirmation before side effects and finalizes only after success", () => {
     const claimed = claimOperationDecisionRecord(
-      { ...pending, handler: "decide_production_plan" }, "approved",
+      { ...pending, handler: "decide_strategy" }, "approved",
       new Date("2026-08-23T00:30:00.000Z"), "operator-1",
     );
     expect(claimed).toMatchObject({ state: "processing", pendingDecision: "approved", decidedByUserId: "operator-1" });

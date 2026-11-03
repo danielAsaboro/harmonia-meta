@@ -214,7 +214,7 @@
           {
             "group": "Media",
             "root": "platform/media/overview", "directory": "card",
-            "pages": ["platform/media/ffmpeg", "platform/media/vertex-generative-media"]
+            "pages": ["platform/media/ffmpeg"]
           },
           {
             "group": "Integrations",

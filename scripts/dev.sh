@@ -44,7 +44,6 @@ if [[ ! -d .venv ]]; then python3 -m venv .venv && ./.venv/bin/pip install -q -r
 export WEB_INTERNAL_URL="http://localhost:3000"
 export INTERNAL_API_TOKEN="${INTERNAL_API_TOKEN:-local-dev-token}"
 export PUBSUB_STAGE_TOPIC="harmonia-stages"
-export PUBSUB_PRODUCTION_TOPIC="harmonia-production"
 export PUBSUB_DATA_TOPIC="harmonia-data-work"
 ./.venv/bin/uvicorn harmonia_agent.main:app --port 8080 &
 popd >/dev/null

@@ -15,15 +15,13 @@ function extractJobId(message: string): string | undefined {
   return undefined;
 }
 
-export type ChatIntent = "create_job" | "establish_strategy" | "revise_strategy" | "advance_plan" | "manage_calendar" | "status" | "list_artifacts" | "approve" | "effect_request"
-  | "create_production_plan" | "revise_production_plan" | "explain_production_plan"
-  | "approve_production_plan" | "production_status" | "rerender_production_plan" | "unknown";
+export type ChatIntent = "create_job" | "establish_strategy" | "revise_strategy" | "advance_plan" | "manage_calendar" | "status" | "list_artifacts" | "approve" | "effect_request" | "unknown";
 export type ChatSourceDescriptor = { kind: "youtube" | "web"; url: string } | { kind: "pasted_text"; title: string; text: string };
-export interface ParsedIntent { intent: ChatIntent; sources?: ChatSourceDescriptor[]; desiredOutputs?: OutputKind[]; libraryName?: string; jobId?: string; productionRequest?: string; userOutcome?: string; assumptions?: string[]; needsClarification?: boolean; clarifyingQuestion?: string; requiresRightsAttestation?: boolean; workspaceContext?: WorkspaceContentContext; platformRecommendations?: string[]; connectionSuggestions?: string[]; strategyContext?: StrategyContext }
+export interface ParsedIntent { intent: ChatIntent; sources?: ChatSourceDescriptor[]; desiredOutputs?: OutputKind[]; libraryName?: string; jobId?: string; userOutcome?: string; assumptions?: string[]; needsClarification?: boolean; clarifyingQuestion?: string; requiresRightsAttestation?: boolean; workspaceContext?: WorkspaceContentContext; platformRecommendations?: string[]; connectionSuggestions?: string[]; strategyContext?: StrategyContext }
 
 export function normalizeParsedIntent(value: unknown): ParsedIntent {
   const raw = value && typeof value === "object" ? value as Record<string, unknown> : {};
-  const intents: ChatIntent[] = ["create_job", "establish_strategy", "revise_strategy", "advance_plan", "manage_calendar", "status", "list_artifacts", "approve", "effect_request", "create_production_plan", "revise_production_plan", "explain_production_plan", "approve_production_plan", "production_status", "rerender_production_plan", "unknown"];
+  const intents: ChatIntent[] = ["create_job", "establish_strategy", "revise_strategy", "advance_plan", "manage_calendar", "status", "list_artifacts", "approve", "effect_request", "unknown"];
   const intent = typeof raw.intent === "string" && intents.includes(raw.intent as ChatIntent) ? raw.intent as ChatIntent : "unknown";
   const sources = Array.isArray(raw.sources) ? raw.sources.flatMap((item): ChatSourceDescriptor[] => {
     if (!item || typeof item !== "object") return [];
@@ -47,7 +45,6 @@ export function normalizeParsedIntent(value: unknown): ParsedIntent {
     ...(desiredOutputs.length ? { desiredOutputs } : {}),
     ...(typeof raw.libraryName === "string" && raw.libraryName.trim() ? { libraryName: raw.libraryName.trim() } : {}),
     ...(typeof raw.jobId === "string" && raw.jobId.trim() ? { jobId: raw.jobId.trim() } : {}),
-    ...(typeof raw.productionRequest === "string" && raw.productionRequest.trim() ? { productionRequest: raw.productionRequest.trim() } : {}),
   };
 }
 
@@ -55,26 +52,6 @@ export function parseLocalIntent(message: string): ParsedIntent {
   const trimmed = message.trim();
   const lower = trimmed.toLowerCase();
   const jobId = extractJobId(trimmed);
-  if (/\b(?:re-?render|render again)\b/.test(lower) && /\b(?:production|media|paid assets?|job)\b/.test(lower)) {
-    return { intent: "rerender_production_plan", jobId, productionRequest: trimmed };
-  }
-  if (/\bapprove\b/.test(lower) && /\b(?:production|media)\s+plan\b/.test(lower)) {
-    return { intent: "approve_production_plan", jobId };
-  }
-  if (/\b(?:revise|change|update|replace|remove)\b/.test(lower)
-    && /\b(?:production plan|soundtrack|shot|storyboard|media plan)\b/.test(lower)) {
-    return { intent: "revise_production_plan", jobId, productionRequest: trimmed };
-  }
-  if (/\b(?:explain|why)\b/.test(lower) && /\b(?:model|production plan|media plan|shot|soundtrack)\b/.test(lower)) {
-    return { intent: "explain_production_plan", jobId };
-  }
-  if (/\b(?:active|running|pending|report|status|progress)\b/.test(lower)
-    && /\b(?:production|media)\s+(?:operations?|plan|status|progress)\b/.test(lower)) {
-    return { intent: "production_status", jobId };
-  }
-  if (/\b(?:create|make|propose|draft|prepare)\b/.test(lower) && /\b(?:production|media)\s+plan\b/.test(lower)) {
-    return { intent: "create_production_plan", jobId, productionRequest: trimmed };
-  }
   if (/\bapprove\b/.test(lower)) return { intent: "approve", jobId };
   if (/\bartifacts?\b/.test(lower)) return { intent: "list_artifacts", jobId };
   if (/\bstatus\b/.test(lower)) return { intent: "status", jobId };

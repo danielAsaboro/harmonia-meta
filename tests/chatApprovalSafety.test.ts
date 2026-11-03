@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { buildApprovalConfirmation, buildProductionApprovalConfirmation } from "@/lib/chatHandler";
+import { buildApprovalConfirmation } from "@/lib/chatHandler";
 import { actionPayloadDigest } from "@/lib/idempotency";
 import type { Job, PlannedAction } from "@/lib/types";
 
@@ -54,25 +54,5 @@ describe("chat approval safety", () => {
     expect(createOperation).not.toHaveBeenCalled();
     expect(result.confirmation).toBeUndefined();
     expect(result.pendingActions).toHaveLength(1);
-  });
-
-  it("binds dashboard production approval to the sealed revision digest without publishing", async () => {
-    const createOperation = vi.fn().mockResolvedValue({ id: "production-operation-1" });
-    const result = await buildProductionApprovalConfirmation({
-      aggregate: {
-        id: "media-plan-1", jobId: "job-1", workspaceId: "workspace-1", brandId: "brand-1",
-        state: "sealed", currentRevision: 2, currentPlanDigest: "b".repeat(64), activeMandateId: null,
-        currentMandateReservedCostUsd: "0.000000", internalRun: 0, createdAt: "2026-08-31T00:00:00.000Z", updatedAt: "2026-08-31T00:00:00.000Z",
-      },
-      revision: { revision: 2, plan: { goal: "Launch film", maximumCostUsd: "0.400000" } as never, planDigest: "b".repeat(64), operations: [], proposedAt: "2026-08-31T00:00:00.000Z" },
-      operations: [],
-    }, "dashboard", createOperation);
-    expect(createOperation).toHaveBeenCalledWith(expect.objectContaining({
-      handler: "decide_production_plan",
-      arguments: { jobId: "job-1", actionId: "media-plan-1", payloadDigest: "b".repeat(64) },
-    }));
-    expect(result.confirmation).toEqual({ operationId: "production-operation-1", payloadDigest: "b".repeat(64) });
-    expect(result.reply).toContain("production");
-    expect(result.reply).not.toContain("publication approved");
   });
 });

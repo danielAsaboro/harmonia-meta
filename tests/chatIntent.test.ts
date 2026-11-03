@@ -40,28 +40,6 @@ describe("local intent grammar", () => {
     });
   });
 
-  it("routes production planning commands without confusing them with publication approval", () => {
-    expect(parseLocalIntent("create a production plan for job demo-clips")).toMatchObject({
-      intent: "create_production_plan", jobId: "demo-clips",
-    });
-    expect(parseLocalIntent("revise the soundtrack choices for job demo-clips to use no music")).toMatchObject({
-      intent: "revise_production_plan", jobId: "demo-clips",
-      productionRequest: "revise the soundtrack choices for job demo-clips to use no music",
-    });
-    expect(parseLocalIntent("explain the media model selection for job demo-clips")).toMatchObject({
-      intent: "explain_production_plan", jobId: "demo-clips",
-    });
-    expect(parseLocalIntent("approve the sealed production plan for job demo-clips")).toMatchObject({
-      intent: "approve_production_plan", jobId: "demo-clips",
-    });
-    expect(parseLocalIntent("report active production operations for job demo-clips")).toMatchObject({
-      intent: "production_status", jobId: "demo-clips",
-    });
-    expect(parseLocalIntent("rerender job demo-clips without changing paid assets")).toMatchObject({
-      intent: "rerender_production_plan", jobId: "demo-clips",
-    });
-  });
-
   it("treats longer operator context as a pasted-text source", async () => {
     const res = parseLocalIntent("Announce our usage-based billing launch for AI agent workloads today");
     expect(res.intent).toBe("create_job");

@@ -6,7 +6,6 @@ import { planJobDeletion } from "@/lib/lifecycle";
 import { currentTenant } from "@/lib/tenancy";
 import { getArtifact } from "@/lib/storage";
 import { normalizedSourceSchema } from "@/lib/contracts";
-import { getProductionPlanWorkspaceForJob } from "@/lib/productionPlanStore";
 import { z } from "zod";
 import { listCommandEffectClaimsForJob } from "@/lib/effectCommandStore";
 
@@ -58,7 +57,7 @@ async function historicalArchiveResponse(jobId: string, tenant: ReturnType<typeo
     const parsed = normalizedSourceSchema.safeParse(JSON.parse(bytes.toString("utf8")));
     return parsed.success ? parsed.data : null;
   }))).filter(Boolean);
-  const [events, receipts, assets, decisions, replays, usage, claims, commandClaims, productionPlan] = await Promise.all([
+  const [events, receipts, assets, decisions, replays, usage, claims, commandClaims] = await Promise.all([
     listEvents(jobId),
     listReceipts(jobId),
     listAssets(jobId),
@@ -67,7 +66,6 @@ async function historicalArchiveResponse(jobId: string, tenant: ReturnType<typeo
     listUsageRecords(jobId),
     listEffectClaims(jobId),
     listCommandEffectClaimsForJob(jobId),
-    getProductionPlanWorkspaceForJob(jobId),
   ]);
   const allClaims = [...claims, ...commandClaims].filter((claim, index, values) =>
     values.findIndex((candidate) =>
@@ -129,7 +127,6 @@ async function historicalArchiveResponse(jobId: string, tenant: ReturnType<typeo
       sizeBytes: asset.sizeBytes,
       digest: asset.digest,
     })),
-    productionPlan,
   });
 }
 
@@ -175,7 +172,7 @@ async function get(
     const parsed = normalizedSourceSchema.safeParse(JSON.parse(bytes.toString("utf8")));
     return parsed.success ? parsed.data : null;
   }))).filter(Boolean);
-  const [events, receipts, assets, decisions, replays, usage, claims, commandClaims, productionPlan] = await Promise.all([
+  const [events, receipts, assets, decisions, replays, usage, claims, commandClaims] = await Promise.all([
     listEvents(id),
     listReceipts(id),
     listAssets(id),
@@ -184,7 +181,6 @@ async function get(
     listUsageRecords(id),
     listEffectClaims(id),
     listCommandEffectClaimsForJob(id),
-    getProductionPlanWorkspaceForJob(id),
   ]);
   const allClaims = [...claims, ...commandClaims].filter((claim, index, values) =>
     values.findIndex((candidate) =>
@@ -192,7 +188,7 @@ async function get(
     ) === index,
   );
   return Response.json({
-    job: { ...job, sourceRecords, normalizedSources, productionPlan, actions: job.actions.map((action) => ({ ...action, payloadDigest: actionPayloadDigest(action) })) },
+    job: { ...job, sourceRecords, normalizedSources, actions: job.actions.map((action) => ({ ...action, payloadDigest: actionPayloadDigest(action) })) },
     events,
     receipts,
     decisions,

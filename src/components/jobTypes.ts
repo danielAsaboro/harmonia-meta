@@ -1,6 +1,5 @@
 import type { AnalysisResearchRequest, AnalysisSearchEvidence, ApprovalDecision, CampaignOutputPlan, EvidenceRef, Angle, ContentStrategy, EditorialPlan, EditorialPlanningSnapshot, EffectClaimSummary, Job, JobConfig, JobSourceManifest, Moment, NormalizedSource, PlannedAction, Receipt, SourceAnalysis, SourceRecord, Stage, StrategyApproval } from "@/lib/types";
 import type { ContentArtifact } from "@/lib/contentArtifacts/contracts";
-import type { ProductionPlanWorkspaceView } from "@/lib/productionPlanStore";
 
 export interface JobSummary {
   id: string;
@@ -75,7 +74,6 @@ export interface JobFull extends JobSummary {
   assets?: Array<{ actionId: string; mime: string; sizeBytes: number; digest: string }>;
   claims?: EffectClaimSummary[];
   decisions?: ApprovalDecision[];
-  productionPlan?: ProductionPlanWorkspaceView | null;
 }
 
 export type { Angle, Moment, PlannedAction, Receipt, Stage };
