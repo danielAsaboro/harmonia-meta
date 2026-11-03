@@ -25,17 +25,13 @@ def test_tick_claims_each_workspace_and_isolates_failed_arms():
         assert limit == 20
         return [{"outcome": "published"}]
 
-    def production_outbox(limit):
-        assert limit == 20
-        return [{"outcome": "published"}, {"outcome": "in_progress"}]
-
     def recovery():
         return [{"action": "replay_operation"}]
 
     result = asyncio.run(run_durable_tick(
         [{"workspaceId": "w1", "brandId": "b1"}], "2026-08-26T00:35Z",
         claim=claim, scheduled=scheduled, proactive=proactive, retention=retention,
-        stage_outbox=stage_outbox, production_outbox=production_outbox, recovery=recovery,
+        stage_outbox=stage_outbox, recovery=recovery,
     ))
 
     assert calls == [("w1", "durable-autonomy", "2026-08-26T00:35Z", 55)]
@@ -43,7 +39,6 @@ def test_tick_claims_each_workspace_and_isolates_failed_arms():
     assert result[0]["arms"]["proactive"]["status"] == "ok"
     assert result[0]["arms"]["retention"]["status"] == "ok"
     assert result[0]["arms"]["stage_outbox"] == {"status": "ok", "publishedCount": 1}
-    assert result[0]["arms"]["production_outbox"] == {"status": "ok", "publishedCount": 1}
     assert result[0]["arms"]["recovery"] == {"status": "ok", "actionCount": 1}
 
 
@@ -59,7 +54,6 @@ def test_duplicate_tick_does_not_enter_any_arm():
         claim=lambda *_args: False,
         scheduled=operation, proactive=operation, retention=lambda _limit: entered.append(True) or [],
         stage_outbox=lambda _limit: entered.append(True) or [],
-        production_outbox=lambda _limit: entered.append(True) or [],
         recovery=lambda: entered.append(True) or [],
     ))
 

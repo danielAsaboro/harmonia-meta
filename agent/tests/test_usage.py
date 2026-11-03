@@ -73,10 +73,10 @@ def test_media_usage_records_one_priced_generation_without_fake_tokens():
     record = media_usage_record(
         invocation=InvocationContext(
             workspace_id="workspace-test", brand_id="brand-test", user_id="user-test",
-            job_id="j1", stage="publish", operation_id="j1:publish:veo1",
+            job_id="j1", stage="publish", operation_id="j1:publish:image1",
         ),
-        role="veo_generator",
-        model="veo-3.1-fast-generate-001",
+        role="image_generator",
+        model="muse-image-1.0",
         estimated_cost_usd="0.080000",
         trace_id="0" * 32,
     )

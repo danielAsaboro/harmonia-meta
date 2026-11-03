@@ -163,57 +163,6 @@ def _meme_angles(job: dict[str, Any]) -> list[dict[str, Any]]:
     return [angle for angle in _source_angles(job) if angle.get("angleType") == "meme"]
 
 
-def deterministic_generative_media_actions(job: dict[str, Any]) -> list[dict[str, Any]]:
-    """Propose bounded paid media from validated analysis, outside the planner."""
-    title = str((job.get("sourceAnalysis") or {}).get("summary") or "startup launch")[:200]
-    moments = [
-        item for item in _source_moments(job)
-        if item.get("id") and item.get("visualHook")
-    ]
-    angles = [item for item in _source_angles(job) if item.get("id")]
-    actions: list[dict[str, Any]] = []
-    if moments:
-        moment = moments[0]
-        prompt = (
-            f"Vertical cinematic b-roll for {title}. Visual beat: {str(moment['visualHook'])[:500]}. "
-            "Abstract product motion, no people, no logos, no text, no dialogue, silent output."
-        )
-        digest = hashlib.sha256(f"veo|{moment['id']}|{prompt}".encode()).hexdigest()[:12]
-        actions.append({
-            "id": f"act-veo-{digest}",
-            "type": "generate_video",
-            "title": f"Generate Veo video: {str(moment.get('title') or title)[:36]}",
-            "description": "Generate one 4-second 720p vertical video asset with Veo 3.1 Fast (estimated $0.32).",
-            "momentId": moment["id"],
-            "payload": {
-                "type": "generate_video", "modelCapability": "veo-3.1-fast",
-                "mode": "text_to_video", "prompt": prompt, "durationSec": 4,
-                "aspectRatio": "9:16", "resolution": "720p", "generateAudio": False,
-                "enhancePrompt": True, "outputCount": 1,
-            },
-        })
-    angle = angles[0] if angles else None
-    music_concept = str(angle.get("title")) if angle else title
-    prompt = (
-        f"Instrumental 30-second soundtrack for a startup social clip about {music_concept}. "
-        "Optimistic, modern, focused, no vocals, clean ending."
-    )
-    digest = hashlib.sha256(f"lyria|{music_concept}|{prompt}".encode()).hexdigest()[:12]
-    actions.append({
-        "id": f"act-lyria-{digest}",
-        "type": "generate_music",
-        "title": f"Generate Lyria soundtrack: {music_concept[:34]}",
-        "description": "Generate one 30-second instrumental clip with Lyria 3; deployment pricing must be configured before approval.",
-        **({"angleId": angle["id"]} if angle else {}),
-        "payload": {
-            "type": "generate_music", "modelCapability": "lyria-3-clip", "prompt": prompt,
-            "instrumental": True, "lyricsMode": "none", "language": "en",
-            "targetDurationSec": 30, "outputCount": 1,
-        },
-    })
-    return actions
-
-
 def _segments_in_window(job_id: str, start: float, end: float) -> list[dict[str, Any]]:
     """Timed normalized segments overlapping [start,end], for caption burning."""
     result = []
@@ -717,10 +666,6 @@ async def run_publish(job_id: str) -> None:
             "type": command["actionType"],
             "payload": command["payload"],
         }
-        if action["type"] in {"generate_video", "generate_music"}:
-            raise AgentProtocolError(
-                "paid media operations must execute through the sealed production executor"
-            )
         key = command["payloadDigest"]
         if action["type"] in {
             "export_content_artifact", "publish_x_post", "publish_x_thread",
@@ -1016,7 +961,7 @@ async def run_verify(job_id: str) -> None:
                 "note": "LinkedIn readback content and destination match the approved artifact" if matches else "LinkedIn readback content digest mismatch",
             })
         elif action["type"] in (
-            "generate_image", "generate_video", "generate_music",
+            "generate_image",
             "render_clip", "render_reel",
         ) and detail.get("digest"):
             stored = get_asset(job_id, action["id"])

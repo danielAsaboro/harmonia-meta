@@ -39,9 +39,6 @@ class Settings:
     agent_engine_resource: str
     memory_bank_enabled: bool
     memory_bank_resource: str | None
-    generative_media_enabled: bool
-    vertex_media_location: str
-    media_output_bucket: str | None
     durable_recovery_limit: int
     durable_recovery_deadline_seconds: int
     durable_recovery_max_retries: int
@@ -95,9 +92,6 @@ class Settings:
             agent_engine_resource=(os.environ.get("AGENT_ENGINE_RESOURCE") or "") if _bool_env("HARMONIA_LOCAL_ADK") else _require("AGENT_ENGINE_RESOURCE"),
             memory_bank_enabled=_bool_env("MEMORY_BANK_ENABLED"),
             memory_bank_resource=os.environ.get("MEMORY_BANK_RESOURCE") or None,
-            generative_media_enabled=_bool_env("GENERATIVE_MEDIA_ENABLED"),
-            vertex_media_location=os.environ.get("VERTEX_MEDIA_LOCATION", "us-central1"),
-            media_output_bucket=os.environ.get("MEDIA_OUTPUT_BUCKET") or os.environ.get("GCS_BUCKET") or None,
             durable_recovery_limit=recovery_limit,
             durable_recovery_deadline_seconds=recovery_deadline,
             durable_recovery_max_retries=recovery_retries,

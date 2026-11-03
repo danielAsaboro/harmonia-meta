@@ -5,7 +5,6 @@ from pydantic import BaseModel, ValidationError
 
 from harmonia_agent.agents import AgentProtocolError
 from harmonia_agent.failures import FailureCategory, normalize_failure
-from harmonia_agent.generative_media import MediaProviderError
 from harmonia_agent.memory_bank import MemoryProviderError
 from harmonia_agent.model_catalog import UnknownModelPrice
 from harmonia_agent.team_runtime import AgentEngineProviderError
@@ -43,7 +42,6 @@ def test_normalizes_every_required_failure_category():
     cases = [
         (validation, FailureCategory.VALIDATION),
         (WebApiError("Bearer super-secret", 401), FailureCategory.AUTHORIZATION),
-        (MediaProviderError("filtered content", permanent=True), FailureCategory.PROVIDER_PERMANENT),
         (UnknownModelPrice("model with no price"), FailureCategory.BUDGET),
         (httpx.ConnectTimeout("token=super-secret", request=request), FailureCategory.PROVIDER_TRANSIENT),
         (XError("provider body super-secret", 400), FailureCategory.PROVIDER_PERMANENT),

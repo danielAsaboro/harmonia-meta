@@ -62,14 +62,6 @@ def _effect_command(action: dict) -> dict:
     }
 
 
-def _veo_action() -> dict:
-    return {"id": "veo-1", "type": "generate_video", "payload": {
-        "modelCapability": "veo-3.1-fast", "mode": "text_to_video", "prompt": "city",
-        "durationSec": 4, "aspectRatio": "9:16", "resolution": "720p",
-        "generateAudio": False, "enhancePrompt": True, "outputCount": 1,
-    }}
-
-
 def test_understand_written_source_routes_through_nimi_without_fake_timestamps(monkeypatch):
     requests = []
     posts = []
@@ -320,20 +312,6 @@ def test_x_verification_binds_readback_to_receipted_content(monkeypatch, observe
     assert ("matches" in result["note"]) is verified
 
 
-def test_paid_media_actions_read_canonical_source_analysis():
-    analysis = _analysis()
-    analysis["moments"][0]["visualHook"] = "Metric rises on screen"
-
-    actions = stages.deterministic_generative_media_actions({
-        "sourceAnalysis": analysis,
-    })
-
-    assert [action["type"] for action in actions] == [
-        "generate_video", "generate_music",
-    ]
-    assert actions[0]["momentId"] == "m1"
-
-
 def test_meme_angles_use_the_canonical_angle_type():
     analysis = _analysis()
     analysis["angles"][0].update(angleType="meme", evidenceKind="public_context")
@@ -429,37 +407,3 @@ def test_uploaded_media_is_materialized_for_clip_rendering(monkeypatch, tmp_path
     source = stages._materialize_source_video("job-1", {"sourceSegmentRefs": ["source-1:segment-1"]}, str(tmp_path))
     assert source == Path(tmp_path) / "source.mp4"
     assert source.read_bytes() == b"video"
-
-
-def test_paid_media_actions_are_deterministic_and_reference_reviewed_evidence_only():
-    actions = stages.deterministic_generative_media_actions({
-        "sourceAnalysis": {
-            "moments": [{
-                "id": "m1", "title": "Dashboard reveal", "visualHook": "Metric rises on screen",
-                "startSec": 1, "endSec": 8,
-            }],
-            "angles": [{
-                "id": "a1", "angleType": "trend_response", "title": "Speed wins",
-                "rationale": "Founders care about activation.",
-            }],
-        },
-    })
-
-    assert [action["type"] for action in actions] == [
-        "generate_video", "generate_music",
-    ]
-    assert actions[0]["momentId"] == "m1"
-    assert actions[0]["payload"]["durationSec"] == 4
-    assert actions[1]["payload"]["targetDurationSec"] == 30
-    assert all("requiresApproval" not in action for action in actions)
-
-
-def test_publish_rejects_paid_production_commands_before_effect_claim(monkeypatch):
-    action = _veo_action()
-    monkeypatch.setattr(stages, "get_job", lambda _job_id: {"stage": "publish", "controlState": "running"})
-    monkeypatch.setattr(stages, "get_effect_commands", lambda _job_id: [_effect_command(action)])
-    monkeypatch.setattr(stages, "_receipts_for_job", lambda _job_id: [])
-    monkeypatch.setattr(stages, "claim_effect", lambda _payload: pytest.fail("publishing must not claim production work"))
-
-    with pytest.raises(stages.AgentProtocolError, match="production executor"):
-        asyncio.run(stages.run_publish("job-1"))

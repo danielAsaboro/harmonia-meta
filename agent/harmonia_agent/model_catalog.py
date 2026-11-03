@@ -47,14 +47,6 @@ CATALOG = {
 # Web search grounding bills per query on top of the request's tokens.
 WEB_SEARCH_USD_PER_QUERY = Decimal("2.50") / Decimal(1000)
 
-MEDIA_CATALOG = {
-    "veo-3.1-fast-generate-001": {"unit": "second", "price": Decimal("0.080000")},
-    "lyria-002": {"unit": "generation", "price": Decimal("0.060000")},
-    "lyria-3-clip-preview": {"unit": "generation", "price": None},
-    "lyria-3-pro-preview": {"unit": "generation", "price": None},
-}
-
-
 def lookup_pricing(model_id: str) -> PricingEntry:
     try:
         return CATALOG[model_id]
@@ -80,18 +72,3 @@ def estimate_web_search_cost(queries: int) -> Decimal:
         Decimal("0.000001"), rounding=ROUND_HALF_UP,
     )
 
-
-def lookup_media_price(
-    model_id: str, *, duration_sec: int, configured_price: str | None = None,
-) -> Decimal:
-    try:
-        entry = MEDIA_CATALOG[model_id]
-    except KeyError as exc:
-        raise UnknownModelPrice(f"no media price configured for model: {model_id}") from exc
-    price = Decimal(configured_price) if configured_price is not None else entry["price"]
-    if price is None:
-        raise UnknownModelPrice(f"deployment price is required for preview model: {model_id}")
-    if duration_sec <= 0:
-        raise ValueError("media duration must be positive")
-    amount = price * duration_sec if entry["unit"] == "second" else price
-    return amount.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)

@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .agents import AgentProtocolError
 from .agent_errors import AgentContractError
-from .generative_media import MediaProtocolError, MediaProviderError
 from .memory_bank import MemoryProtocolError, MemoryProviderError
 from .model_catalog import UnknownModelPrice
 from .team_runtime import AgentEngineProtocolError, AgentEngineProviderError
@@ -87,7 +86,7 @@ def _classification(exc: Exception) -> tuple[FailureCategory, str, bool]:
         if isinstance(exc, UnknownModelPrice):
             return FailureCategory.BUDGET, "unknown_model_price", False
         return FailureCategory.VALIDATION, "contract_validation_failed", False
-    if isinstance(exc, (AgentProtocolError, AgentEngineProtocolError, MediaProtocolError, MemoryProtocolError)):
+    if isinstance(exc, (AgentProtocolError, AgentEngineProtocolError, MemoryProtocolError)):
         return FailureCategory.PROTOCOL, "invalid_provider_response", False
     if isinstance(exc, (WebApiError, XError)):
         if status in (401, 403):
@@ -95,10 +94,6 @@ def _classification(exc: Exception) -> tuple[FailureCategory, str, bool]:
         if isinstance(exc, WebApiError) and status in (400, 422):
             return FailureCategory.VALIDATION, "internal_contract_rejected", False
         if getattr(exc, "permanent", False):
-            return FailureCategory.PROVIDER_PERMANENT, "provider_request_rejected", False
-        return FailureCategory.PROVIDER_TRANSIENT, "provider_request_failed", True
-    if isinstance(exc, MediaProviderError):
-        if exc.permanent:
             return FailureCategory.PROVIDER_PERMANENT, "provider_request_rejected", False
         return FailureCategory.PROVIDER_TRANSIENT, "provider_request_failed", True
     if isinstance(exc, httpx.TimeoutException):
