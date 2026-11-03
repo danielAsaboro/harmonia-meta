@@ -15,7 +15,7 @@ for svc in run.googleapis.com firestore.googleapis.com pubsub.googleapis.com \
            cloudbuild.googleapis.com artifactregistry.googleapis.com \
            secretmanager.googleapis.com iam.googleapis.com iamcredentials.googleapis.com \
            cloudresourcemanager.googleapis.com \
-           aiplatform.googleapis.com cloudtrace.googleapis.com \
+           cloudtrace.googleapis.com \
            telemetry.googleapis.com monitoring.googleapis.com logging.googleapis.com \
            storage.googleapis.com identitytoolkit.googleapis.com cloudscheduler.googleapis.com; do
   gcloud services enable "$svc" --project "${PROJECT_ID}"
@@ -26,19 +26,6 @@ if ! gcloud artifacts repositories describe harmonia --location "${REGION}" --pr
   gcloud artifacts repositories create harmonia \
     --repository-format docker --location "${REGION}" \
     --description "Immutable Harmonia release images" --project "${PROJECT_ID}"
-fi
-
-echo "-- Agent Engine staging bucket"
-STAGING_BUCKET="gs://${PROJECT_ID}-harmonia-agent-staging"
-if ! gcloud storage buckets describe "${STAGING_BUCKET}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
-  gcloud storage buckets create "${STAGING_BUCKET}" \
-    --location="${REGION}" --uniform-bucket-level-access --project="${PROJECT_ID}"
-fi
-BUCKET_LOCATION="$(gcloud storage buckets describe "${STAGING_BUCKET}" \
-  --project="${PROJECT_ID}" --format='value(location)' | tr '[:upper:]' '[:lower:]')"
-if [[ "${BUCKET_LOCATION}" != "${REGION}" ]]; then
-  echo "staging bucket is in ${BUCKET_LOCATION}; required residency region is ${REGION}" >&2
-  exit 2
 fi
 
 echo "-- Durable media bucket"
@@ -89,10 +76,8 @@ fi
 echo "-- Pub/Sub topics"
 gcloud pubsub topics create harmonia-stages --project "${PROJECT_ID}" 2>/dev/null || echo "topic exists"
 gcloud pubsub topics create harmonia-stages-dlq --project "${PROJECT_ID}" 2>/dev/null || echo "dlq topic exists"
-gcloud pubsub topics create harmonia-production --project "${PROJECT_ID}" 2>/dev/null || echo "production topic exists"
-gcloud pubsub topics create harmonia-production-dlq --project "${PROJECT_ID}" 2>/dev/null || echo "production dlq topic exists"
 gcloud pubsub topics create harmonia-data-work --project "${PROJECT_ID}" 2>/dev/null || echo "data work topic exists"
-for topic in harmonia-stages harmonia-stages-dlq harmonia-production harmonia-production-dlq harmonia-data-work; do
+for topic in harmonia-stages harmonia-stages-dlq harmonia-data-work; do
   gcloud pubsub topics update "${topic}" --project "${PROJECT_ID}" \
     --message-storage-policy-allowed-regions="${REGION}" \
     --message-storage-policy-enforce-in-transit
@@ -177,9 +162,6 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member "serviceAccount:harmonia-agent@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role roles/datastore.user >/dev/null
-gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-  --member "serviceAccount:harmonia-agent@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --role roles/aiplatform.user >/dev/null
 # Secret access is granted per named secret below. Cloud Run invocation is
 # granted only on the private agent service after deployment.
 
@@ -195,12 +177,6 @@ if [[ -n "${YOUTUBE_API_KEY:-}" ]]; then
     || printf '%s' "${YOUTUBE_API_KEY}" | gcloud secrets versions add youtube-api-key --data-file=- --project "${PROJECT_ID}"
 else
   echo "  YOUTUBE_API_KEY not provided; ingest falls back to oEmbed."
-fi
-if [[ -n "${GOOGLE_CSE_API_KEY:-}" ]]; then
-  printf '%s' "${GOOGLE_CSE_API_KEY}" | gcloud secrets create google-cse-api-key --data-file=- --project "${PROJECT_ID}" 2>/dev/null \
-    || printf '%s' "${GOOGLE_CSE_API_KEY}" | gcloud secrets versions add google-cse-api-key --data-file=- --project "${PROJECT_ID}"
-else
-  echo "  GOOGLE_CSE_API_KEY not provided; Noni web research will fail closed."
 fi
 if [[ -n "${GOOGLE_CLIENT_ID:-}" || -n "${GOOGLE_CLIENT_SECRET:-}" ]]; then
   : "${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID together with GOOGLE_CLIENT_SECRET}"
@@ -256,9 +232,6 @@ gcloud secrets add-iam-policy-binding malware-scanner-token \
   --member "serviceAccount:harmonia-malware-scanner@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role roles/secretmanager.secretAccessor --project "${PROJECT_ID}" >/dev/null
 gcloud secrets add-iam-policy-binding youtube-api-key \
-  --member "serviceAccount:harmonia-agent@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --role roles/secretmanager.secretAccessor --project "${PROJECT_ID}" >/dev/null 2>&1 || true
-gcloud secrets add-iam-policy-binding google-cse-api-key \
   --member "serviceAccount:harmonia-agent@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role roles/secretmanager.secretAccessor --project "${PROJECT_ID}" >/dev/null 2>&1 || true
 

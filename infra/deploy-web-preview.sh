@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Deploy only the Harmonia web UI on a scale-to-zero Cloud Run service.
-# This path intentionally excludes the worker, Agent Engine, Memory Bank,
-# Vertex endpoints, Gemini credentials, Pub/Sub subscriptions, and publishers.
+# This path intentionally excludes the worker, workspace memory, Meta Model API
+# credentials, Pub/Sub subscriptions, and publishers.
 set -euo pipefail
 
 PROJECT_ID="${PROJECT_ID:?set PROJECT_ID}"
@@ -73,8 +73,7 @@ Custom-domain target: ${APP_URL}
 
 Paid runtime exclusions:
   Agent worker:       not deployed
-  Agent Engine:       not deployed
-  Memory Bank:        not deployed
-  Gemini API secret:  not mounted
+  Workspace memory:   not deployed
+  Meta API secret:    not mounted
   Pub/Sub subscriber: not created
 DONE

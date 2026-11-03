@@ -86,8 +86,6 @@ describe("Google Cloud deployment automation", () => {
     expect(log).toContain("--update-env-vars");
     expect(log).toContain("--update-secrets");
     expect(log).not.toContain("run deploy harmonia-agent");
-    expect(log).not.toContain("GEMMA_VERTEX_ENDPOINT");
-    expect(log).not.toContain("AGENT_ENGINE_RESOURCE");
     expect(log).not.toContain("MODEL_API_KEY=");
     expect(log).not.toContain("pubsub subscriptions create");
   });
@@ -110,7 +108,6 @@ describe("Google Cloud deployment automation", () => {
         ...fake.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
 
@@ -127,7 +124,6 @@ describe("Google Cloud deployment automation", () => {
         ...fake.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
 
@@ -153,7 +149,6 @@ describe("Google Cloud deployment automation", () => {
         ...deploy.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
     expect(deploy.log()).toContain("HARMONIA_CONNECTION_ENVELOPE_KEY=harmonia-connection-envelope-key:latest");
@@ -174,7 +169,6 @@ describe("Google Cloud deployment automation", () => {
         ...fake.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
 
@@ -224,7 +218,6 @@ describe("Google Cloud deployment automation", () => {
         ...fake.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
 
@@ -243,7 +236,6 @@ describe("Google Cloud deployment automation", () => {
         ...fake.env,
         FIREBASE_API_KEY: "firebase-api-key",
         FIREBASE_APP_ID: "firebase-app-id",
-        AGENT_ENGINE_RESOURCE: "projects/p/locations/us-central1/reasoningEngines/2",
       },
     });
     const log = fake.log();
