@@ -10,19 +10,11 @@
       ]
     },
     {
-      "collectionGroup": "production_operation_outbox",
+      "collectionGroup": "memory_facts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "state", "order": "ASCENDING" },
-        { "fieldPath": "availableAt", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "production_operation_outbox",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "state", "order": "ASCENDING" },
-        { "fieldPath": "publishLeaseExpiresAt", "order": "ASCENDING" }
+        { "fieldPath": "evidence_ref.brand_id", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }
   ],

@@ -1,8 +1,8 @@
-"""Exact-scope, durable context through Vertex AI Agent Engine Memory Bank."""
+"""Exact-scope, durable workspace memory stored by the web service in Firestore."""
 
 from __future__ import annotations
 
-import json
+from collections.abc import Callable
 from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,11 +11,11 @@ from .telemetry import safe_attributes, tracer
 
 
 class MemoryProtocolError(RuntimeError):
-    """Memory Bank returned a malformed response or an ineligible write."""
+    """The memory store returned a malformed response or an ineligible write."""
 
 
 class MemoryProviderError(RuntimeError):
-    """Memory Bank transport or provider execution failed."""
+    """The memory store transport failed."""
 
 
 class MemoryScope(BaseModel):
@@ -53,32 +53,21 @@ class MemoryBank(Protocol):
     def generate(self, *, scope: MemoryScope, candidates: list[MemoryCandidate]) -> None: ...
 
 
-def _fact_from_result(result: Any) -> str | None:
-    if isinstance(result, dict):
-        memory = result.get("memory") or {}
-        return memory.get("fact") if isinstance(memory, dict) else getattr(memory, "fact", None)
-    memory = getattr(result, "memory", None)
-    return getattr(memory, "fact", None)
+class WorkspaceMemoryBank:
+    """Facts live in the tenant's Firestore workspace behind the internal web API.
 
+    Retrieval ranks facts by shared words with the query; there is no embedding
+    model, so a fact must use the query's vocabulary to be found.
+    """
 
-class VertexMemoryBank:
-    def __init__(self, *, resource_name: str, client: Any | None = None) -> None:
-        if not resource_name.startswith("projects/") or "/reasoningEngines/" not in resource_name:
-            raise ValueError("MEMORY_BANK_RESOURCE must be a full reasoning engine resource name")
-        self.resource_name = resource_name
-        self._client = client
+    def __init__(self, *, post: Callable[[str, dict[str, Any]], dict[str, Any]] | None = None) -> None:
+        self._post = post
 
-    def _memories(self) -> Any:
-        client = self._client
-        if client is None:
-            try:
-                import vertexai
-            except ImportError as exc:  # pragma: no cover - deployment dependency
-                raise MemoryProviderError(
-                    "google-cloud-aiplatform Memory Bank support is not installed"
-                ) from exc
-            client = vertexai.Client()
-        return client.agent_engines.memories
+    def _call(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        if self._post is None:
+            from .web_client import post
+            return post(path, payload)
+        return self._post(path, payload)
 
     def retrieve(self, *, scope: MemoryScope, query: str, top_k: int = 3) -> list[MemoryFact]:
         if not query.strip():
@@ -91,45 +80,38 @@ class VertexMemoryBank:
                 "memory.top_k": bounded_top_k,
             }))
             try:
-                results = self._memories().retrieve(
-                    name=self.resource_name,
-                    scope=scope.to_wire(),
-                    similarity_search_params={
-                        "search_query": query[:1000],
-                        "top_k": bounded_top_k,
-                    },
-                )
-                facts: list[MemoryFact] = []
-                for result in results:
-                    raw = _fact_from_result(result)
-                    if not isinstance(raw, str) or not raw.strip():
-                        raise MemoryProtocolError("Memory Bank result is missing a valid fact")
-                    try:
-                        fact = MemoryFact.model_validate_json(raw)
-                    except Exception as exc:
-                        raise MemoryProtocolError("Memory Bank fact is missing typed evidence") from exc
-                    if fact.evidence_ref.workspace_id != scope.workspace_id or fact.evidence_ref.brand_id != scope.brand_id:
-                        raise MemoryProtocolError("Memory Bank returned a cross-scope fact")
-                    facts.append(fact)
-                span.set_attribute("memory.result_count", len(facts))
-                return facts
-            except MemoryProtocolError:
-                raise
+                response = self._call("/api/internal/memory/search", {
+                    "brandId": scope.brand_id, "query": query[:1000], "topK": bounded_top_k,
+                })
             except Exception as exc:  # noqa: BLE001 - provider boundary
-                raise MemoryProviderError(f"Memory Bank retrieval failed: {exc}") from exc
+                raise MemoryProviderError(f"memory retrieval failed: {exc}") from exc
+            raw_facts = response.get("facts") if isinstance(response, dict) else None
+            if not isinstance(raw_facts, list):
+                raise MemoryProtocolError("memory search returned no fact list")
+            facts: list[MemoryFact] = []
+            for raw in raw_facts:
+                try:
+                    fact = MemoryFact.model_validate(raw)
+                except Exception as exc:
+                    raise MemoryProtocolError("memory fact is missing typed evidence") from exc
+                if fact.evidence_ref.workspace_id != scope.workspace_id or fact.evidence_ref.brand_id != scope.brand_id:
+                    raise MemoryProtocolError("memory store returned a cross-scope fact")
+                facts.append(fact)
+            span.set_attribute("memory.result_count", len(facts))
+            return facts
 
     def generate(self, *, scope: MemoryScope, candidates: list[MemoryCandidate]) -> None:
         if not candidates:
             return
         if len(candidates) > 5:
-            raise MemoryProtocolError("Memory Bank accepts at most five eligible facts per write")
+            raise MemoryProtocolError("memory accepts at most five eligible facts per write")
         validated = [MemoryCandidate.model_validate(candidate) for candidate in candidates]
         if any(
             item.evidence_ref.workspace_id != scope.workspace_id
             or item.evidence_ref.brand_id != scope.brand_id
             for item in validated
         ):
-            raise MemoryProtocolError("Memory Bank candidate evidence does not match retrieval scope")
+            raise MemoryProtocolError("memory candidate evidence does not match retrieval scope")
         with tracer().start_as_current_span("harmonia.memory.generate") as span:
             span.set_attributes(safe_attributes({
                 "workspace.id": scope.workspace_id,
@@ -137,17 +119,12 @@ class VertexMemoryBank:
                 "memory.fact_count": len(validated),
             }))
             try:
-                self._memories().generate(
-                    name=self.resource_name,
-                    scope=scope.to_wire(),
-                    direct_memories_source={
-                        "direct_memories": [{
-                            "fact": json.dumps(item.model_dump(mode="json"), sort_keys=True, separators=(",", ":")),
-                        } for item in validated],
-                    },
-                )
+                self._call("/api/internal/memory", {
+                    "brandId": scope.brand_id,
+                    "facts": [item.model_dump(mode="json") for item in validated],
+                })
             except Exception as exc:  # noqa: BLE001 - provider boundary
-                raise MemoryProviderError(f"Memory Bank generation failed: {exc}") from exc
+                raise MemoryProviderError(f"memory write failed: {exc}") from exc
 
 
 def format_memory_context(facts: list[MemoryFact], *, max_chars: int = 3500) -> str:

@@ -77,21 +77,12 @@ if ! gcloud firestore indexes composite list --database='(default)' --project "$
     --project "${PROJECT_ID}"
 fi
 if ! gcloud firestore indexes composite list --database='(default)' --project "${PROJECT_ID}" \
-  --filter='collectionGroupId=production_operation_outbox AND state=READY AND fields.fieldPath:state AND fields.fieldPath:publishLeaseExpiresAt' \
+  --filter='collectionGroupId=memory_facts AND state=READY AND fields.fieldPath:createdAt' \
   --format='value(name)' | grep -q .; then
   gcloud firestore indexes composite create \
-    --database='(default)' --collection-group=production_operation_outbox --query-scope=collection \
-    --field-config=field-path=state,order=ascending \
-    --field-config=field-path=publishLeaseExpiresAt,order=ascending \
-    --project "${PROJECT_ID}"
-fi
-if ! gcloud firestore indexes composite list --database='(default)' --project "${PROJECT_ID}" \
-  --filter='collectionGroupId=production_operation_outbox AND state=READY AND fields.fieldPath:state AND fields.fieldPath:availableAt' \
-  --format='value(name)' | grep -q .; then
-  gcloud firestore indexes composite create \
-    --database='(default)' --collection-group=production_operation_outbox --query-scope=collection \
-    --field-config=field-path=state,order=ascending \
-    --field-config=field-path=availableAt,order=ascending \
+    --database='(default)' --collection-group=memory_facts --query-scope=collection \
+    --field-config=field-path=evidence_ref.brand_id,order=ascending \
+    --field-config=field-path=createdAt,order=descending \
     --project "${PROJECT_ID}"
 fi
 

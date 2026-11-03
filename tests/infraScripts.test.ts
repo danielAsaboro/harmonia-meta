@@ -48,24 +48,16 @@ describe("cloud infrastructure scripts", () => {
       ],
     });
     expect(indexes.indexes).toContainEqual({
-      collectionGroup: "production_operation_outbox",
+      collectionGroup: "memory_facts",
       queryScope: "COLLECTION",
       fields: [
-        { fieldPath: "state", order: "ASCENDING" },
-        { fieldPath: "availableAt", order: "ASCENDING" },
-      ],
-    });
-    expect(indexes.indexes).toContainEqual({
-      collectionGroup: "production_operation_outbox",
-      queryScope: "COLLECTION",
-      fields: [
-        { fieldPath: "state", order: "ASCENDING" },
-        { fieldPath: "publishLeaseExpiresAt", order: "ASCENDING" },
+        { fieldPath: "evidence_ref.brand_id", order: "ASCENDING" },
+        { fieldPath: "createdAt", order: "DESCENDING" },
       ],
     });
     expect(setup).toContain("firestore indexes composite create");
     expect(setup).toContain("--collection-group=operations");
-    expect(setup).toContain("--collection-group=production_operation_outbox");
+    expect(setup).toContain("--collection-group=memory_facts");
   });
 
   it("bounds redelivery and runs recovery on its own authenticated wake", () => {

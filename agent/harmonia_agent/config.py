@@ -37,7 +37,6 @@ class Settings:
     otel_service_name: str
     image_max_cost_usd: str
     memory_bank_enabled: bool
-    memory_bank_resource: str | None
     durable_recovery_limit: int
     durable_recovery_deadline_seconds: int
     durable_recovery_max_retries: int
@@ -89,7 +88,6 @@ class Settings:
             otel_service_name=os.environ.get("OTEL_SERVICE_NAME", "harmonia-agent"),
             image_max_cost_usd=image_max_cost_usd,
             memory_bank_enabled=_bool_env("MEMORY_BANK_ENABLED"),
-            memory_bank_resource=os.environ.get("MEMORY_BANK_RESOURCE") or None,
             durable_recovery_limit=recovery_limit,
             durable_recovery_deadline_seconds=recovery_deadline,
             durable_recovery_max_retries=recovery_retries,

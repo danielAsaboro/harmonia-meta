@@ -66,7 +66,7 @@ from .model_catalog import PRICING_VERSION, estimate_text_cost
 from .meta_search import provenance_from_trace, search_model_id, web_search_reservation, web_search_spend
 from .provider_schema import meta_output_schema
 from .meta_llm import MetaLlm
-from .memory_bank import MemoryBank, MemoryScope, VertexMemoryBank
+from .memory_bank import MemoryBank, MemoryScope, WorkspaceMemoryBank
 from .memory_bank import MemoryFact as RetrievedMemoryFact
 from .agent_models import MemoryFact as StrategyMemoryFact
 from .ryan_prompt import RYAN_STRATEGIST_INSTRUCTION
@@ -3127,12 +3127,9 @@ def configured_memory(
     cfg = settings()
     if not cfg.memory_bank_enabled:
         return None
-    resource = cfg.memory_bank_resource
-    if not resource:
-        raise ValueError("MEMORY_BANK_RESOURCE is required")
     tenant = current_tenant() if invocation is None else None
     return (
-        VertexMemoryBank(resource_name=resource),
+        WorkspaceMemoryBank(),
         MemoryScope(
             workspace_id=invocation.workspace_id if invocation else tenant.workspace_id,
             brand_id=invocation.brand_id if invocation else tenant.brand_id,
