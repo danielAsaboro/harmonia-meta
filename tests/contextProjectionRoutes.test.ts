@@ -15,7 +15,7 @@ const manifest = {
   compilerVersion: "harmonia-context/v1",
   operationId: "job:job-1:stage:draft",
   operationEpoch: 2,
-  model: "gemini-3.5-flash",
+  model: "muse-spark-1.3",
   goalDigest: "a".repeat(64),
   policyVersion: "policy-1",
   pinnedConstraints: [{ id: "constraint-1", digest: "b".repeat(64) }],

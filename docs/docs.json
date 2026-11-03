@@ -182,7 +182,7 @@
             "root": "platform/agents/overview", "directory": "card",
             "pages": [
               "platform/agents/google-adk",
-              "platform/agents/gemini",
+              "platform/agents/muse",
               "platform/agents/noni-runtime",
               "platform/agents/memory-bank"
             ]

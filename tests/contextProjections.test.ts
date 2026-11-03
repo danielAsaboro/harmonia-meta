@@ -12,7 +12,7 @@ const manifest: ContextProjectionManifest = {
   compilerVersion: "harmonia-context/v1",
   operationId: "job:job-1:stage:draft",
   operationEpoch: 2,
-  model: "gemini-3.5-flash",
+  model: "muse-spark-1.3",
   goalDigest: "a".repeat(64),
   policyVersion: "policy-2026-08-28",
   pinnedConstraints: [{ id: "constraint:no-publish", digest: "b".repeat(64) }],
@@ -79,7 +79,7 @@ describe("context projection contracts", () => {
       compilerVersion: "harmonia-context/v1",
       operationId: "job:job-1:stage:draft",
       operationEpoch: 3,
-      model: "gemini-3.5-flash",
+      model: "muse-spark-1.3",
       goalDigest: "a".repeat(64),
       policyVersion: "policy-1",
       pinnedConstraints: [
@@ -99,8 +99,8 @@ describe("context projection contracts", () => {
       maxChars: 2400,
     };
     const digest = contextProjectionManifestDigest(pythonManifest);
-    expect(digest).toBe("5681816d3dce6443ed71f724d9f232caaf558ba1f8a40b80f9a86753a092be8a");
+    expect(digest).toBe("a3328943dee301abf0514f996f4dacd4bf18643060b6b00dc6aacbfc4b86564d");
     expect(contextProjectionId(pythonManifest.operationId, 3, digest))
-      .toBe("87576aee6a41ca6687140064afa359cb5e9754538a9a5555e9417329f3b3106b");
+      .toBe("f8513b623828eafbc3efab88f2c80a075570043969266c33aaf0be1e050b0cda");
   });
 });

@@ -186,7 +186,7 @@ export default function LandingPage() {
             </div>
           </div>
           <footer>
-            <span>Gemini</span><span>Google ADK</span><span>Cloud Run</span><span>Firestore</span><span>Pub/Sub</span>
+            <span>Muse Spark</span><span>Muse Image</span><span>Muse Voice Transcribe</span><span>Meta web search</span>
           </footer>
         </div>
       </section>

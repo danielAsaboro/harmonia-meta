@@ -127,7 +127,7 @@ def test_health_reports_durable_runtime_capabilities_without_secrets() -> None:
     assert "internalApiToken" not in payload
 
 
-def test_local_pubsub_project_can_be_separated_from_vertex_project(monkeypatch) -> None:
+def test_local_pubsub_project_can_be_separated_from_the_cloud_project(monkeypatch) -> None:
     monkeypatch.setenv("PUBSUB_EMULATOR_PROJECT", "harmonia-local")
     assert main._pubsub_project() == "harmonia-local"
 

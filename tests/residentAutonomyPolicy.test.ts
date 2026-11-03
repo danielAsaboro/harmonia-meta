@@ -13,7 +13,7 @@ describe("resident autonomy deterministic policy", () => {
   it("permits reversible tuning only inside hard bounds", () => {
     expect(validateAutoTuneCandidate({ category: "retry_backoff_seconds", currentValue: 30, candidateValue: 45 })).toEqual({ decision: "auto_tune" });
     expect(validateAutoTuneCandidate({ category: "retry_backoff_seconds", currentValue: 30, candidateValue: 500 })).toMatchObject({ decision: "reject" });
-    expect(validateAutoTuneCandidate({ category: "model_selection", currentValue: "gemini-3.5-flash", candidateValue: "other" })).toMatchObject({ decision: "propose" });
+    expect(validateAutoTuneCandidate({ category: "model_selection", currentValue: "muse-spark-1.3", candidateValue: "other" })).toMatchObject({ decision: "propose" });
     expect(validateAutoTuneCandidate({ category: "budget", currentValue: 1, candidateValue: 2 })).toMatchObject({ decision: "propose" });
   });
 });

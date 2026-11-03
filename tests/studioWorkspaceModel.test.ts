@@ -24,7 +24,7 @@ describe("studio workspace model", () => {
     const model = buildStudioWorkspace({
       id: "job-2", status: "complete", stage: "complete", createdAt: "2026-08-23T00:00:00.000Z", updatedAt: "2026-08-23T00:00:00.000Z",
       config: { sourceManifestId: "manifest-1", desiredOutputs: ["x_post"], allowedOutputs: ["x_post"], platforms: ["x"] }, normalizedSources: [],
-      contentArtifacts: [{ id: "d1", jobId: "job-2", outputPlanId: "plan-1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Claim", sourceSegmentRefs: ["missing"], producer: { role: "noni", model: "gemini-3.5-flash", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "Grounded claim" }, contentDigest: "d".repeat(64) }], actions: [], assets: [],
+      contentArtifacts: [{ id: "d1", jobId: "job-2", outputPlanId: "plan-1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Claim", sourceSegmentRefs: ["missing"], producer: { role: "noni", model: "muse-spark-1.3", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "Grounded claim" }, contentDigest: "d".repeat(64) }], actions: [], assets: [],
     }, []);
     expect(model.traceLinks).toEqual([
       expect.objectContaining({ artifactId: "d1", valid: false, error: "source segment missing not found" }),
@@ -41,7 +41,7 @@ describe("studio workspace model", () => {
         segments: [{ id: "provider-segment-7", text: "Evidence", locator: { kind: "time_range", startMs: 1, endMs: 2 }, digest: "b".repeat(64) }],
         metadata: {}, extractionReceiptId: "receipt-1",
       }],
-      contentArtifacts: [{ id: "d2", jobId: "job-3", outputPlanId: "plan-1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Claim", sourceSegmentRefs: ["source-1:seg-1"], producer: { role: "noni", model: "gemini-3.5-flash", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "Grounded claim" }, contentDigest: "d".repeat(64) }],
+      contentArtifacts: [{ id: "d2", jobId: "job-3", outputPlanId: "plan-1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Claim", sourceSegmentRefs: ["source-1:seg-1"], producer: { role: "noni", model: "muse-spark-1.3", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "Grounded claim" }, contentDigest: "d".repeat(64) }],
       actions: [], assets: [],
     }, []);
     expect(model.traceLinks).toEqual([expect.objectContaining({ artifactId: "d2", valid: true })]);

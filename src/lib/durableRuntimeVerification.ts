@@ -79,7 +79,7 @@ export function runDurableRuntimeBenchmark(): DurableRuntimeBenchmarkReport {
   const currentRevision = Math.max(...revisions.map((item) => item.revision));
   const manifest: ContextProjectionManifest = {
     compilerVersion: "harmonia-context/v1", operationId: operation.id, operationEpoch: operation.epoch,
-    model: "gemini-3.5-flash", goalDigest: operation.goal.digest, policyVersion: "policy-1",
+    model: "muse-spark-1.3", goalDigest: operation.goal.digest, policyVersion: "policy-1",
     pinnedConstraints: constraints.map((id) => ({ id, digest: eventPayloadDigest({ id }) })),
     approvalIds: ["approval-1"], unresolvedEffectIds: ["command-1"],
     currentRevisions: [{ kind: "strategy", id: "strategy", revision: currentRevision, digest: "c".repeat(64) }],

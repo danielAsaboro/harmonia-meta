@@ -8,7 +8,7 @@ const base = {
   id: "artifact-1", jobId: "job-1", outputPlanId: "plan-1", outputPlanDigest: "a".repeat(64),
   outputType: "newsletter" as const, revision: 1, title: "Launch note",
   sourceSegmentRefs: ["source-1:seg-1"],
-  producer: { role: "noni_copywriter", model: "gemini-3.5-flash", traceId: "b".repeat(32) },
+  producer: { role: "noni_copywriter", model: "muse-spark-1.3", traceId: "b".repeat(32) },
   review: { role: "dara_editor", traceId: "c".repeat(32), decision: "accept" as const },
   mimeType: "text/markdown" as const, createdAt: "2026-08-30T00:00:00.000Z",
   payload: { kind: "newsletter" as const, subject: "Launch", preheader: "What changed", introduction: "Intro", sections: [{ id: "s1", heading: "Proof", body: "Body", sourceSegmentRefs: ["source-1:seg-1"] }], cta: "Try it" },

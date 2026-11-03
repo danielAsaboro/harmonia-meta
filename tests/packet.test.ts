@@ -5,7 +5,7 @@ import type { ContentArtifact } from "@/lib/contentArtifacts/contracts";
 
 const config: JobConfig = { sourceManifestId: "manifest-1", desiredOutputs: ["x_post"], allowedOutputs: ["x_post"], platforms: ["x"] };
 
-const artifact: ContentArtifact = { id: "d1", jobId: "j", outputPlanId: "p1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Post", sourceSegmentRefs: ["s1"], producer: { role: "noni", model: "gemini-3.5-flash", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "hi" }, contentDigest: "d".repeat(64) };
+const artifact: ContentArtifact = { id: "d1", jobId: "j", outputPlanId: "p1", outputPlanDigest: "a".repeat(64), outputType: "x_post", revision: 1, title: "Post", sourceSegmentRefs: ["s1"], producer: { role: "noni", model: "muse-spark-1.3", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload: { kind: "x_post", text: "hi" }, contentDigest: "d".repeat(64) };
 const publishAction: PlannedAction = {
   id: "a1", jobId: "j", type: "publish_x_post", title: "post to x", description: "",
   risk: "high", requiresApproval: true, approvalState: "approved", state: "executed",

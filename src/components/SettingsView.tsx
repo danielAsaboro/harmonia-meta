@@ -456,8 +456,9 @@ export default function SettingsView() {
             inline-button taps.
           </li>
           <li>
-            <strong className="text-zinc-800 dark:text-zinc-200">Gemini</strong> — required for
-            transcription, analysis, drafting, and chat intent parsing.
+            <strong className="text-zinc-800 dark:text-zinc-200">Meta Model API</strong> — Muse
+            Spark for analysis, drafting, and chat; Muse Voice Transcribe for audio; Muse Image
+            for images.
           </li>
         </ul>
         <p className="mt-3 text-[11px] text-zinc-400">

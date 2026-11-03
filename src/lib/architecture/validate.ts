@@ -31,8 +31,8 @@ export function validateArchitecture(input: unknown): ArchitectureDefinition {
   }
   const firestore = nodes.get("firestore");
   if (!firestore || firestore.stateLifetime !== "durable") throw new Error("Firestore must be the durable source of truth");
-  const engine = nodes.get("agent-engine");
-  if (!engine || engine.stateLifetime !== "ephemeral") throw new Error("Agent Engine must be ephemeral");
+  const runtime = nodes.get("agent-runtime");
+  if (!runtime || runtime.stateLifetime !== "ephemeral") throw new Error("Agent runtime must be ephemeral");
   for (const effect of definition.nodes.filter((node) => node.kind === "effect")) {
     if (effect.approval === "Required" && !definition.edges.some((edge) => edge.target === effect.id && edge.kind === "approval")) {
       throw new Error(`Approval-gated effect requires approval: ${effect.id}`);

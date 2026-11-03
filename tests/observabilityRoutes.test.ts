@@ -23,7 +23,7 @@ const activity = {
   outcome: "success",
   agent: "ryan_strategist",
   stage: "strategize",
-  model: "gemini-3.5-flash",
+  model: "muse-spark-1.3",
   traceId: "a".repeat(32),
   spanId: "b".repeat(16),
   durationMs: 120,

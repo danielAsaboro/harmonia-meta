@@ -213,7 +213,7 @@ export const evidenceRefSchema = z.object({
   kind: z.enum([
     "youtube_api",
     "media_file",
-    "gemini_call",
+    "model_call",
     "x_api",
     "linkedin_api",
     "firestore_doc",

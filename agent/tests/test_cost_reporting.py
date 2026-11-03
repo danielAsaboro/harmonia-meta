@@ -259,7 +259,7 @@ def test_multimodal_source_uri_is_not_exported_in_trace_content():
         asyncio.run(_run_coordinator(
             "nimi_analyst",
             _analyst_input(media=True),
-            model="gemini-test",
+            model="muse-spark-test",
             team_runtime=ManagedRuntime(),
         ))
 

@@ -31,7 +31,7 @@ export const WORKFLOW_STAGES: readonly WorkflowStage[] = [
     index: "02",
     verb: "Extract",
     title: "Every source becomes evidence",
-    detail: "Gemini and deterministic parsers preserve time, page, section, line, and URL locators.",
+    detail: "Muse Voice Transcribe and deterministic parsers preserve time, page, section, line, and URL locators.",
     signal: "sources normalized",
   },
   {

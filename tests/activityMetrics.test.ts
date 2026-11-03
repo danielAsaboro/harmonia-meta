@@ -9,7 +9,7 @@ function record(overrides: Partial<AgentActivity> = {}): AgentActivity {
     occurredAt: "2026-08-28T10:00:00.000Z", signalType: "metric",
     eventName: "agent.measurement", severity: "info", outcome: "success",
     agent: "ryan_strategist", stage: "strategize", workflow: "harmonia.agent",
-    model: "gemini-3.5-flash", tool: null, traceId: "a".repeat(32), spanId: "b".repeat(16),
+    model: "muse-spark-1.3", tool: null, traceId: "a".repeat(32), spanId: "b".repeat(16),
     parentSpanId: null, durationMs: 100, inputTokens: 40, outputTokens: 10,
     inferenceCalls: 1, toolCalls: 0, errorCategory: null, errorType: null,
     backend: "google_cloud", ...overrides,

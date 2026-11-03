@@ -298,8 +298,8 @@ def _pubsub_project() -> str:
 def _run_pull_loop() -> None:
     from google.cloud import pubsub_v1
 
-    # Local Pub/Sub may intentionally use an emulator namespace while Gemini
-    # authenticates against the real Vertex AI project.
+    # Local Pub/Sub may intentionally use an emulator namespace separate from
+    # the real Google Cloud project.
     project = _pubsub_project()
     topic_name = os.environ.get("PUBSUB_STAGE_TOPIC", "harmonia-stages")
     subscriber = pubsub_v1.SubscriberClient()

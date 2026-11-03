@@ -3,7 +3,7 @@ import { normalizeParsedIntent, parseLocalIntent } from "@/lib/chatIntent";
 
 describe("local intent grammar", () => {
 
-  it("normalizes a Gemini pasted-text descriptor that omits its model-generated title", () => {
+  it("normalizes a model pasted-text descriptor that omits its model-generated title", () => {
     expect(normalizeParsedIntent({
       intent: "create_job",
       sources: [{ kind: "pasted_text", text: "Harmonia turns sources into approved content." }],

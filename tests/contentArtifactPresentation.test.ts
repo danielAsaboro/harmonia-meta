@@ -4,7 +4,7 @@ import { contentArtifactPreview } from "@/lib/contentArtifacts/presentation";
 import type { ContentArtifact } from "@/lib/contentArtifacts/contracts";
 
 function artifact(payload: ContentArtifact["payload"]): ContentArtifact {
-  return { id: "a1", jobId: "j1", outputPlanId: "p1", outputPlanDigest: "a".repeat(64), outputType: payload.kind, revision: 2, title: "Launch", sourceSegmentRefs: ["s:1"], producer: { role: "noni", model: "gemini-3.5-flash", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload, contentDigest: "d".repeat(64) };
+  return { id: "a1", jobId: "j1", outputPlanId: "p1", outputPlanDigest: "a".repeat(64), outputType: payload.kind, revision: 2, title: "Launch", sourceSegmentRefs: ["s:1"], producer: { role: "noni", model: "muse-spark-1.3", traceId: "b".repeat(32) }, review: { role: "dara", traceId: "c".repeat(32), decision: "accept" }, mimeType: "text/markdown", createdAt: "2026-08-30T00:00:00.000Z", payload, contentDigest: "d".repeat(64) };
 }
 
 describe("content artifact presentation", () => {

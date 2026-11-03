@@ -34,7 +34,7 @@ print(json.dumps({"analysis": value, "digest": hashlib.sha256(_canonical_typed_b
 `], { input: JSON.stringify(value), encoding: "utf8", env: { ...process.env, PYTHONPATH: "agent" } }));
     const parsed = analysisSubmissionSchema.parse({
       jobId: "job-1", stage: "understand", analysis: serialized.analysis,
-      analysisDigest: serialized.digest, modelUsed: "gemini-3.7-flash",
+      analysisDigest: serialized.digest, modelUsed: "muse-spark-1.3",
       researchRequest: null, searchEvidence: [], searchProvenance: null,
     });
     expect(parsed.analysis).toEqual(serialized.analysis);
@@ -56,7 +56,7 @@ print(json.dumps({"analysis": value, "digest": hashlib.sha256(_canonical_typed_b
     expect(sourceAnalysisSchema.safeParse(analysis()).success).toBe(true);
     expect(analysisSubmissionSchema.safeParse({
       jobId: "job-1", stage: "understand", analysis: analysis(),
-      analysisDigest: "b".repeat(64), modelUsed: "gemini-3.5-flash",
+      analysisDigest: "b".repeat(64), modelUsed: "muse-spark-1.3",
       researchRequest: null, searchEvidence: [], searchProvenance: null,
     }).success).toBe(true);
   });

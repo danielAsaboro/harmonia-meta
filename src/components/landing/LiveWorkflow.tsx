@@ -6,7 +6,7 @@ import { LIVE_WORKFLOW_FRAMES } from "./workflow";
 
 const MODES = [
   { id: "source", label: "Source", note: "Original asset" },
-  { id: "intelligence", label: "Intelligence", note: "Gemini analysis" },
+  { id: "intelligence", label: "Intelligence", note: "Muse Spark analysis" },
   { id: "drafts", label: "Drafts", note: "Platform-native" },
   { id: "delivery", label: "Delivery", note: "Action + proof" },
 ] as const;

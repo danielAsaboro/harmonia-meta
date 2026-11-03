@@ -6,15 +6,15 @@ const byId = (id: string) => architectureDefinition.nodes.find((node) => node.id
 
 describe("Harmonia architecture dataset", () => {
   it("contains the exact agent and model team", () => {
-    expect(byId("agent-harmonia").model?.name).toBe("Gemini 3.5 Flash-Lite");
-    expect(byId("agent-intent-router").model?.name).toBe("Gemini 3.5 Flash-Lite");
-    expect(byId("agent-ryan").model?.name).toBe("Gemini 3.5 Flash");
-    expect(byId("agent-nimi").model?.name).toBe("Gemini 3.5 Flash");
-    expect(byId("agent-noni").model?.name).toBe("Gemini 3.5 Flash");
-    expect(byId("agent-dara").model?.name).toBe("Gemini 3.5 Flash");
-    expect(byId("agent-temi").model?.name).toBe("Gemini 3.5 Flash-Lite");
-    expect(byId("agent-maya").model?.name).toBe("Gemini 3.5 Flash");
-    expect(byId("agent-nova").model?.name).toBe("Gemini 3.5 Flash");
+    expect(byId("agent-harmonia").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-intent-router").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-ryan").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-nimi").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-noni").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-dara").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-temi").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-maya").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-nova").model?.name).toBe("Muse Spark 1.3");
   });
 
   it("contains the eleven stages, routing skill, and read-only data tools", () => {
@@ -32,8 +32,8 @@ describe("Harmonia architecture dataset", () => {
 
   it("keeps durable and ephemeral state ownership explicit", () => {
     expect(byId("firestore").stateLifetime).toBe("durable");
-    expect(byId("agent-engine").stateLifetime).toBe("ephemeral");
-    expect(byId("agent-engine").summary).toMatch(/cognitive runtime/i);
+    expect(byId("agent-runtime").stateLifetime).toBe("ephemeral");
+    expect(byId("agent-runtime").summary).toMatch(/cognitive runtime/i);
   });
 
   it("represents Temi planning as agentic cognition inside deterministic controls", () => {
@@ -73,18 +73,18 @@ describe("Harmonia architecture dataset", () => {
   });
 
   it("does not claim pending providers are live verified", () => {
-    for (const id of ["external-veo", "external-lyria", "agent-engine", "memory-bank"]) {
+    for (const id of ["external-muse-image", "external-muse-voice", "agent-runtime", "memory-bank"]) {
       expect(byId(id).statuses).toContain("pending-live");
       expect(byId(id).statuses).not.toContain("offline-verified");
     }
   });
 
   it("represents the canonical approval policy for each effect", () => {
-    for (const id of ["effect-publish-x", "effect-generate-veo", "effect-generate-lyria", "effect-schedule-content"]) {
+    for (const id of ["effect-publish-x", "effect-generate-image", "effect-schedule-content"]) {
       expect(byId(id).statuses).toContain("approval-gated");
       expect(byId(id).approval).toBe("Required");
     }
-    for (const id of ["effect-export-artifact", "effect-generate-image", "effect-render-media"]) {
+    for (const id of ["effect-export-artifact", "effect-render-media"]) {
       expect(byId(id).statuses).not.toContain("approval-gated");
       expect(byId(id).approval).toBe("Not required");
       expect(byId(id).summary).toMatch(/internal|artifact|local/i);
@@ -94,7 +94,7 @@ describe("Harmonia architecture dataset", () => {
       .map((edge) => edge.target)
       .sort();
     expect(approvalTargets).toEqual([
-      "effect-generate-lyria", "effect-generate-veo", "effect-publish-x", "effect-schedule-content",
+      "effect-generate-image", "effect-publish-x", "effect-schedule-content",
     ]);
   });
 

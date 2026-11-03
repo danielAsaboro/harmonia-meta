@@ -88,7 +88,7 @@ def test_role_can_move_to_muse_spark_open_on_baseten(monkeypatch):
 
 
 def test_unknown_role_provider_is_rejected(monkeypatch):
-    monkeypatch.setenv("ANALYST_PROVIDER", "gemini")
+    monkeypatch.setenv("ANALYST_PROVIDER", "other")
 
     with pytest.raises(ValueError, match="ANALYST_PROVIDER must be meta or baseten"):
         load_role_model_catalog()

@@ -30,7 +30,7 @@ describe("Harmonia A2UI elements", () => {
 
   test("context usage derives bounded utilization", () => {
     const html = renderToStaticMarkup(createElement(ContextUsage, {
-      model: "gemini",
+      model: "muse-spark-1.3",
       inputTokens: 750,
       outputTokens: 25,
       contextLimit: 1_000,

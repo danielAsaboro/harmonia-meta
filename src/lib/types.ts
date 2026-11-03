@@ -375,7 +375,7 @@ export interface EvidenceRef {
   kind:
     | "youtube_api"
     | "media_file"
-    | "gemini_call"
+    | "model_call"
     | "x_api"
     | "linkedin_api"
     | "http_probe"

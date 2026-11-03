@@ -24,10 +24,10 @@ describe("internal contracts", () => {
     }).success).toBe(true);
   });
 
-  it("accepts provider-default sampling in Gemini 3.7 budget and usage evidence", () => {
+  it("accepts provider-default sampling in Muse budget and usage evidence", () => {
     const reservation = {
       jobId: "j1", operationId: "j1:understand:nimi:0", stage: "understand",
-      role: "nimi", model: "gemini-3.7-flash",
+      role: "nimi", model: "muse-spark-1.3",
       estimatedCostUsd: "0.001000", pricingVersion: "2026-11-03",
       modelPolicy: {
         policyVersion: "gear-2026-11-03", pricingVersion: "2026-11-03",
@@ -60,7 +60,7 @@ describe("internal contracts", () => {
         angles: [], assumptions: [], confidence: "high",
       },
       analysisDigest: "b".repeat(64),
-      modelUsed: "gemini-3.5-flash",
+      modelUsed: "muse-spark-1.3",
       researchRequest: null,
       searchEvidence: [],
       searchProvenance: null,
@@ -105,7 +105,7 @@ describe("internal contracts", () => {
     };
     expect(budgetReservationSchema.safeParse({
       jobId: "j1", operationId: "j1:draft:nimi:0", stage: "draft",
-      role: "nimi", model: "gemini-3.5-flash",
+      role: "nimi", model: "muse-spark-1.3",
       estimatedCostUsd: "0.001000", pricingVersion: "2026-08-23",
       modelPolicy,
     }).success).toBe(true);
@@ -117,7 +117,7 @@ describe("internal contracts", () => {
     }).success).toBe(false);
     expect(usageRecordSchema.safeParse({
       id: "u1", jobId: "j1", operationId: "j1:draft:nimi:0", stage: "draft",
-      role: "nimi", model: "gemini-3.5-flash", inputUnits: 100, outputUnits: 10,
+      role: "nimi", model: "muse-spark-1.3", inputUnits: 100, outputUnits: 10,
       unitType: "tokens", estimatedCostUsd: "0.000240",
       pricingVersion: "2026-08-23", traceId: "a".repeat(32),
       modelPolicy,

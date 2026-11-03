@@ -6,15 +6,15 @@ const checks = ["grounding", "brief", "brand", "format", "cta", "safety", "clari
 
 describe("artifact production submission", () => {
   it("accepts an exact accepted batch bound to production lineage", () => {
-    const parsed = artifactProductionSubmissionSchema.parse({ jobId: "job-1", producerModel: "gemini-3.7-flash", stage: "draft", operation: "complete", editorialPlanId: "editorial-1", editorialPlanDigest: "a".repeat(64), editorialItemId: "item-1", briefId: "brief-1", result: { original: { artifacts: [artifact] }, firstReview: { reviews: [{ artifactId: "artifact-1", decision: "accept", checks, issues: [] }] }, revision: null, finalReview: null, accepted: { artifacts: [artifact] } } });
+    const parsed = artifactProductionSubmissionSchema.parse({ jobId: "job-1", producerModel: "muse-spark-1.3", stage: "draft", operation: "complete", editorialPlanId: "editorial-1", editorialPlanDigest: "a".repeat(64), editorialItemId: "item-1", briefId: "brief-1", result: { original: { artifacts: [artifact] }, firstReview: { reviews: [{ artifactId: "artifact-1", decision: "accept", checks, issues: [] }] }, revision: null, finalReview: null, accepted: { artifacts: [artifact] } } });
     expect(parsed.result.accepted.artifacts[0].outputType).toBe("newsletter");
-    expect(parsed.producerModel).toBe("gemini-3.7-flash");
+    expect(parsed.producerModel).toBe("muse-spark-1.3");
     const { producerModel: _model, ...missingModel } = parsed;
     expect(artifactProductionSubmissionSchema.safeParse(missingModel).success).toBe(false);
   });
 
   it("rejects action authority and mismatched accepted artifacts", () => {
-    const value: Record<string, unknown> = { jobId: "job-1", producerModel: "gemini-3.7-flash", stage: "draft", operation: "complete", editorialPlanId: "editorial-1", editorialPlanDigest: "a".repeat(64), editorialItemId: "item-1", briefId: "brief-1", result: { original: { artifacts: [artifact] }, firstReview: { reviews: [{ artifactId: "artifact-1", decision: "accept", checks, issues: [] }] }, revision: null, finalReview: null, accepted: { artifacts: [{ ...artifact, id: "invented" }] } }, proposedActions: [] };
+    const value: Record<string, unknown> = { jobId: "job-1", producerModel: "muse-spark-1.3", stage: "draft", operation: "complete", editorialPlanId: "editorial-1", editorialPlanDigest: "a".repeat(64), editorialItemId: "item-1", briefId: "brief-1", result: { original: { artifacts: [artifact] }, firstReview: { reviews: [{ artifactId: "artifact-1", decision: "accept", checks, issues: [] }] }, revision: null, finalReview: null, accepted: { artifacts: [{ ...artifact, id: "invented" }] } }, proposedActions: [] };
     expect(artifactProductionSubmissionSchema.safeParse(value).success).toBe(false);
   });
 });

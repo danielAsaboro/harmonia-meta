@@ -72,15 +72,15 @@ describe("job budgets", () => {
   it("aggregates usage by model and role with microdollar precision", () => {
     const records = [
       {
-        model: "gemini-3.5-flash", role: "analyst", inputUnits: 100,
+        model: "muse-spark-1.3", role: "analyst", inputUnits: 100,
         outputUnits: 20, estimatedCostUsd: "0.000330", observedCostUsd: "0.000300",
       },
       {
-        model: "gemini-3.5-flash", role: "analyst", inputUnits: 50,
+        model: "muse-spark-1.3", role: "analyst", inputUnits: 50,
         outputUnits: 10, estimatedCostUsd: "0.000165",
       },
       {
-        model: "gemini-3.5-flash-lite", role: "strategist", inputUnits: 10,
+        model: "muse-spark-1.2", role: "strategist", inputUnits: 10,
         outputUnits: 2, estimatedCostUsd: "0.000008",
       },
     ];
@@ -88,11 +88,11 @@ describe("job budgets", () => {
     expect(aggregateModelUsage(records)).toEqual({
       modelUsage: [
         {
-          model: "gemini-3.5-flash", role: "analyst", calls: 2,
+          model: "muse-spark-1.3", role: "analyst", calls: 2,
           inputUnits: 150, outputUnits: 30, estimatedCostUsd: "0.000495",
         },
         {
-          model: "gemini-3.5-flash-lite", role: "strategist", calls: 1,
+          model: "muse-spark-1.2", role: "strategist", calls: 1,
           inputUnits: 10, outputUnits: 2, estimatedCostUsd: "0.000008",
         },
       ],

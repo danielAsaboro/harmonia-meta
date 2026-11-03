@@ -37,8 +37,7 @@ const CATEGORY_LIMITS: Record<AttachmentCategory, number> = {
   image: 25 * 1024 * 1024,
   document: 50 * 1024 * 1024,
   // Product limits bound upload, scan, storage, ffmpeg, and transcription
-  // work. The worker routes media above its conservative inline threshold
-  // through Gemini's Files API instead of base64-encoding it in the request.
+  // work. The worker splits media into clips for Muse Voice Transcribe.
   audio: 24 * 1024 * 1024,
   video: 24 * 1024 * 1024,
 };

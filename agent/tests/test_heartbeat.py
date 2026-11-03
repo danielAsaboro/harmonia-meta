@@ -16,7 +16,7 @@ def test_heartbeat_runs_deterministic_arms_without_model_calls():
         stage_outbox=lambda limit: [{"outcome": "published"}],
         recover_missed=lambda: [{"cycleId": "missed-1"}],
         inspect_stuck=lambda: [{"jobId": "job-1", "reason": "expired lease"}],
-        provider_health=lambda: {"gemini": "healthy"},
+        provider_health=lambda: {"meta": "healthy"},
         budget_health=lambda: {"available": True},
         maintenance=lambda: ["retention-complete"],
         cognitive_arm=model_arm,
@@ -44,7 +44,7 @@ def test_heartbeat_isolates_failed_arms_and_pauses_paid_work_when_budget_is_empt
         claim_cycle=lambda *_args: {"outcome": "execute", "cycleId": "cycle-1"},
         finalize_cycle=lambda payload: payload,
         stage_outbox=broken_outbox,
-        recover_missed=lambda: [], inspect_stuck=lambda: [], provider_health=lambda: {"gemini": "unknown"},
+        recover_missed=lambda: [], inspect_stuck=lambda: [], provider_health=lambda: {"meta": "unknown"},
         budget_health=lambda: {"available": False, "reason": "daily budget exhausted"},
         maintenance=lambda: entered.append("maintenance") or [], cognitive_arm=cognitive, cognitive_due=True,
     ))

@@ -97,7 +97,7 @@ def test_rollback_restores_exact_previous_model_and_requires_reason(tmp_path):
 def test_tampered_ledger_is_rejected(tmp_path):
     ledger = tmp_path / "governance.jsonl"
     append_event(ledger, candidate())
-    ledger.write_text(ledger.read_text().replace("muse-wonder-1.0", "gemini-tampered"))
+    ledger.write_text(ledger.read_text().replace("muse-wonder-1.0", "muse-tampered"))
     with pytest.raises(ValueError, match="digest"):
         load_ledger(ledger)
 
