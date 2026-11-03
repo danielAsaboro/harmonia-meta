@@ -31,7 +31,7 @@ export function classifyLibrarySyncFailure(error: unknown, retryCount: number, n
   return { code: error instanceof Error ? error.name : "sync_error", category, publicMessage: message.slice(0, 240), retryCount, ...(nextRetry ? { nextEligibleRetryAt: nextRetry } : {}) };
 }
 
-const supportedMime = (mime: string) => mime.startsWith("text/") || mime.startsWith("audio/") || mime.startsWith("video/") || ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.google-apps.document", "application/vnd.google-apps.presentation", "application/vnd.google-apps.spreadsheet"].includes(mime);
+const supportedMime = (mime: string) => mime.startsWith("text/") || mime.startsWith("audio/") || mime.startsWith("video/") || ["image/png", "image/jpeg", "image/webp", "image/gif", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.google-apps.document", "application/vnd.google-apps.presentation", "application/vnd.google-apps.spreadsheet"].includes(mime);
 type Enumerated = { providerResourceId: string; providerVersion: string; title: string; mimeType: string; size: number; download: () => Promise<{ bytes: Buffer; mimeType: string }> };
 
 async function enumerateDrive(connection: BrandLibraryConnection): Promise<Enumerated[]> {

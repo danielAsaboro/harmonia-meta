@@ -60,7 +60,7 @@ from .team_runtime import TeamRuntimeProtocolError, TeamRuntimeProviderError
 from .telemetry import current_trace_id, inject_context, safe_attributes, tracer
 from .usage import InvocationContext
 from .effect_executor import execute_effect_command, production_adapters
-from .extraction import extract_docx, extract_html, extract_media, extract_pdf, extract_text
+from .extraction import extract_docx, extract_html, extract_image, extract_media, extract_pdf, extract_text
 from .extraction.security import assert_public_url
 from .operation_context import current_operation, operation_scope
 from .web_client import (
@@ -295,6 +295,7 @@ def _extract_source(job: dict[str, Any], source: dict[str, Any], source_input: d
         if mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" or lowered.endswith(".docx"): return extract_docx(source_id, filename, body, receipt_id=receipt_id)
         if mime.startswith("text/") or lowered.endswith((".txt", ".md")): return extract_text(source_id, filename, body.decode("utf-8"), "text/markdown" if lowered.endswith(".md") else "text/plain", receipt_id=receipt_id)
         if mime.startswith(("audio/", "video/")): return extract_media(source_id, filename, body, mime, invocation=InvocationContext(job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"], user_id=job["createdByUserId"], stage="extract_sources", operation_id=_invocation_operation_id(f"{job['id']}:extract_sources:{source_id}", source_id)), receipt_id=receipt_id)
+        if mime.startswith("image/"): return extract_image(source_id, filename, body, mime, invocation=InvocationContext(job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"], user_id=job["createdByUserId"], stage="extract_sources", operation_id=_invocation_operation_id(f"{job['id']}:extract_sources:{source_id}", source_id)), receipt_id=receipt_id)
         raise ValueError(f"unsupported uploaded source type: {mime}")
     raise ValueError(f"unsupported source kind: {kind}")
 

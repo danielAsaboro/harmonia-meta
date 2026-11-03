@@ -55,9 +55,14 @@ def _media_duration(body: bytes, mime_type: str) -> float:
     return duration
 
 
+SUPPORTED_IMAGE_MIMES = frozenset({"image/png", "image/jpeg", "image/webp", "image/gif"})
+# Image understanding returns visible text plus at most twelve short observations.
+IMAGE_CHARACTER_BOUND = 12_000
+
+
 def estimate_extraction(body: bytes, mime_type: str, limits: ExtractionLimits) -> ExtractionEstimate:
     mime = mime_type.split(";", 1)[0].lower()
-    if not (mime.startswith("text/") or mime.startswith(("audio/", "video/")) or mime in SUPPORTED_DOCUMENT_MIMES):
+    if not (mime.startswith("text/") or mime.startswith(("audio/", "video/")) or mime in SUPPORTED_DOCUMENT_MIMES or mime in SUPPORTED_IMAGE_MIMES):
         raise ValueError(f"unsupported library source type: {mime}")
     if not body or len(body) > limits.maximum_bytes:
         raise ValueError("library source exceeds byte policy")
@@ -66,7 +71,7 @@ def estimate_extraction(body: bytes, mime_type: str, limits: ExtractionLimits) -
         raise ValueError("library source exceeds media duration policy")
     # UTF-8 text can expand to at most one character per byte. Documents are
     # bounded conservatively because compressed containers can expand heavily.
-    characters = len(body) if mime.startswith("text/") else len(body) * 20
+    characters = len(body) if mime.startswith("text/") else IMAGE_CHARACTER_BOUND if mime in SUPPORTED_IMAGE_MIMES else len(body) * 20
     if characters > limits.maximum_characters:
         raise ValueError("library source exceeds extracted-character policy")
     # Conservative reservation: media seconds plus byte-derived text tokens.

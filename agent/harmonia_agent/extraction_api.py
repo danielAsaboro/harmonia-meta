@@ -6,7 +6,7 @@ import hmac
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from .config import settings
-from .extraction import extract_docx, extract_media, extract_pdf, extract_text
+from .extraction import extract_docx, extract_image, extract_media, extract_pdf, extract_text
 from .extraction.preflight import ExtractionLimits, estimate_extraction
 from .tenant_context import tenant_scope
 from .usage import InvocationContext
@@ -26,6 +26,7 @@ def _extract(value: ExtractionRequest, invocation: InvocationContext):
     if mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document": return extract_docx(value.sourceId, value.title, body, receipt_id=value.receiptId)
     if mime.startswith("text/"): return extract_text(value.sourceId, value.title, body.decode("utf-8"), mime, receipt_id=value.receiptId)
     if mime.startswith(("audio/", "video/")): return extract_media(value.sourceId, value.title, body, mime, invocation=invocation, receipt_id=value.receiptId)
+    if mime.startswith("image/"): return extract_image(value.sourceId, value.title, body, mime, invocation=invocation, receipt_id=value.receiptId)
     raise ValueError(f"unsupported library source type: {mime}")
 
 @router.post("/internal/sources/extract")

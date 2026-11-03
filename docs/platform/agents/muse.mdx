@@ -13,6 +13,7 @@ Every cognitive call in Harmonia goes to a Meta model. Role policy fixes the con
 | Any role with `*_PROVIDER=baseten` | Muse Spark Open (`meta-models/muse-spark-open-1026`) on Baseten |
 | Public research for Nimi and Ryan | Muse Spark with the built-in `web_search` tool (Responses API) |
 | Audio and video transcription | Muse Voice Transcribe 1.0 (`/v1/asr/transcribe`) |
+| Uploaded images (screenshots, slides, charts, photos) | Muse Spark image understanding (`/v1/responses`, strict JSON): verbatim visible text plus up to 12 observations, each a `frame` segment pointing at the stored image |
 | Visual evidence from uploaded video | Muse Spark video understanding (`/v1/responses`, strict JSON) on a 2 fps, 480 px proxy; each observation becomes a `frame` segment backed by an ffmpeg still |
 | Approved image generation | Muse Image 1.0 (`/v1/images/generations`) |
 | Subject tracking for vertical and square clips | SAM 3.1 (`/v1/responses`, boxes only) on a 5 fps, 640 px proxy |
@@ -42,5 +43,7 @@ Model routing and output contracts are locally tested. Authenticated Meta Model 
 - `agent/harmonia_agent/content.py`
 - `agent/harmonia_agent/segmentation.py`
 - `agent/harmonia_agent/video_understanding.py`
+- `agent/harmonia_agent/extraction/image.py`
+- `agent/harmonia_agent/meta_api.py`
 - `src/lib/metaChatCompletion.ts`
 - `docs/models-cost-evaluation.mdx`
