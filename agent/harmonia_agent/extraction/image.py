@@ -34,7 +34,8 @@ MAX_OBSERVATIONS = 12
 MAX_OUTPUT_TOKENS = 4000
 # The internal artifact store accepts at most 8 MiB per object.
 MAX_STORED_IMAGE_BYTES = 7_500_000
-# Meta does not publish an image token rate; reserve generously, record actual usage.
+# Meta does not publish an image token rate. Reservations use the exact count from
+# /responses/input_tokens and fall back to this generous estimate only when counting fails.
 ESTIMATED_IMAGE_INPUT_TOKENS = 3000
 
 IMAGE_SCHEMA: dict[str, Any] = {
@@ -59,8 +60,10 @@ class ImageUnderstandingError(RuntimeError):
     pass
 
 
-def _observe(client: httpx.Client, model: str, image: bytes, mime: str) -> tuple[str, dict[str, Any]]:
-    response = client.post("/responses", json={
+def _observe(
+    client: httpx.Client, model: str, image: bytes, mime: str, before_dispatch: Callable[[int | None], None],
+) -> tuple[str, dict[str, Any]]:
+    request = {
         "model": model,
         "reasoning": {"effort": "low"},
         "max_output_tokens": MAX_OUTPUT_TOKENS,
@@ -69,7 +72,9 @@ def _observe(client: httpx.Client, model: str, image: bytes, mime: str) -> tuple
             {"type": "input_image", "image_url": f"data:{mime};base64," + base64.b64encode(image).decode()},
         ]}],
         "text": {"format": {"type": "json_schema", "name": "ImageEvidence", "schema": IMAGE_SCHEMA, "strict": True}},
-    })
+    }
+    before_dispatch(meta_api.count_input_tokens(client, request))
+    response = client.post("/responses", json=request)
     if response.status_code >= 300:
         raise ImageUnderstandingError(f"image understanding failed ({response.status_code}): {response.text[:200]}")
     body = response.json()
@@ -95,7 +100,7 @@ def extract_image(
     invocation: InvocationContext,
     receipt_id: str,
     store_image: Callable[[bytes, str], str] | None = None,
-    observe: Callable[[httpx.Client, str, bytes, str], tuple[str, dict[str, Any]]] = _observe,
+    observe: Callable[[httpx.Client, str, bytes, str, Callable[[int | None], None]], tuple[str, dict[str, Any]]] = _observe,
     client_factory: Callable[[float], httpx.Client] = lambda timeout: meta_api.client(timeout, purpose="Muse Spark image understanding"),
     budget_reserver: Callable[[dict[str, object]], None] = reserve_budget,
     budget_resolver: Callable[[dict[str, object]], None] = resolve_budget_reservation,
@@ -108,22 +113,27 @@ def extract_image(
     role = "image_reader"
     model = video_model()
     operation_id = invocation.role_operation_id(role)
-    budget_reserver({
-        "jobId": invocation.job_id, "operationId": operation_id, "stage": invocation.stage,
-        "role": role, "model": model,
-        "estimatedCostUsd": str(estimate_text_cost(model, ESTIMATED_IMAGE_INPUT_TOKENS, MAX_OUTPUT_TOKENS)),
-        "pricingVersion": PRICING_VERSION,
-    })
-    state = "reserved"
+    progress: dict[str, Any] = {"state": "pending", "input": ESTIMATED_IMAGE_INPUT_TOKENS, "counted": False}
+
+    def reserve(counted: int | None) -> None:
+        if counted is not None:
+            progress.update(input=counted, counted=True)
+        budget_reserver({
+            "jobId": invocation.job_id, "operationId": operation_id, "stage": invocation.stage,
+            "role": role, "model": model,
+            "estimatedCostUsd": str(estimate_text_cost(model, progress["input"], MAX_OUTPUT_TOKENS)),
+            "pricingVersion": PRICING_VERSION,
+        })
+        progress["state"] = "dispatched"
+
     try:
         with tracer().start_as_current_span("harmonia.model.generate") as span:
             span.set_attributes(safe_attributes({
                 "job.id": invocation.job_id, "stage": invocation.stage, "agent": role, "model": model,
             }))
             with client_factory(180.0) as client:
-                state = "dispatched"
-                text, usage = observe(client, model, body, mime_type)
-            input_tokens = int(usage.get("input_tokens") or ESTIMATED_IMAGE_INPUT_TOKENS)
+                text, usage = observe(client, model, body, mime_type, reserve)
+            input_tokens = int(usage.get("input_tokens") or progress["input"])
             output_tokens = int(usage.get("output_tokens") or 0)
             cached = min(int((usage.get("input_tokens_details") or {}).get("cached_tokens") or 0), input_tokens)
             cost = estimate_text_cost(model, input_tokens, output_tokens, cached)
@@ -134,16 +144,17 @@ def extract_image(
                 cached_input_units=cached or None, unit_type="tokens", estimated_cost_usd=str(cost),
                 trace_id=current_trace_id(), created_at=datetime.now(timezone.utc).isoformat(),
             ).to_wire())
-            state = "reported"
+            progress["state"] = "reported"
             span.set_attributes(safe_attributes({
                 "input.units": input_tokens, "output.units": output_tokens, "cost.estimated_usd": str(cost),
+                "input.counted": progress["counted"],
             }))
     except Exception:
-        if state != "reported":
+        # Nothing was reserved until the request was ready to send.
+        if progress["state"] == "dispatched":
             budget_resolver({
-                "jobId": invocation.job_id, "operationId": operation_id,
-                "outcome": "uncertain" if state == "dispatched" else "not_invoked",
-                "reason": f"image understanding failed {'after' if state == 'dispatched' else 'before'} provider dispatch",
+                "jobId": invocation.job_id, "operationId": operation_id, "outcome": "uncertain",
+                "reason": "image understanding failed after provider dispatch",
             })
         raise
     visible, observations = parse_image_evidence(text)

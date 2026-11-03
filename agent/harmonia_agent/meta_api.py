@@ -129,6 +129,28 @@ def fetch_status(get: Callable[[str], httpx.Response] | None = None) -> dict[str
     }
 
 
+def count_input_tokens(client: httpx.Client, body: dict[str, Any]) -> int | None:
+    """Exact rendered input size of a Responses body, or None when it can't be counted.
+
+    docs/meta/token-counting.md: ``POST /responses/input_tokens`` runs the target
+    model's tokenizer over the request as sent, media included, without
+    generating or billing. Requests without hosted tools are billed on that same
+    rendered input, so it replaces per-second and per-image guesses when sizing
+    a budget reservation. Counting is best effort: callers keep their estimate.
+    """
+    try:
+        response = client.post("/responses/input_tokens", json=body)
+    except httpx.HTTPError:
+        return None
+    if response.status_code != 200:
+        return None
+    try:
+        value = response.json().get("input_tokens")
+    except ValueError:
+        return None
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
 # docs/meta/file-handling.md: inline media is capped at 50 MB per request; the
 # Files API accepts up to 1 GiB. Uploads expire after an hour and are deleted
 # as soon as the call that needed them returns.

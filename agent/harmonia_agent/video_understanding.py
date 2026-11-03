@@ -32,8 +32,9 @@ MAX_OBSERVATIONS = 20
 PROXY_WIDTH = 480
 # Larger proxies go through the Files API (1 GiB cap) instead of inline.
 MAX_PROXY_BYTES = 1_000_000_000
-# Meta does not publish a per-second video token rate; reserve against a
-# deliberately high estimate and record the provider-reported usage afterwards.
+# Meta does not publish a per-second video token rate. The reservation uses the
+# exact count from /responses/input_tokens and falls back to this deliberately
+# high estimate only when counting fails; provider usage is recorded afterwards.
 ESTIMATED_INPUT_TOKENS_PER_SECOND = 400
 MAX_OUTPUT_TOKENS = 6000
 logger = logging.getLogger("harmonia.video_understanding")
@@ -128,9 +129,11 @@ def _http_client(timeout: float) -> httpx.Client:
     return meta_api.client(timeout, purpose="Muse Spark video understanding")
 
 
-def _observe(client: httpx.Client, model: str, video: bytes) -> tuple[str, dict[str, Any]]:
+def _observe(
+    client: httpx.Client, model: str, video: bytes, before_dispatch: Callable[[int | None], None],
+) -> tuple[str, dict[str, Any]]:
     with meta_api.video_input(client, video) as video_part:
-        response = client.post("/responses", json={
+        request = {
             "model": model,
             "reasoning": {"effort": "low"},
             "max_output_tokens": MAX_OUTPUT_TOKENS,
@@ -138,7 +141,9 @@ def _observe(client: httpx.Client, model: str, video: bytes) -> tuple[str, dict[
                 {"type": "input_text", "text": PROMPT}, video_part,
             ]}],
             "text": {"format": {"type": "json_schema", "name": "VisualObservations", "schema": OBSERVATION_SCHEMA, "strict": True}},
-        })
+        }
+        before_dispatch(meta_api.count_input_tokens(client, request))
+        response = client.post("/responses", json=request)
     if response.status_code >= 300:
         raise VideoUnderstandingError(f"video understanding failed ({response.status_code}): {response.text[:200]}")
     body = response.json()
@@ -174,7 +179,7 @@ def observe_video(
     *,
     invocation: InvocationContext,
     store_frame: Callable[[bytes], str],
-    observe: Callable[[httpx.Client, str, bytes], tuple[str, dict[str, Any]]] = _observe,
+    observe: Callable[[httpx.Client, str, bytes, Callable[[int | None], None]], tuple[str, dict[str, Any]]] = _observe,
     client_factory: Callable[[float], httpx.Client] = _http_client,
     budget_reserver: Callable[[dict[str, object]], None] = reserve_budget,
     budget_resolver: Callable[[dict[str, object]], None] = resolve_budget_reservation,
@@ -184,14 +189,21 @@ def observe_video(
     role = "video_observer"
     model = video_model()
     operation_id = invocation.role_operation_id(role)
-    estimated_input = int(duration_sec * ESTIMATED_INPUT_TOKENS_PER_SECOND) + 500
-    estimate = estimate_text_cost(model, estimated_input, MAX_OUTPUT_TOKENS)
-    budget_reserver({
-        "jobId": invocation.job_id, "operationId": operation_id, "stage": invocation.stage,
-        "role": role, "model": model, "estimatedCostUsd": str(estimate),
-        "pricingVersion": PRICING_VERSION,
-    })
-    state = "reserved"
+    progress: dict[str, Any] = {
+        "state": "pending", "input": int(duration_sec * ESTIMATED_INPUT_TOKENS_PER_SECOND) + 500, "counted": False,
+    }
+
+    def reserve(counted: int | None) -> None:
+        if counted is not None:
+            progress.update(input=counted, counted=True)
+        budget_reserver({
+            "jobId": invocation.job_id, "operationId": operation_id, "stage": invocation.stage,
+            "role": role, "model": model,
+            "estimatedCostUsd": str(estimate_text_cost(model, progress["input"], MAX_OUTPUT_TOKENS)),
+            "pricingVersion": PRICING_VERSION,
+        })
+        progress["state"] = "dispatched"
+
     try:
         with tempfile.TemporaryDirectory() as td, tracer().start_as_current_span("harmonia.model.generate") as span:
             span.set_attributes(safe_attributes({
@@ -199,9 +211,8 @@ def observe_video(
             }))
             video = _small_proxy(source, Path(td))
             with client_factory(600.0) as client:
-                state = "dispatched"
-                text, usage = observe(client, model, video)
-            input_tokens = int(usage.get("input_tokens") or estimated_input)
+                text, usage = observe(client, model, video, reserve)
+            input_tokens = int(usage.get("input_tokens") or progress["input"])
             output_tokens = int(usage.get("output_tokens") or 0)
             cached_tokens = min(int((usage.get("input_tokens_details") or {}).get("cached_tokens") or 0), input_tokens)
             cost = estimate_text_cost(model, input_tokens, output_tokens, cached_tokens)
@@ -212,7 +223,7 @@ def observe_video(
                 cached_input_units=cached_tokens or None, unit_type="tokens", estimated_cost_usd=str(cost),
                 trace_id=current_trace_id(), created_at=datetime.now(timezone.utc).isoformat(),
             ).to_wire())
-            state = "reported"
+            progress["state"] = "reported"
             anchored: list[tuple[float, str, str]] = []
             for timestamp, observation in parse_observations(text, duration_sec):
                 try:
@@ -222,15 +233,16 @@ def observe_video(
             span.set_attributes(safe_attributes({
                 "input.units": input_tokens, "output.units": output_tokens,
                 "cost.estimated_usd": str(cost), "video.observations": len(anchored),
+                "input.counted": progress["counted"],
             }))
             return anchored
     except Exception:
-        if state != "reported":
+        # Nothing was reserved until the request was ready to send.
+        if progress["state"] == "dispatched":
             try:
                 budget_resolver({
-                    "jobId": invocation.job_id, "operationId": operation_id,
-                    "outcome": "uncertain" if state == "dispatched" else "not_invoked",
-                    "reason": f"video understanding failed {'after' if state == 'dispatched' else 'before'} provider dispatch",
+                    "jobId": invocation.job_id, "operationId": operation_id, "outcome": "uncertain",
+                    "reason": "video understanding failed after provider dispatch",
                 })
             except Exception:  # noqa: BLE001 - preserve the causal failure
                 logger.exception("budget resolution failed for operation %s", operation_id)

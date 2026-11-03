@@ -69,8 +69,9 @@ def test_observe_video_anchors_each_observation_to_a_stored_frame(tmp_path: Path
         def __exit__(self, *_args):
             return False
 
-    def observe(_client, model, video):
+    def observe(_client, model, video, before_dispatch):
         assert model == "muse-spark-1.3" and video[4:8] == b"ftyp"
+        before_dispatch(900)
         return json.dumps({"observations": [{"timestampSec": 2, "observation": "A color test pattern."}]}), {
             "input_tokens": 1000, "output_tokens": 200,
         }
@@ -88,16 +89,19 @@ def test_observe_video_anchors_each_observation_to_a_stored_frame(tmp_path: Path
     assert result == [(2.0, "A color test pattern.", "artifact-1")]
     assert stored[0][:3] == b"\xff\xd8\xff"
     assert reserved[0]["role"] == "video_observer"
+    # 900 counted input tokens plus the 6,000-token output ceiling, not 4 s x 400 + 500.
+    assert reserved[0]["estimatedCostUsd"] == "0.026625"
     assert (usage[0]["inputUnits"], usage[0]["outputUnits"], usage[0]["estimatedCostUsd"]) == (1000, 200, "0.002100")
 
 
 @ffmpeg
-def test_observe_video_releases_the_reservation_when_nothing_was_sent(tmp_path: Path):
+def test_observe_video_reserves_nothing_when_no_request_was_built(tmp_path: Path):
     resolved: list[dict] = []
     with pytest.raises(vu.VideoUnderstandingError):
         vu.observe_video(
             tmp_path / "missing.mp4", 4, invocation=_invocation(), store_frame=lambda _b: "x",
             client_factory=lambda _timeout: pytest.fail("must not dispatch"),
-            budget_reserver=lambda _p: None, budget_resolver=resolved.append, usage_reporter=lambda _p: None,
+            budget_reserver=lambda _p: pytest.fail("must not reserve"), budget_resolver=resolved.append,
+            usage_reporter=lambda _p: None,
         )
-    assert resolved[0]["outcome"] == "not_invoked"
+    assert resolved == []

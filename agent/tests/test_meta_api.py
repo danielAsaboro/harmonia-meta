@@ -125,3 +125,39 @@ def test_large_video_goes_through_the_files_api_and_is_deleted(monkeypatch):
         assert b'name="expires_after[seconds]"' in body and b"3600" in body
         assert b"0123456789" in body
     assert (seen[-1].method, seen[-1].url.path) == ("DELETE", "/v1/files/file-842549258569145")
+
+
+def _count_client(handler) -> httpx.Client:
+    return httpx.Client(transport=httpx.MockTransport(handler), base_url="https://api.meta.ai/v1")
+
+
+def test_count_input_tokens_sends_the_exact_request_body():
+    seen: list[httpx.Request] = []
+    body = {"model": "muse-spark-1.3", "input": "hi", "max_output_tokens": 10}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json={"object": "response.input_tokens", "input_tokens": 42})
+
+    with _count_client(handler) as client:
+        assert meta_api.count_input_tokens(client, body) == 42
+    assert seen[0].url.path == "/v1/responses/input_tokens"
+    assert seen[0].read() == httpx.Request("POST", "/", json=body).read()
+
+
+def test_count_input_tokens_is_best_effort():
+    responses = [
+        httpx.Response(400, json={"error": {"message": "bad"}}),
+        httpx.Response(200, json={"input_tokens": "many"}),
+        httpx.Response(200, json={"input_tokens": True}),
+        httpx.Response(200, json={"input_tokens": -1}),
+        httpx.Response(200, content=b"not json"),
+    ]
+    with _count_client(lambda _request: responses.pop(0)) as client:
+        assert [meta_api.count_input_tokens(client, {"model": "m"}) for _ in range(5)] == [None] * 5
+
+    def unreachable(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("down", request=request)
+
+    with _count_client(unreachable) as client:
+        assert meta_api.count_input_tokens(client, {"model": "m"}) is None

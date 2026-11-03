@@ -27,7 +27,7 @@ Every role records the policy version, provider/model identity, generation limit
 ## Reservation and usage lifecycle
 
 <Steps>
-  <Step title="Estimate">Resolve an immutable pricing-catalog entry and the operation’s maximum authorized cost.</Step>
+  <Step title="Estimate">Resolve an immutable pricing-catalog entry and the operation’s maximum authorized cost. Video and image understanding first send the exact request to Meta’s `POST /v1/responses/input_tokens`, so the reservation uses the model’s own token count for that media instead of a per-second or per-image guess; if counting fails, they reserve against a deliberately high estimate.</Step>
   <Step title="Reserve">Atomically reserve budget using the stable operation ID before provider execution.</Step>
   <Step title="Execute">Call the configured provider only after reservation succeeds.</Step>
   <Step title="Finalize">Write one immutable usage record and reconcile observed units or endpoint time.</Step>

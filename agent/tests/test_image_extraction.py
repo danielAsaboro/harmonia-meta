@@ -50,8 +50,9 @@ def test_schema_is_a_strict_subset():
 
 
 def test_image_becomes_frame_segments_backed_by_the_stored_image():
-    def observe(_client, model, body, mime):
+    def observe(_client, model, body, mime, before_dispatch):
         assert (model, body, mime) == ("muse-spark-1.3", PNG, "image/png")
+        before_dispatch(1800)
         return json.dumps({
             "visibleText": "Pro plan $49/mo",
             "observations": ["A pricing table with three columns.", "  ", "The middle column is highlighted."],
@@ -66,21 +67,52 @@ def test_image_becomes_frame_segments_backed_by_the_stored_image():
     assert result.sourceKind == "document" and result.metadata["mediaType"] == "image"
     assert calls["stored"] == [(PNG, "image/png")]
     assert calls["reserve"][0]["role"] == "image_reader"
+    # 1,800 counted input tokens plus the 4,000-token output ceiling on Muse Spark.
+    assert calls["reserve"][0]["estimatedCostUsd"] == "0.019250"
     assert calls["usage"][0]["estimatedCostUsd"] == "0.002925"
     assert calls["resolve"] == []
 
 
 def test_provider_failure_marks_the_reservation_uncertain_and_stores_nothing():
-    def observe(*_args):
+    calls: dict = {}
+
+    def observe(_client, _model, _body, _mime, before_dispatch):
+        before_dispatch(None)
+        calls["reserved"] = True
         raise image.ImageUnderstandingError("image understanding failed (500)")
 
+    resolved: list[dict] = []
     with pytest.raises(image.ImageUnderstandingError):
-        _extract(observe)
+        _extract(observe, budget_resolver=resolved.append)
+    assert calls["reserved"] and resolved[0]["outcome"] == "uncertain"
+
+
+def test_an_uncounted_image_reserves_against_the_generous_estimate():
+    def observe(_client, _model, _body, _mime, before_dispatch):
+        before_dispatch(None)
+        return json.dumps({"visibleText": "Hi", "observations": []}), {"input_tokens": 10, "output_tokens": 5}
+
+    _result, calls = _extract(observe)
+    assert calls["reserve"][0]["estimatedCostUsd"] == "0.020750"
+
+
+def test_failure_before_the_request_is_ready_reserves_nothing():
+    def observe(*_args):
+        raise image.ImageUnderstandingError("client failed")
+
+    resolved: list[dict] = []
+    with pytest.raises(image.ImageUnderstandingError):
+        _extract(observe, budget_reserver=lambda _p: pytest.fail("must not reserve"), budget_resolver=resolved.append)
+    assert resolved == []
 
 
 def test_empty_evidence_is_rejected_after_usage_is_recorded():
+    def observe(_client, _model, _body, _mime, before_dispatch):
+        before_dispatch(None)
+        return json.dumps({"visibleText": "", "observations": []}), {}
+
     with pytest.raises(ValueError, match="no evidence"):
-        _extract(lambda *_args: (json.dumps({"visibleText": "", "observations": []}), {}))
+        _extract(observe)
 
 
 def test_rejects_unsupported_types_before_spending():
