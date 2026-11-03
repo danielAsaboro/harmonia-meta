@@ -7,7 +7,7 @@ Google Cloud Trace is Harmonia's intended managed trace backend. OpenTelemetry e
 
 ## How Harmonia uses it
 
-Both Cloud Run service accounts receive `roles/cloudtrace.agent`. Deployment enables the Cloud Trace API and configures OTLP export. A complete execution should expose correlated spans for the web request, Firestore transition, Pub/Sub delivery, worker stage, Agent Engine invocation, Memory Bank access when eligible, model call, validation, effect, and verification.
+Both Cloud Run service accounts receive `roles/cloudtrace.agent`. Deployment enables the Cloud Trace API and configures OTLP export. A complete execution should expose correlated spans for the web request, Firestore transition, Pub/Sub delivery, worker stage, ADK team invocation, workspace memory access when eligible, model call, validation, effect, and verification.
 
 Trace IDs are also carried in safe application records so an operator can compare observability data with Firestore workflow truth and provider receipts.
 

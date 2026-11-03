@@ -12,7 +12,7 @@ flowchart TB
   E --> R[Receipt]
   R --> I[Independent read-back]
   I --> F[Firestore workflow truth]
-  M[Memory Bank] -. advisory facts only .-> A
+  M[workspace memory] -. advisory facts only .-> A
   O[Telemetry] -. diagnosis only .-> D
 ```
 

@@ -6,19 +6,19 @@ description: "Canonical runtime inventory for Harmonia's seven Google ADK specia
 This page answers which method skill an agent may load, which data tools it may call, where its
 focused prompt lives, and which deterministic trace proves what actually ran.
 
-<Warning>Skill guidance is method, never evidence. Search is a tool, not a skill. Memory Bank is advisory context, never authority.</Warning>
+<Warning>Skill guidance is method, never evidence. Search is a tool, not a skill. Workspace memory is advisory context, never authority.</Warning>
 
 ## Runtime inventory
 
 | Agent | ADK name and model | Typed contract | Filesystem skill | Separate tools and research |
 |---|---|---|---|---|
-| [Nimi](/agents/nimi) | `nimi_analyst`, `gemini-3.5-flash` | `AnalystInput` → `SourceAnalysis` | `nimi-analysis-skills` (seven references) | Isolated, request-bound `nimi_web_search` only when an exact research request exists |
-| [Ryan](/agents/ryan) | `ryan_strategist`, `gemini-3.5-flash` | `StrategistInput` → `StrategistResult` / `ContentStrategy` | `ryan-strategy-skills` (seven references) | Isolated, request-bound `ryan_web_search` only when current public information is necessary |
-| [Temi](/agents/temi) | `temi_editorial_planner`, `gemini-3.5-flash-lite` | `EditorialPlannerInput` → `EditorialPlan` | `temi-editorial-planning-skills` (six references) | Six read-only views over one immutable, digest-bound planning snapshot; no search or core MCP server |
-| [Noni](/agents/noni) | `noni_copywriter`, `gemini-3.5-flash` | `CopywriterInput` → `ContentDraft` | `noni-writing-skills` (eleven references) | `search_verified_publications`; Meta web search through isolated `noni_web_search` |
-| [Dara](/agents/dara) | `dara_editor`, `gemini-3.5-flash` | `EditorialReviewInput` → `EditorialAssessment` | `dara-editing-skills` (seven references) | Skill loaders only; no data or research tool |
-| [Maya](/agents/maya) | `maya_presenter`, `gemini-3.5-flash` | `UiContext` → `SurfacePlan` | None | None; deterministic host hydration only |
-| [Nova](/agents/nova) | `nova_liaison`, `gemini-3.5-flash` | `LiaisonInput` → `LiaisonAnswer` | `trend-scan`, `signal-watch`, `engagement-insights`, `posting-schedule`, or `job-status` | Six bounded reads for trends, engagement, operator feed, job status, and posting windows |
+| [Nimi](/agents/nimi) | `nimi_analyst`, `muse-spark-1.3` | `AnalystInput` → `SourceAnalysis` | `nimi-analysis-skills` (seven references) | Isolated, request-bound `nimi_web_search` only when an exact research request exists |
+| [Ryan](/agents/ryan) | `ryan_strategist`, `muse-spark-1.3` | `StrategistInput` → `StrategistResult` / `ContentStrategy` | `ryan-strategy-skills` (seven references) | Isolated, request-bound `ryan_web_search` only when current public information is necessary |
+| [Temi](/agents/temi) | `temi_editorial_planner`, `muse-spark-1.3` | `EditorialPlannerInput` → `EditorialPlan` | `temi-editorial-planning-skills` (six references) | Six read-only views over one immutable, digest-bound planning snapshot; no search or core MCP server |
+| [Noni](/agents/noni) | `noni_copywriter`, `muse-spark-1.3` | `CopywriterInput` → `ContentDraft` | `noni-writing-skills` (eleven references) | `search_verified_publications`; Meta web search through isolated `noni_web_search` |
+| [Dara](/agents/dara) | `dara_editor`, `muse-spark-1.3` | `EditorialReviewInput` → `EditorialAssessment` | `dara-editing-skills` (seven references) | Skill loaders only; no data or research tool |
+| [Maya](/agents/maya) | `maya_presenter`, `muse-spark-1.3` | `UiContext` → `SurfacePlan` | None | None; deterministic host hydration only |
+| [Nova](/agents/nova) | `nova_liaison`, `muse-spark-1.3` | `LiaisonInput` → `LiaisonAnswer` | `trend-scan`, `signal-watch`, `engagement-insights`, `posting-schedule`, or `job-status` | Six bounded reads for trends, engagement, operator feed, job status, and posting windows |
 
 ## Prompt and runtime locations
 
@@ -48,7 +48,7 @@ may be cited.
 ## Evidence and authority
 
 Valid evidence comes only from the typed invocation: operator context IDs, Nimi moment or angle IDs,
-verified performance IDs, eligible Memory Bank fact IDs with Firestore provenance, approved internal
+verified performance IDs, eligible workspace memory fact IDs with Firestore provenance, approved internal
 read-tool evidence IDs, or validated native-search evidence IDs. Skill files, prompts, model memory,
 and source-coverage ledgers cannot prove customer, market, trend, performance, or source claims.
 

@@ -34,8 +34,8 @@ describe("public documentation truth boundaries", () => {
     expect(overview).toContain("web-only preview");
   });
 
-  it("documents Agent Engine as mandatory in the managed worker", () => {
-    expect(deployment).toContain("mandatory in the managed worker");
+  it("documents the in-process ADK runtime on Meta Model API", () => {
+    expect(deployment).toContain("Google ADK team running in-process inside the worker");
     expect(deployment).not.toContain("optional explicit production mode");
   });
 
@@ -51,7 +51,7 @@ describe("public documentation truth boundaries", () => {
       "Context rot", "Memory rot", "prune + spill", "Authority comes first",
       "intent before effect", "attempt generation", "10/10", "does not prove multi-week uptime",
     ]) expect(continuity).toContain(required);
-    expect(continuity).toContain("Memory Bank is advisory");
+    expect(continuity).toContain("Workspace memory is advisory");
     expect(continuity).not.toContain("exactly-once external effects");
   });
 

@@ -18,7 +18,7 @@ Local inspection and authenticated execution are different claims:
 | Mode | Purpose | What it proves |
 |---|---|---|
 | Persisted fixture inspection | Review the studio, state transitions, approvals, assets, and failure presentation | UI and local data-contract behavior only |
-| Authenticated cognitive job | Invoke configured Google identity, Agent Engine, Gemini, and managed memory boundaries | Only the providers captured in that specific run |
+| Authenticated cognitive job | Invoke configured Google identity, Meta Model API, and workspace memory boundaries | Only the providers captured in that specific run |
 
 Fixtures are never submission evidence for a provider invocation or deployment. Authenticated execution can incur provider charges; inspect pricing and quota before enabling it.
 
@@ -45,7 +45,7 @@ INTERNAL_API_TOKEN=local-dev-token
 
 ## Run an authenticated cognitive job
 
-Before this path can succeed, configure the values documented in [Configuration](/configuration), including Google Identity Platform, application credentials, `AGENT_SERVICE_URL`, the shared `INTERNAL_API_TOKEN`, `AGENT_ENGINE_RESOURCE`, and the exact regional model and memory resources used by the worker. There is no in-process ADK fallback.
+Before this path can succeed, configure the values documented in [Configuration](/configuration), including Google Identity Platform, application credentials, `AGENT_SERVICE_URL`, the shared `INTERNAL_API_TOKEN`, `MODEL_API_KEY`, and the exact regional model and memory resources used by the worker. There is no in-process ADK fallback.
 
 Open [http://localhost:3000](http://localhost:3000) and send the console:
 

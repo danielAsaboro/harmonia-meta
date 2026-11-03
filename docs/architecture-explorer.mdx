@@ -17,7 +17,7 @@ On narrow screens the graph becomes a searchable hierarchical list with the same
 
 The palette follows Harmonia's product system: warm paper and forest neutrals form the canvas, violet distinguishes cognitive roles, amber marks policy and human approval, green marks executed or independently verified effects, red marks uncertainty or blocked authority, and gray marks external systems.
 
-Edge semantics never rely on color alone. Labels, marker words, and line patterns distinguish durable transitions, delegation, human decisions, effects, independent verification read-back, read-only retrieval, Memory Bank retrieval, telemetry, and blocked or uncertain paths. Open the persistent Legend for the current key.
+Edge semantics never rely on color alone. Labels, marker words, and line patterns distinguish durable transitions, delegation, human decisions, effects, independent verification read-back, read-only retrieval, workspace memory retrieval, telemetry, and blocked or uncertain paths. Open the persistent Legend for the current key.
 
 ## Agent hierarchy and authority
 
@@ -27,7 +27,7 @@ See [ADK agent platform](./agent-platform) and [tool contracts](./tool-contracts
 
 ## Workflow and state ownership
 
-The workflow is collect_sources → extract_sources → understand with Nimi → strategize with Ryan → await strategy approval → plan with Temi → Noni/Dara typed artifact production → await effect approval → publish/export/render → verify → learn. Firestore is the durable source of truth and Pub/Sub owns asynchronous delivery and retry. Agent Engine sessions are ephemeral cognition; Memory Bank stores only exact-scope eligible facts and never authority.
+The workflow is collect_sources → extract_sources → understand with Nimi → strategize with Ryan → await strategy approval → plan with Temi → Noni/Dara typed artifact production → await effect approval → publish/export/render → verify → learn. Firestore is the durable source of truth and Pub/Sub owns asynchronous delivery and retry. ADK sessions are ephemeral cognition; workspace memory stores only exact-scope eligible facts and never authority.
 
 See [pipeline](/pipeline), the [system architecture guide](/architecture/overview), and [state ownership](/state-ownership).
 
@@ -59,7 +59,7 @@ binds its strict answer, citations, errors, and retry behavior to that trace.
 
 ## Model allocation
 
-The explorer records the checked-in allocation: Gemini 3.5 Flash-Lite for Harmonia and Temi, and Gemini 3.5 Flash for Ryan, Nimi, Noni, Dara, Maya, and Nova. Noni and Dara link to their bounded filesystem method skills. Status badges distinguish offline contract verification from pending authenticated live evidence.
+The explorer records the checked-in allocation: Muse Spark 1.3 for Harmonia, Ryan, Nimi, Temi, Noni, Dara, Maya, and Nova. Noni and Dara link to their bounded filesystem method skills. Status badges distinguish offline contract verification from pending authenticated live evidence.
 
 See [models, cost, and evaluation](./models-cost-evaluation).
 
@@ -91,7 +91,7 @@ The architecture dataset lives in `src/lib/architecture/data.ts`; its closed sch
 3. Connect external effects to approval and independent verification edges.
 4. Run the architecture tests, TypeScript, lint, and production build.
 
-Validation rejects duplicate IDs, dangling endpoints, parent cycles, private paths, prohibited agent authority, durable Agent Engine ownership, effects without approval, and effects without verification. Keep source links under `src/`, `agent/`, or `docs/`.
+Validation rejects duplicate IDs, dangling endpoints, parent cycles, private paths, prohibited agent authority, durable agent-runtime ownership, effects without approval, and effects without verification. Keep source links under `src/`, `agent/`, or `docs/`.
 
 ## Accessibility and keyboard navigation
 

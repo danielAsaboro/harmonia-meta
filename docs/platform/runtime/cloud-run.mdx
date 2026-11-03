@@ -10,7 +10,7 @@ Cloud Run is Harmonia's target compute platform. The deployment separates the pu
 | Service | Responsibility |
 |---|---|
 | Web | Dashboard, chat, authenticated APIs, Firestore state transitions, integrations, and signed asset routes |
-| Worker | Pub/Sub stage execution, ADK/Agent Engine invocation, media work, verification, and learning stages |
+| Worker | Pub/Sub stage execution, in-process ADK team invocation, media work, verification, and learning stages |
 
 The worker receives authenticated Pub/Sub pushes and Scheduler ticks. Each service uses its own least-privilege service account. Deployment injects resource names and non-secret configuration; provider tokens belong in Secret Manager-backed environment variables.
 

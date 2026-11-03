@@ -1,9 +1,9 @@
 ---
-title: "Vertex AI Memory Bank"
+title: "Workspace memory"
 description: "How Harmonia uses scoped, evidence-linked memory as advisory cross-job context."
 ---
 
-Memory Bank supplies eligible cross-job facts to bounded cognitive stages. Firestore remains the provenance anchor and workflow authority.
+Workspace memory supplies eligible cross-job facts to bounded cognitive stages. Facts live in the workspace's Firestore `memory_facts` collection behind two internal routes; Firestore remains the provenance anchor and workflow authority.
 
 ## How Harmonia uses it
 
@@ -11,7 +11,7 @@ Memory Bank supplies eligible cross-job facts to bounded cognitive stages. Fires
 - Returned facts include stable fact IDs and Firestore evidence references.
 - Nimi and Ryan may use eligible facts to qualify analysis and strategy recommendations.
 - Learning writes admit only typed, evidence-linked decisions and verified outcomes.
-- Retrieval and generation are bounded to small result sets.
+- Retrieval ranks facts by the words they share with the query, newest first on ties, and returns at most five. Meta Model API has no embedding model, so a fact must use the query's vocabulary to be found.
 
 Raw prompts, transcripts, drafts, logs, replay fixtures, unverified claims, credentials, and private reasoning are excluded from durable memory.
 
@@ -25,11 +25,12 @@ Unavailable memory is visible but does not create fictional context. Stages cont
 
 ## Evidence status
 
-Scope, eligibility, provenance, and failure contracts have automated local coverage. Authenticated retrieval or generation requires captured Memory Bank operation evidence.
+Scope, eligibility, provenance, and failure contracts have automated local coverage. Authenticated retrieval or writes require captured deployment evidence.
 
 ## Relevant files
 
 - `agent/harmonia_agent/memory_bank.py`
+- `src/lib/memoryFacts.ts`
 - `agent/harmonia_agent/model_governance.py`
 - `agent/harmonia_agent/stages.py`
 - `docs/session-memory.mdx`

@@ -12,7 +12,7 @@ flowchart LR
   PS --> W[Worker]
   W --> APP
   W <--> CS[(Cloud Storage: bytes)]
-  W -. context .-> MB[(Memory Bank)]
+  W -. context .-> MB[(workspace memory)]
   APP -. events .-> TEL[Logs, traces, metrics]
 ```
 

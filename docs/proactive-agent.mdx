@@ -43,7 +43,7 @@ sequenceDiagram
     participant DB as Firestore
     participant O as Operator
     W->>S: fetch signals / insights
-    W->>W: coordinator delegates to strategist (Gemini or explicit mock)
+    W->>W: coordinator delegates to strategist (Muse Spark or explicit mock)
     W->>Web: POST /api/internal/proposals
     Web->>DB: save proposals (dedup by id)
     Web->>O: bell notifications

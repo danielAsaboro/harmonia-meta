@@ -1,27 +1,27 @@
 ---
 title: "Sessions, history, and memory"
-description: "How Harmonia separates invocation state, bounded conversation continuity, Firestore truth, and cross-session Memory Bank facts."
+description: "How Harmonia separates invocation state, bounded conversation continuity, Firestore truth, and cross-session workspace memory facts."
 ---
 
 Harmonia has four distinct continuity layers. They are intentionally not interchangeable.
 
 <CardGroup cols={2}>
-  <Card title="Invocation state" icon="bolt">Short-lived typed handoffs inside one managed cognition call.</Card>
+  <Card title="Invocation state" icon="bolt">Short-lived typed handoffs inside one specialist call.</Card>
   <Card title="Chat history" icon="messages">Bounded continuity for one authenticated operator and interface.</Card>
   <Card title="Firestore" icon="database">Authoritative durable workflow, approval, effect, cost, and failure state.</Card>
-  <Card title="Memory Bank" icon="brain">Evidence-linked decisions and verified outcomes that may inform later jobs.</Card>
+  <Card title="Workspace memory" icon="brain">Evidence-linked decisions and verified outcomes that may inform later jobs.</Card>
 </CardGroup>
 
 ## Ownership matrix
 
 | Layer | Scope | Retention | May authorize effects? |
 |---|---|---|---|
-| ADK invocation state | one managed call | discarded after validation | no |
-| Agent Engine session | deterministic hash of `{workspace}:{user}:{job}:{operation}:{specialist}` | retained by Agent Engine for restart recovery under provider/deployment lifecycle policy | no |
+| ADK invocation state | one specialist call | discarded after validation | no |
+| ADK in-memory session | one specialist call inside the worker | discarded when the call returns | no |
 | dashboard chat | workspace + user + dashboard conversation | bounded to 300 messages | no |
 | Telegram chat | workspace + allow-listed chat + conversation | bounded to 300 messages | no |
 | Firestore job and audit records | workspace + brand + entity | deployment policy | yes, only through typed deterministic contracts |
-| Memory Bank | exact workspace + brand | provider/deployment policy | no |
+| Workspace memory | exact workspace + brand | provider/deployment policy | no |
 
 ## Conversation retention
 
@@ -29,7 +29,7 @@ When a scoped conversation exceeds 300 retained messages, Harmonia prunes old tu
 
 ## Memory eligibility
 
-Memory Bank writes accept only typed candidates linked to durable Firestore evidence.
+Workspace memory writes accept only typed candidates linked to durable Firestore evidence.
 
 <Tabs>
   <Tab title="Eligible">
@@ -49,18 +49,15 @@ Memory Bank writes accept only typed candidates linked to durable Firestore evid
 
 Retrieval is bounded to five facts and formatted within a fixed character budget. A cross-scope or malformed result fails visibly instead of entering a model prompt.
 
-<Info>Firestore remains the recovery source after a crash or Pub/Sub redelivery. Memory Bank improves later judgment; it cannot reconstruct or overwrite workflow truth.</Info>
+<Info>Firestore remains the recovery source after a crash or Pub/Sub redelivery. Workspace memory improves later judgment; it cannot reconstruct or overwrite workflow truth.</Info>
 
 <Warning>The scope, eligibility, and failure contracts below are verified offline. Do not claim live
-cross-job memory until a real Agent Engine write, a later same-scope retrieval, and a different-scope
+cross-job memory until a real memory write, a later same-scope retrieval, and a different-scope
 negative retrieval have been captured from the authenticated deployment.</Warning>
 
-Each cognitive operation derives a stable, non-content-bearing Agent Engine session ID. A restarted
-worker retrieves that exact session before continuing; concurrent creators converge on the same ID.
-The caller payload is copied only when the session is first created, and retrieved session objects are
-never mutated in process. This preserves managed event continuity for a single operation without
-allowing session state to authorize, replay, or advance the Firestore workflow. Durable stage leases
-still decide whether a crashed operation may continue or must be quarantined as uncertain.
+Each specialist call runs in a fresh in-memory ADK session inside the worker. A crashed worker loses
+that session; durable stage leases decide whether the operation may run again or must be quarantined
+as uncertain. Session state never authorizes, replays, or advances the Firestore workflow.
 
 See the exhaustive [state ownership and retention matrix](/state-ownership).
 

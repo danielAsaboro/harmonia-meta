@@ -54,9 +54,9 @@ One grounded idea can become an X post or thread, LinkedIn post, article, newsle
 
 The creative work is divided among bounded Google ADK specialists rather than hidden inside one general-purpose prompt.
 
-- **Nimi** uses Gemini 3.5 Flash to analyze multimodal evidence and identify bounded moments, quotes, visual signals, and content angles.
+- **Nimi** uses Muse Spark to analyze multimodal evidence and identify bounded moments, quotes, visual signals, and content angles.
 - **Ryan** turns the source, business goals, and eligible prior learning into a grounded four-week strategy.
-- **Temi**, using Gemini 3.5 Flash-Lite, converts an approved strategy into a structured editorial plan and selects eligible production work.
+- **Temi**, using Muse Spark, converts an approved strategy into a structured editorial plan and selects eligible production work.
 - **Noni** creates platform-native content from approved briefs and their referenced evidence.
 - **Dara** reviews grounding, brand voice, platform fit, clarity, safety, and calls to action, allowing at most one issue-bound revision.
 - **Maya** composes trusted A2UI operator surfaces from bounded references to persisted state.
@@ -84,8 +84,8 @@ As the workflow approaches an external consequence, acceptable model authority d
 
 | Stage | Owner |
 |---|---|
-| Interpret source material | Gemini and ADK specialists |
-| Propose strategy and content | Gemini and ADK specialists |
+| Interpret source material | Muse Spark ADK specialists |
+| Propose strategy and content | Muse Spark ADK specialists |
 | Validate schemas and provenance | Deterministic application code |
 | Persist workflow truth | Firestore |
 | Deliver asynchronous work | Pub/Sub |
@@ -147,7 +147,7 @@ These failures were not model-quality problems. A larger model or more forceful 
 
 Long-running agents need more than intelligence. They need durable state, recovery, and accountability.
 
-Firestore is Harmonia's source of workflow truth. Pub/Sub carries restartable work between the Next.js control plane and the private Python worker. Cloud Storage holds immutable binary artifacts. Vertex AI Agent Engine hosts bounded cognitive work. Memory Bank can supply eligible, workspace-scoped context, but it cannot redefine job state or become approval.
+Firestore is Harmonia's source of workflow truth. Pub/Sub carries restartable work between the Next.js control plane and the private Python worker. Cloud Storage holds immutable binary artifacts. The ADK team runs in-process in the worker and calls Meta Model API for every model turn. Workspace memory can supply eligible, workspace-scoped context, but it cannot redefine job state or become approval.
 
 That distinction matters when a worker stops, a message is delivered twice, or a human approves work hours later. Process memory is disposable; the job is not.
 
@@ -239,7 +239,7 @@ For a live claim, the evidence must follow one job across the relevant boundarie
 source identity
   → persisted job and stage
   → Pub/Sub delivery
-  → Agent Engine and model invocation
+  → ADK and Muse Spark invocation
   → specialist output and validation
   → human approval
   → effect ownership
@@ -286,7 +286,7 @@ Do not let the proposer or executor be the only witness of success. Re-read the 
 
 ## Models, media, and interfaces
 
-Harmonia uses role-specific Gemini 3.5 Flash and Flash-Lite policies for its core reasoning work. Gemini 3.5 Flash Image provides a budget-controlled image path. The repository also implements approval- and budget-gated Veo 3.1 Fast and Lyria 3 Clip actions; optional paid-media capabilities remain disabled unless their configuration, policy, and evidence requirements are satisfied.
+Harmonia uses role-specific Muse Spark policies on Meta Model API for its core reasoning work, with Muse Spark Open on Baseten as a per-role option. Muse Spark's `web_search` grounds research, Muse Voice Transcribe turns audio and video into timed segments, and Muse Image provides an approval- and budget-gated image path. Meta has no video or music model, so Harmonia does not generate either.
 
 Deterministic ffmpeg paths cut, caption, reframe, and assemble clips and reels. Official integration code covers authorized YouTube sources, Google Drive brand libraries, Google Calendar, Telegram, X, LinkedIn, Instagram, and YouTube destinations, subject to each workspace's credentials and provider requirements.
 
@@ -310,15 +310,9 @@ Finally, implementation and evidence are different claims. Tests can demonstrate
 
 ## What we built
 
-During the hackathon, we built:
+Harmonia predates the Meta Global AI Developer Hackathon. Its pipeline, approval boundary, idempotent effects, verification, studio, and integrations were built in August 2026.
 
-- a seven-specialist Google ADK team with role-specific models, skills, typed handoffs, and explicit authority limits;
-- a resumable, multi-source pipeline spanning analysis, strategy approval, editorial planning, multi-format production, review, effect approval, execution, receipts, and verification;
-- a Next.js control plane and private Python/Pydantic worker connected through Firestore and Pub/Sub;
-- a live product, public Mintlify documentation, interactive architecture explorer, dashboard, A2UI workspace, and Telegram boundary;
-- deterministic content-pack exports and media rendering, plus official-provider publishing adapters designed around independent read-back;
-- tenant-scoped uploads, brand-library snapshots, cost controls, observability, replay, retention, and visible failure recovery; and
-- deployment and evidence tooling that distinguishes implemented, locally tested, deployed, and authenticated-success states.
+During the Meta hackathon, we moved every model call to Meta Model API: Muse Spark for each specialist role with per-role reasoning effort and strict structured output, Muse Spark Open on Baseten as an option, Muse Spark `web_search` for provenance-checked research, Muse Voice Transcribe for media, and Muse Image for approved images. We also ran the ADK team in-process, moved workspace memory to Firestore, and removed the Google-only video and music generation features.
 
 Harmonia gives a small startup a content operation that can continue working asynchronously while preserving human authority over the decisions that carry real responsibility.
 
@@ -328,7 +322,7 @@ The strategy may begin the work. Harmonia carries it through execution.
 
 ---
 
-Harmonia was created during the contest period using Gemini 3.5, Google ADK, Google GenAI SDK, and Google Cloud services. Product ideas were informed by an earlier, unsubmitted social-media automation experiment; its previous non-Google implementation stack was not copied into Harmonia.
+Harmonia runs on Meta Model API, the open-source Google ADK framework, and Google Cloud hosting. See the README for exactly which parts were built during the Meta hackathon.
 
 <CardGroup cols={2}>
   <Card title="Read the system architecture" icon="sitemap" href="/architecture/overview">

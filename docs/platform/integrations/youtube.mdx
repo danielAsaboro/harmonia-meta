@@ -7,7 +7,7 @@ YouTube URLs are one supported direct-source path. Harmonia resolves source meta
 
 ## How Harmonia uses it
 
-The source registry validates the URL and records source rights. During `extract_sources`, the worker resolves public metadata through YouTube/oEmbed, obtains authorized media, and uses Gemini to produce digest-bound timed segments. Those segments and authorized video evidence join the same normalized source bundle used for documents, web pages, pasted text, uploads, and pinned brand-library snapshots.
+The source registry validates the URL and records source rights. During `extract_sources`, the worker resolves public metadata through YouTube/oEmbed, obtains authorized media, and uses Muse Voice Transcribe to produce digest-bound timed segments. Those segments and authorized video evidence join the same normalized source bundle used for documents, web pages, pasted text, uploads, and pinned brand-library snapshots.
 
 Google OAuth configuration is available where an authorized source requires it. Public URLs do not grant reuse rights by themselves; the job retains the operator's rights declaration and source provenance.
 

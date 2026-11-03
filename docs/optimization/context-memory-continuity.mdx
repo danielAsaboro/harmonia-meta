@@ -41,7 +41,7 @@ work signals, not memory and not permission to publish.
 
 ## 2. Harmonia rebuilds the present instead of replaying the past
 
-The new worker does not stuff the complete event history into Gemini. It asks Firestore for current
+The new worker does not stuff the complete event history into Muse Spark. It asks Firestore for current
 durable state and compiles a fresh, deterministic context projection.
 
 The distinction matters. A chronological transcript tells the model everything that happened,
@@ -58,7 +58,7 @@ The compiler orders information by consequence rather than recency:
 4. the current strategy, plan, draft, and evidence revision digests;
 5. trusted durable observations;
 6. clearly delimited external or model-produced material; and
-7. bounded Memory Bank facts, labeled non-authoritative.
+7. bounded workspace memory facts, labeled non-authoritative.
 
 These authority fields cannot be compacted away. A polished summary cannot replace an approval. A
 retrieved memory cannot select the current draft. A model assertion cannot manufacture a receipt.
@@ -73,10 +73,10 @@ flowchart LR
     E[Durable event] --> O[Operation + epoch]
     O --> C[Context compiler]
     F[(Firestore current truth)] --> C
-    M[(Scoped Memory Bank facts)] -->|advisory| C
+    M[(Scoped workspace memory facts)] -->|advisory| C
     A[(Artifact store)] -->|digest-verified ranges| C
     C --> P[Bounded projection]
-    P --> G[Gemini / ADK turn]
+    P --> G[Muse Spark / ADK turn]
     G --> T[Typed result]
     T --> F
 ```
@@ -118,7 +118,7 @@ The worker may now retrieve a fact learned from an earlier campaign: perhaps the
 prefers evidence-led openings over hype. That can improve the next draft, but only if it belongs to the
 same workspace and brand and points back to eligible durable evidence.
 
-This is Harmonia's defense against Memory rot. Memory Bank writes are allowlisted and typed. Eligible
+This is Harmonia's defense against Memory rot. Workspace memory writes are allowlisted and typed. Eligible
 facts come from explicit operator preferences, approved decisions, independently verified outcomes,
 or measured learnings with durable record IDs. Raw transcripts, prompts, draft copy, credentials,
 provider bodies, errors, unverified claims, and facts without lineage are rejected.
@@ -127,7 +127,7 @@ Retrieval is bounded by count and characters. Wrong-scope or malformed memories 
 of entering the projection. Even a valid result carries less authority than current Firestore state.
 
 <Warning>
-Memory Bank is advisory. It can influence judgment; it cannot approve an effect, advance an operation,
+Workspace memory is advisory. It can influence judgment; it cannot approve an effect, advance an operation,
 choose the current revision, repair a receipt, or reconstruct Firestore after a crash.
 </Warning>
 
@@ -136,16 +136,16 @@ This is why Harmonia keeps four different kinds of continuity instead of calling
 | Layer | What it preserves | What it cannot do |
 |---|---|---|
 | ADK invocation state | typed handoffs inside one cognitive turn | survive as workflow truth |
-| Agent Engine session | continuity for one scoped operation | own leases or authorize effects |
+| ADK session | continuity for one specialist call | own leases or authorize effects |
 | Firestore | current workflow, authority, receipts, and failures | provide generative judgment |
-| Memory Bank | evidence-linked lessons across sessions | override current durable state |
+| Workspace memory | evidence-linked lessons across sessions | override current durable state |
 
 The detailed eligibility and retention boundaries are documented in
 [Sessions, history, and memory](/session-memory).
 
 ## 5. The model proposes an action, but does not perform it yet
 
-With its bounded projection assembled, Gemini and the ADK team can decide what content work is needed.
+With its bounded projection assembled, the Muse Spark ADK team can decide what content work is needed.
 Their output still crosses a typed validation boundary before deterministic workflow code accepts it.
 
 When an approved external action is ready, Harmonia writes **intent before effect**. The effect command
@@ -250,7 +250,7 @@ concurrent claims, recurring recovery attempts, artifact integrity, stale epochs
 and operator resolution.
 
 <Info>
-This does not prove multi-week uptime, authenticated Memory Bank behavior, cloud IAM correctness,
+This does not prove multi-week uptime, authenticated workspace memory behavior, cloud IAM correctness,
 provider availability, or successful external publication. Those claims require a deployed soak run,
 real elapsed time, and independent provider read-back. The benchmark proves the implemented state
 transitions and reconstruction contract—not the availability of systems outside it.

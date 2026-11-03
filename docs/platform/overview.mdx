@@ -10,15 +10,15 @@ Harmonia separates agentic judgment from deterministic workflow authority. Model
 | Area | Components | Responsibility |
 |---|---|---|
 | UI | Next.js, React, Google A2UI | Dashboard, chat, authenticated APIs, and server-hydrated generative surfaces |
-| Agents and AI | Google ADK, Gemini, Vertex AI Agent Engine, Memory Bank | Bounded specialist reasoning and eligible advisory memory |
+| Agents and AI | Meta Model API (Muse Spark, Muse Voice Transcribe, Muse Image), Google ADK, workspace memory | Bounded specialist reasoning and eligible advisory memory |
 | Security and identity | Firebase Authentication, IAM service accounts, Secret Manager | Operator identity, machine identity, and server-side credentials |
 | Storage and messaging | Firestore, Pub/Sub, Cloud Storage | Durable workflow truth, asynchronous stage delivery, and binary assets |
 | Runtime and automation | Cloud Run, Cloud Scheduler | Web/worker hosting and authenticated durable ticks |
-| Media | ffmpeg, Vertex generative media | Deterministic rendering and approval-gated generated assets |
+| Media | ffmpeg, Muse Image | Deterministic rendering and approval-gated generated images |
 | Integrations | X API, Telegram Bot API, Google Calendar API, Hacker News Algolia, YouTube | Publishing, operator access, explicit calendar synchronization, public signals, and authorized sources |
 | Observability | OpenTelemetry, Cloud Trace target, structured logs, metrics, budget records | Correlation, diagnosis, usage accounting, and operator visibility |
 
-<Warning>Firestore is the durable workflow authority. Agent Engine sessions, Memory Bank facts, model output, telemetry, and external API responses cannot approve or authorize an effect.</Warning>
+<Warning>Firestore is the durable workflow authority. ADK sessions, workspace memory facts, model output, telemetry, and external API responses cannot approve or authorize an effect.</Warning>
 
 ## Evidence status
 

@@ -10,7 +10,7 @@ describe("authenticated evidence runbook", () => {
     "emulator",
     "awaiting_approval",
     "already_applied",
-    "Agent Engine",
+    "Meta Model API",
     "Cloud Run revision",
     "traceId",
     "private/public boundary",

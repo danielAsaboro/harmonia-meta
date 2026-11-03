@@ -7,7 +7,7 @@ This protocol preserves the private/public boundary: raw provider responses, aut
 
 ## Phase 1: preflight
 
-Before creating or changing application state, confirm an active gcloud identity and matching project. Record the deployed Cloud Run revision for both services, the exact Agent Engine resource, Firestore database, Pub/Sub topic/subscription, secret metadata (never values), and deployed health response. Every emulator setting must be unset. Any missing or unauthorized prerequisite stops the run.
+Before creating or changing application state, confirm an active gcloud identity and matching project. Record the deployed Cloud Run revision for both services, the Meta Model API base URL and role model IDs, Firestore database, Pub/Sub topic/subscription, secret metadata (never values), and deployed health response. Every emulator setting must be unset. Any missing or unauthorized prerequisite stops the run.
 
 Also record the ready `operations` composite index, the subscription retry/dead-letter policy, and
 both scheduler jobs (`harmonia-durable-autonomy` and `harmonia-durable-recovery`). Confirm the worker

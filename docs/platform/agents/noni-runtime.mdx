@@ -3,7 +3,7 @@ title: "Noni writing runtime"
 description: "How Harmonia runs skill-backed, provenance-bound copywriting."
 ---
 
-Noni uses Gemini 3.5 Flash through Google ADK because writing-skill and bounded
+Noni uses Muse Spark through Google ADK because writing-skill and bounded
 research tools are part of the copywriting contract.
 
 ## How Harmonia uses it
@@ -15,12 +15,12 @@ writing reference. It may then read independently verified prior publications
 or brief-scoped public sources.
 
 Every research-derived claim or URL must cite a live evidence ID returned by
-the actual tool trace. Noni cannot access Memory Bank, redefine strategy,
+the actual tool trace. Noni cannot access workspace memory, redefine strategy,
 approve, schedule, publish, or mutate workflow state.
 
 ## Configuration and failure behavior
 
-`COPYWRITER_MODEL_ID` defaults to `gemini-3.5-flash`. Public web research uses
+`COPYWRITER_MODEL_ID` defaults to `muse-spark-1.3`. Public web research uses
 Meta Model API `web_search` in a dedicated `noni_web_search` tool because search
 grounding runs only on the Responses API, apart from Noni's Chat Completions
 requests. The trace retains Meta's search results and URL citations. Cross-brief queries,
@@ -31,7 +31,7 @@ fail closed.
 
 The skill loader, research-tool contracts, trace validation, verified-publication
 query, grounding checks, and authority boundaries have automated offline
-coverage. Authenticated Agent Engine and live Meta web search execution
+coverage. Authenticated Muse Spark and live Meta web search execution
 remain unverified until a separately captured live run supplies correlated
 provider and usage evidence.
 

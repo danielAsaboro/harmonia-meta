@@ -12,12 +12,12 @@ Harmonia's local stack uses the official Firestore and Pub/Sub emulators and exe
 | Component | Service |
 |---|---|
 | Next.js web app | Cloud Run (with Firestore + Pub/Sub access) |
-| ADK worker | Cloud Run service with separate Pub/Sub **push subscriptions** to `/pubsub/push` and `/pubsub/production`, authenticated via OIDC service account |
-| Cognitive runtime | Vertex AI Agent Engine (mandatory in the managed worker; no in-process fallback) |
-| Long-term context | Agent Engine Memory Bank, exact workspace + brand scope |
+| ADK worker | Cloud Run service with a Pub/Sub **push subscription** to `/pubsub/push`, authenticated via OIDC service account |
+| Models | Meta Model API: Muse Spark, `web_search`, Muse Voice Transcribe, Muse Image (optional Muse Spark Open on Baseten) |
+| Cognitive runtime | Google ADK team running in-process inside the worker |
+| Long-term context | Workspace memory facts in Firestore, exact workspace + brand scope |
 | State | Cloud Firestore (native mode) |
 | Stage triggers | Pub/Sub topic `harmonia-stages` |
-| Paid production triggers | Pub/Sub topic `harmonia-production` |
 | Media assets | Cloud Storage (`GCS_BUCKET`) |
 
 Firestore also owns the durable runtime's tenant-scoped `operations`, `event_inbox`,
@@ -29,7 +29,7 @@ leases deterministically; `firestore.indexes.json` is the reviewable source defi
 
 ```bash
 gcloud services enable run.googleapis.com firestore.googleapis.com \
-  pubsub.googleapis.com storage.googleapis.com aiplatform.googleapis.com cloudtrace.googleapis.com \
+  pubsub.googleapis.com storage.googleapis.com cloudtrace.googleapis.com \
   telemetry.googleapis.com monitoring.googleapis.com logging.googleapis.com
 
 gcloud firestore databases create --location=<region>
@@ -37,7 +37,7 @@ gcloud firestore databases create --location=<region>
 gcloud pubsub topics create harmonia-stages
 ```
 
-`infra/setup.sh` also creates regional staging and durable-media buckets. The media bucket uses uniform access, grants object access only to the two runtime service accounts, and is injected as `GCS_BUCKET` by `infra/deploy.sh`. Deployment configures CORS for the resulting Cloud Run web origin so direct resumable uploads do not depend on ephemeral container storage.
+`infra/setup.sh` also creates a regional durable-media bucket. The media bucket uses uniform access, grants object access only to the two runtime service accounts, and is injected as `GCS_BUCKET` by `infra/deploy.sh`. Deployment configures CORS for the resulting Cloud Run web origin so direct resumable uploads do not depend on ephemeral container storage.
 
 `infra/setup.sh` provisions a generated `malware-scanner-token` and a dedicated scanner service
 account. `infra/deploy.sh` builds and deploys the repository's ClamAV scanner as an IAM-private Cloud
@@ -72,26 +72,15 @@ Both services use digest-pinned base images and exact dependency inputs:
 
 Set the [configuration](/configuration) secrets as Cloud Run environment variables (Secret Manager for tokens). With `PUBSUB_EMULATOR_HOST` unset, both clients connect to real Google Cloud services automatically.
 
-The deployment script sends each role model ID separately, including `COPYWRITER_MODEL_ID` for Noni and `PRESENTER_MODEL_ID` for Maya. Noni defaults to Gemini 3.5 Flash because ADK skill loading is part of the writing contract.
+The deployment script sends each role model ID separately, including `COPYWRITER_MODEL_ID` for Noni and `PRESENTER_MODEL_ID` for Maya. Every role defaults to Muse Spark 1.3.
 
 Noni's brief-scoped public research uses Meta Model API `web_search` with the same
 `MODEL_API_KEY` and needs no separate search credentials. Verified prior-publication
 search remains available through the authenticated tenant-scoped internal API.
 
-Deploy a fresh cognitive-hierarchy revision for every rollout that changes ADK agents, schemas, **or skill definitions** (`agent/harmonia_agent/skills/` — the liaison's skills load from the deployed package at import time), then point the Cloud Run worker at the returned resource:
+The ADK hierarchy, schemas, and skill definitions ship inside the worker image, so every `infra/deploy.sh` rollout updates them together. Cloud deployment always enables workspace memory; workspace and brand scopes come from each authenticated job rather than deployment configuration.
 
-```bash
-cd agent
-./.venv/bin/python -m harmonia_agent.agent_engine_deploy \
-  --project "$PROJECT_ID" \
-  --location "$REGION" \
-  --staging-bucket "gs://$PROJECT_ID-harmonia-agent-staging" \
-  --service-account "harmonia-agent@$PROJECT_ID.iam.gserviceaccount.com"
-```
-
-Set the returned full `AGENT_ENGINE_RESOURCE` and `MEMORY_BANK_RESOURCE` (they may identify the same reasoning engine) before running `infra/deploy.sh`. The Cloud Run script does not update Agent Engine and must never be given a pre-change resource after the hierarchy gains a specialist such as `maya_presenter`. Cloud deployment always enables Memory Bank and fails before rollout when either managed resource is absent. Workspace and brand scopes come from each authenticated job rather than deployment configuration. To expose paid media proposals, set `GENERATIVE_MEDIA_ENABLED=true`. The worker identity already receives Vertex prediction access in `infra/setup.sh`; Memory Bank retrieval/generation and Veo/Lyria calls fail visibly if unavailable.
-
-`REGION` controls regional infrastructure placement, not end-to-end data residency. Setup verifies the Firestore database and Agent Engine staging bucket location and applies a Pub/Sub message-storage policy with in-transit enforcement. Agent Engine, Memory Bank, and Veo resources must match that region. Transcription and image generation call the Meta Model API (`META_API_BASE_URL`, bearer `MODEL_API_KEY` from the `model-api-key` secret). Transcription decodes media locally with ffmpeg to mono 16-bit 24 kHz WAV and uploads it to Muse Voice Transcribe in clips of at most 590 seconds, so media bytes leave Google Cloud for Meta. Lyria uses a global endpoint and remains disabled unless `ALLOW_GLOBAL_LYRIA=true`. These controls are not a regulatory certification or a guarantee that model inference stays in one region.
+`REGION` controls regional infrastructure placement, not end-to-end data residency. Setup verifies the Firestore database and media bucket location and applies a Pub/Sub message-storage policy with in-transit enforcement. Every model call goes to the Meta Model API (`META_API_BASE_URL`, bearer `MODEL_API_KEY` from the `model-api-key` secret). Transcription decodes media locally with ffmpeg to mono 16-bit 24 kHz WAV and uploads it to Muse Voice Transcribe in clips of at most 590 seconds, so media bytes and prompts leave Google Cloud for Meta. These controls are not a regulatory certification or a guarantee that model inference stays in one region.
 
 The deployed worker does not contain process-resident scheduler, polling, or proactive supervisors. Cloud Scheduler drives the durable tick, and Firestore workspace leases plus stage/effect claims make concurrent delivery safe.
 
@@ -123,16 +112,16 @@ Completing deployment commands is not acceptance. A deployment becomes claimable
 
 1. Create a job from the deployed dashboard URL and watch it reach `awaiting_approval`.
 2. Read one job usage record and copy its `traceId`.
-3. Locate the same trace in Cloud Trace; confirm the Pub/Sub stage, Agent Engine invocation, memory lookup, agent/model generation, and validation spans are correlated.
+3. Locate the same trace in Cloud Trace; confirm the Pub/Sub stage, ADK invocation, memory lookup, Muse Spark generation, and validation spans are correlated.
 4. Confirm span attributes contain identifiers and usage metadata but none of the job's source or generated text.
 5. Compare the usage record's estimate with `/api/metrics`; keep platform estimates distinct from observed billing data.
 6. Approve an action and confirm its receipt and independent verification record.
-7. Approve one Veo or Lyria proposal, confirm its cost reservation, provider-operation record, stored asset digest, usage record, and independent verification.
+7. Approve one Muse Image proposal, confirm its cost reservation, stored asset digest, usage record, and independent verification.
 8. Interrupt a worker after a durable boundary, invoke `harmonia-durable-recovery`, and confirm the
    replacement attempt resumes with a newer epoch while the stale token is rejected.
 
 <Warning>
-Authenticated multimodal Gemini, Agent Engine, Memory Bank, Veo, Lyria, and Cloud telemetry execution are not verified merely by deploying this code. Capture a correlated trace plus its persisted sessions, memory operation, media operation, and usage records before presenting those integrations as live evidence.
+Authenticated Muse Spark, web search, Muse Voice Transcribe, Muse Image, workspace memory, and Cloud telemetry execution are not verified merely by deploying this code. Capture a correlated trace plus its memory operation, media operation, and usage records before presenting those integrations as live evidence.
 
 Follow [How to capture Google Cloud deployment evidence](/cloud-proof) before recording the submission video.
 </Warning>

@@ -13,7 +13,7 @@ flowchart TB
   PS --> WK[Cloud Run worker]
   WK <--> FS
   WK <--> ST[(Cloud Storage)]
-  WK --> AI[Gemini / Vertex AI / ADK]
+  WK --> AI[ADK team / Meta Model API]
   WK --> EXT[Official external APIs]
   WEB -. telemetry .-> OBS[Cloud observability]
   WK -. telemetry .-> OBS

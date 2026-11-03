@@ -1,6 +1,6 @@
 ---
 title: "System architecture"
-description: "How Harmonia wires Gemini, ADK, Firestore, Pub/Sub, Cloud Run, and the web UI together."
+description: "How Harmonia wires Meta Model API, ADK, Firestore, Pub/Sub, Cloud Run, and the web UI together."
 ---
 
 ## System diagram
@@ -24,7 +24,7 @@ flowchart TB
         STREAM[Durable NDJSON chat runs<br/>validated host events]
         A2UI[Harmonia A2UI catalog<br/>official React renderer]
         UPLOAD[Resumable upload broker<br/>magic-byte verification + quarantine]
-        CHAT[Chat intent parser<br/>Gemini structured output]
+        CHAT[Chat intent parser<br/>Muse Spark structured output]
         DEC[Decision engine<br/>policy + approval gates]
         CALSYNC[Operator-only Calendar sync<br/>deterministic IDs + read-back]
         FS[(Firestore<br/>workspaces/{workspaceId}/...)]
@@ -36,8 +36,8 @@ flowchart TB
 
     subgraph Worker["ADK worker (FastAPI / Cloud Run)"]
         PULL[Stage dispatcher<br/>pull loop / push receiver]
-        RUNTIME[Agent Engine client<br/>mandatory, no fallback]
-        CONTENT[Direct media operations<br/>transcription + image generation]
+        RUNTIME[ADK in-process runner]
+        CONTENT[Direct media operations<br/>Muse Voice Transcribe + Muse Image]
         PROACT[Proactive agent<br/>trend scan + engagement watch]
         SCHED[Scheduler dispatcher<br/>due content items]
         TICK[Durable tick<br/>isolated recovery arms]
@@ -45,19 +45,18 @@ flowchart TB
         FFMPEG[ffmpeg skills<br/>clips, reels, images]
     end
 
-    subgraph AgentPlatform["Vertex AI Agent Engine"]
-        COORD[ADK coordinator<br/>Gemini 3.5 Flash-Lite]
+    subgraph AgentPlatform["ADK team on Meta Model API"]
+        COORD[ADK coordinator<br/>Muse Spark 1.3]
         SPECIALISTS[Single-turn specialists<br/>Nimi analysis · Ryan strategy · Temi plan]
         DRAFTFLOW[Deterministic artifact production/review<br/>approved output plan: Noni ↔ Dara]
-        MEMORY[(Memory Bank<br/>workspace + brand exact scope)]
+        MEMORY[(workspace memory<br/>workspace + brand exact scope)]
     end
 
     subgraph External
         YT[YouTube<br/>oEmbed + yt-dlp]
         HN[Hacker News front page<br/>Algolia API]
         TRACE[Cloud Trace / Telemetry API<br/>metadata-only OpenTelemetry]
-        VEO[Veo 3.1 Fast<br/>4-second b-roll]
-        LYRIA[Lyria 3 Clip<br/>30-second music]
+        META[Meta Model API<br/>Muse Spark · web_search · Muse Voice Transcribe · Muse Image]
         GCAL[Google Calendar API<br/>app-created calendar only]
     end
 
@@ -80,11 +79,9 @@ flowchart TB
     COORD <--> MEMORY
     PULL --> FFMPEG
     PULL --> X
-    DEC -- approved paid-media action --> PULL
-    PULL --> VEO
-    PULL --> LYRIA
-    VEO --> STOR
-    LYRIA --> STOR
+    DEC -- approved image action --> PULL
+    CONTENT --> META
+    SPECIALISTS --> META
     PROACT --> HN
     PROACT --> COORD
     SCHED --> X
@@ -110,7 +107,7 @@ The full Console uses a versioned Harmonia catalog on Google's A2UI v0.9 wire pr
 
 The dashboard Console is a long-conversation editorial studio, not a stacked card feed. Desktop reserves two fifths for chaptered operator conversation and three fifths for a living cross-media canvas; narrower screens use an explicit Conversation/Studio canvas switcher. Pure selectors derive the active working set, chapters, artifact groups, and source links from persisted history and job records. Written posts, images, clips/reels, audio, transcript evidence, crop/caption-safe metadata, receipts, policy, cost, and verification appear only when corresponding records exist. Validated A2UI components are partitioned by product role: safe summaries and agent activity stay in conversation, artifacts/plans/citations stay on the canvas, and confirmation metadata stays inside the unchanged trusted approval boundary.
 
-`POST /api/chat/stream` creates a tenant-scoped Firestore run and emits schema-validated NDJSON records with monotonic sequence numbers. Each record is persisted before delivery and can be replayed from `GET /api/chat/runs/{id}/events?after={sequence}`. Activity and tool state arrive while the request is executing; the compatibility chat handler currently returns its Gemini answer as one result, which the stream then delivers in bounded deltas. This is transport streaming, not a claim that provider tokens are streamed directly.
+`POST /api/chat/stream` creates a tenant-scoped Firestore run and emits schema-validated NDJSON records with monotonic sequence numbers. Each record is persisted before delivery and can be replayed from `GET /api/chat/runs/{id}/events?after={sequence}`. Activity and tool state arrive while the request is executing; the compatibility chat handler currently returns its Muse Spark answer as one result, which the stream then delivers in bounded deltas. This is transport streaming, not a claim that provider tokens are streamed directly.
 
 The composer creates an authenticated upload session before any bytes move. In cloud deployments the browser sends bytes directly to a tenant-scoped Cloud Storage resumable-upload URL. The server independently verifies size, type, and magic bytes, then requires a complete clean verdict from the configured private malware scanner before marking the attachment ready. Mismatches and infected objects are deleted; unavailable or malformed scan results remain quarantined. Local development uses the same fail-closed boundary. Ready video, audio, and document uploads become independent direct-source records and are sealed into the job manifest only when the accompanying prompt selects `create_job`; images remain conversation context rather than an invented standalone-analysis capability.
 
@@ -123,16 +120,16 @@ Harmonia, the ADK root coordinator, delegates evidence analysis to Nimi (`nimi_a
 All cognitive roles use policy `gear-2026-08-24`, pricing catalog `2026-08-23`, the
 `harmonia-standard` safety profile, and a proposed promotion quality floor of `0.95`.
 
-| Role | Default target | Temp / max output | Evaluation focus | State and tools | Prohibited authority |
+| Role | Default target | Reasoning effort / max output | Evaluation focus | State and tools | Prohibited authority |
 |---|---|---:|---|---|---|
-| Harmonia coordinator | Gemini 3.5 Flash-Lite | 0.1 / 1,024 | exact one-specialist route | delegation only; invocation state | answer task, approve, publish |
-| Ryan strategist | Gemini 3.5 Flash | 0.4 / 4,096 | grounded four-week strategy and content briefs | typed Nimi/company/campaign/performance/memory context; one allow-listed filesystem strategy skill; optional isolated request-bound Meta web search | cite skill guidance as evidence, open-ended research, invent evidence, schedule, approve, publish |
-| Nimi analyst | Gemini 3.5 Flash multimodal | 0.2 / 2,048 | strict source analysis with quote/time/frame and evidence-kind provenance | typed source package, verified performance, eligible memory, allow-listed filesystem skill; optional isolated request-bound Meta web search | use skill as evidence, invent evidence/trends, define strategy, write copy, approve, schedule, publish |
-| Temi editorial planner | Gemini 3.5 Flash-Lite | 0.1 / 1,024 | coherent sequencing, cadence, supported channel/format, windows, deadlines, dependencies, priority | exact approved Ryan strategy, Nimi evidence, planning-method skill, six reads over one immutable Firestore planning snapshot | invent evidence/strategy, search, read outside the snapshot, write final copy, approve, schedule externally, publish |
-| Noni content producer | Gemini 3.5 Flash | 0.8 / 8,192 | exact output-plan coverage, provenance, grounding, and format schemas | approved output plan + exact Nimi evidence + brand constraints | redefine strategy, access Memory Bank, create facts, approve, persist, publish |
-| Dara artifact reviewer | Gemini 3.5 Flash | 0.2 / 8,192 | complete grounding, brief, brand, format, CTA, safety, and clarity checks for every artifact | exact Noni batch + immutable production input | rewrite content, create facts or authority, approve, persist, publish |
-| Maya presenter | Gemini 3.5 Flash | 0.2 / 2,048 | exact-context component/entity graph | typed `UiContext`; no tools; host hydrates Firestore truth | invent state/IDs, emit lifecycle states, approve, publish, verify, execute actions |
-| Nova liaison | Gemini 3.5 Flash | 0.2 / 2,048 | grounded read-only answers | insight skills + read-only tools | mutate, approve, publish |
+| Harmonia coordinator | Muse Spark 1.3 | low / 4,096 | exact one-specialist route | delegation only; invocation state | answer task, approve, publish |
+| Ryan strategist | Muse Spark 1.3 | high / 32,768 | grounded four-week strategy and content briefs | typed Nimi/company/campaign/performance/memory context; one allow-listed filesystem strategy skill; optional isolated request-bound Meta web search | cite skill guidance as evidence, open-ended research, invent evidence, schedule, approve, publish |
+| Nimi analyst | Muse Spark 1.3 multimodal | medium / 16,384 | strict source analysis with quote/time/frame and evidence-kind provenance | typed source package, verified performance, eligible memory, allow-listed filesystem skill; optional isolated request-bound Meta web search | use skill as evidence, invent evidence/trends, define strategy, write copy, approve, schedule, publish |
+| Temi editorial planner | Muse Spark 1.3 | medium / 16,384 | coherent sequencing, cadence, supported channel/format, windows, deadlines, dependencies, priority | exact approved Ryan strategy, Nimi evidence, planning-method skill, six reads over one immutable Firestore planning snapshot | invent evidence/strategy, search, read outside the snapshot, write final copy, approve, schedule externally, publish |
+| Noni content producer | Muse Spark 1.3 | medium / 8,192 | exact output-plan coverage, provenance, grounding, and format schemas | approved output plan + exact Nimi evidence + brand constraints | redefine strategy, access workspace memory, create facts, approve, persist, publish |
+| Dara artifact reviewer | Muse Spark 1.3 | medium / 8,192 | complete grounding, brief, brand, format, CTA, safety, and clarity checks for every artifact | exact Noni batch + immutable production input | rewrite content, create facts or authority, approve, persist, publish |
+| Maya presenter | Muse Spark 1.3 | low / 8,192 | exact-context component/entity graph | typed `UiContext`; no tools; host hydrates Firestore truth | invent state/IDs, emit lifecycle states, approve, publish, verify, execute actions |
+| Nova liaison | Muse Spark 1.3 | low / 8,192 | grounded read-only answers | insight skills + read-only tools | mutate, approve, publish |
 
 All cognitive roles record input/output tokens under the immutable pricing catalog.
 The public ADK evalset and deterministic authority/grounding evaluators are committed; real-model
@@ -147,17 +144,17 @@ the private evidence workspace and mock mode is explicitly refused by the live r
 
 ### Actual multimodal analysis
 
-For each job, Harmonia loads the exact sealed manifest and its normalized artifacts. Authorized video and audio are supplied to Gemini for timed extraction; documents, web pages, and pasted text use typed page, paragraph, section, or character-range locators. Nimi receives only those identified segments and may propose clip moments only from real time ranges. It loads its analysis skill and relevant method references before returning one strict `SourceAnalysis`. Optional current public context is fetched only by an isolated request-bound Meta web search. Runtime code validates the real trace and Meta's search results and URL citations, then rejects mismatched digests, invented references, non-verbatim quotes, invalid locator bounds, unsupported visual claims, and authority language before storing the full analysis, research lineage, search provenance, and canonical digest. Media bytes and source URIs are excluded from trace content.
+For each job, Harmonia loads the exact sealed manifest and its normalized artifacts. Authorized video and audio are transcribed by Muse Voice Transcribe into timed segments; documents, web pages, and pasted text use typed page, paragraph, section, or character-range locators. Nimi receives only those identified segments and may propose clip moments only from real time ranges. It loads its analysis skill and relevant method references before returning one strict `SourceAnalysis`. Optional current public context is fetched only by an isolated request-bound Meta web search. Runtime code validates the real trace and Meta's search results and URL citations, then rejects mismatched digests, invented references, non-verbatim quotes, invalid locator bounds, unsupported visual claims, and authority language before storing the full analysis, research lineage, search provenance, and canonical digest. Media bytes and source URIs are excluded from trace content.
 
-No agent has publishing, approval, credential, external-calendar, or destructive tools. Temi proposes output plans; Noni proposes typed artifacts; Dara proposes structured review decisions. Deterministic code owns validation, canonical digests, persistence, the one-revision limit, and every external scheduling/effect mutation. It derives actions only from sealed accepted artifacts. X post/thread and LinkedIn publication plus paid-media actions wait for human approval; immutable artifact export, images, and ffmpeg renders remain internal and separate from publication. A content-pack artifact is a manifest over constituent artifact IDs and digests and cannot export until every constituent's JSON and Markdown bytes independently verify.
+No agent has publishing, approval, credential, external-calendar, or destructive tools. Temi proposes output plans; Noni proposes typed artifacts; Dara proposes structured review decisions. Deterministic code owns validation, canonical digests, persistence, the one-revision limit, and every external scheduling/effect mutation. It derives actions only from sealed accepted artifacts. X post/thread and LinkedIn publication plus paid Muse Image generation wait for human approval; immutable artifact export and ffmpeg renders remain internal and separate from publication. A content-pack artifact is a manifest over constituent artifact IDs and digests and cannot export until every constituent's JSON and Markdown bytes independently verify.
 
-### Managed runtime and persistent memory
+### In-process runtime and persistent memory
 
-Agent Engine is the only cognitive execution runtime. For each cognitive operation the worker derives a stable hashed session ID, retrieves or creates that session, seeds the typed job snapshot only on creation, streams state deltas, and validates the required output keys. This permits process-restart continuation without making session state workflow authority. `AGENT_ENGINE_RESOURCE` is mandatory at worker startup. There is no in-process ADK execution branch and no runtime fallback.
+The worker runs the ADK team in-process. For each cognitive operation it opens a fresh in-memory session seeded with the typed job snapshot, streams state deltas, and validates the required output keys. Every model turn goes to Meta Model API. Session state never becomes workflow authority; after a crash, Firestore leases decide whether the operation runs again.
 
-Memory Bank is mandatory in the managed deployment. Every retrieval and generation uses the exact `{workspace_id, brand_id}` values persisted on the job. Up to five facts are retrieved before analysis, strategy, or drafting. Writes are restricted to typed operator decisions and independently verified outcomes with durable Firestore evidence references; a learn-stage aggregate is not eligible until its own durable record exists. Raw source material, transcripts, prompts, drafts, errors, and unverified claims are ineligible. See the [state ownership matrix](/state-ownership) for every store's scope and authority.
+Workspace memory is mandatory in the managed deployment. Every retrieval and write uses the exact `{workspace_id, brand_id}` values persisted on the job. Up to five facts are retrieved before analysis, strategy, or drafting. Writes are restricted to typed operator decisions and independently verified outcomes with durable Firestore evidence references; a learn-stage aggregate is not eligible until its own durable record exists. Raw source material, transcripts, prompts, drafts, errors, and unverified claims are ineligible. See the [state ownership matrix](/state-ownership) for every store's scope and authority.
 
-This separation is what makes the workflow architecture capable of spanning weeks; no elapsed-weeks run is claimed without evidence. Firestore—not an agent's prompt window—retains the current stage, delivery history, approvals, operation identifiers, receipts, and verification results. Pub/Sub can redeliver work after a process restart without duplicating an external effect. A restarted cognitive operation retrieves its deterministic managed session, while a new operation seeds a distinct session from Firestore and may request only eligible facts from the same workspace-and-brand Memory Bank scope. Authenticated cross-job Memory Bank retrieval remains an explicit cloud-evidence gate.
+This separation is what makes the workflow architecture capable of spanning weeks; no elapsed-weeks run is claimed without evidence. Firestore—not an agent's prompt window—retains the current stage, delivery history, approvals, operation identifiers, receipts, and verification results. Pub/Sub can redeliver work after a process restart without duplicating an external effect. Every operation seeds a fresh session from Firestore and may request only eligible facts from the same workspace-and-brand workspace memory scope. Authenticated cross-job workspace memory retrieval remains an explicit cloud-evidence gate.
 
 ### Production-data and sovereignty boundary
 
@@ -168,8 +165,8 @@ Harmonia does not claim a general-purpose enterprise compliance certification. I
 - Firestore is a shared SaaS database: IAM separates services, while workspace isolation inside that database is enforced by verified application context, nested paths, ownership checks, and cross-tenant tests. It is not represented as per-tenant IAM isolation.
 - Service accounts separate the public control plane from the private worker. Publishing still requires an action-specific human approval receipt.
 - OpenTelemetry spans contain identifiers, stages, role/model labels, counts, outcomes, and trace correlation only. Prompts, responses, transcripts, drafts, media, and private reasoning are excluded.
-- The deployment selects one `REGION` and rejects mismatched Agent Engine, Memory Bank, Veo, Firestore, or storage locations. Pub/Sub persistence and in-transit processing are restricted to that region. Because Lyria uses a global endpoint, generative media fails closed unless an operator explicitly acknowledges an approved global-processing policy exception.
-- Memory Bank accepts only typed eligible facts. Raw sources, creative text, failures, and unverified claims cannot be written by the normal learn path.
+- The deployment selects one `REGION` and rejects mismatched Firestore or storage locations. Pub/Sub persistence and in-transit processing are restricted to that region. Prompts and media sent to Meta Model API are processed outside that region.
+- Workspace memory accepts only typed eligible facts. Raw sources, creative text, failures, and unverified claims cannot be written by the normal learn path.
 
 Terminal job retention, per-job holds, administrator-confirmed job erasure, owner-confirmed workspace erasure, binary artifact cleanup, and metadata-only deletion tombstones are implemented. Tenant-wide export, customer-managed encryption, organization-policy integration, and formal regulatory certification remain deployment-specific work and must not be implied by these controls.
 
@@ -177,7 +174,7 @@ Terminal job retention, per-job holds, administrator-confirmed job erasure, owne
 
 Google Identity Platform authenticates users through Google sign-in. A first sign-in creates one owner workspace and default brand. The server derives `userId`, `workspaceId`, and `brandId` from the verified session and membership record; request bodies cannot select ownership.
 
-All durable customer data lives below `workspaces/{workspaceId}`: jobs, event logs, content items, assets, connections, goals, chat history, proposals, notifications, proactive cadence, and Telegram configuration. Artifact object names include the workspace and brand. Pub/Sub messages carry the workspace and brand in both data and attributes; the worker rejects mismatches, restores invocation-local tenant context, and re-reads the job from that workspace. Agent Engine user IDs are namespaced as `{workspace}:{user}:{job}`.
+All durable customer data lives below `workspaces/{workspaceId}`: jobs, event logs, content items, assets, connections, goals, chat history, proposals, notifications, proactive cadence, and Telegram configuration. Artifact object names include the workspace and brand. Pub/Sub messages carry the workspace and brand in both data and attributes; the worker rejects mismatches, restores invocation-local tenant context, and re-reads the job from that workspace. ADK session user IDs are namespaced as `{workspace}:{user}:{job}`.
 
 Each workspace has a cumulative budget guard in addition to per-job reservations. Social publishing and Telegram use that workspace's stored connection only. Background scans enumerate active workspaces and execute each scan inside a separate tenant context.
 
@@ -191,15 +188,13 @@ Google Calendar is deliberately adjacent to, rather than inside, the worker acti
 
 Each stage transition and its deterministic pending outbox record are committed in one Firestore transaction. Publication then claims that record before sending the Pub/Sub trigger; the durable tick retries pending or expired claims. A crash can therefore cause a harmless duplicate trigger, but cannot leave a persisted stage without a recoverable trigger. The worker consumes stages through a push subscription on Cloud Run or an identical pull loop locally against the emulators. Jobs retain the exact source-manifest identity plus their analysis, plans, drafts, actions, and receipts; normalized source artifacts remain immutable registry records, so any stage can resume after a crash.
 
-The coordinator is the cognitive dispatcher, not the durable workflow engine. Pub/Sub owns asynchronous delivery and retry; Firestore owns resumable stage state, approvals, reservations, usage, provider-operation IDs, receipts, and verification evidence. Agent Engine hosts cognitive turns; it does not replace the durable stage machine.
+The coordinator is the cognitive dispatcher, not the durable workflow engine. Pub/Sub owns asynchronous delivery and retry; Firestore owns resumable stage state, approvals, reservations, usage, provider-operation IDs, receipts, and verification evidence. The ADK team hosts cognitive turns; it does not replace the durable stage machine.
 
 ### Correlated observability and cost controls
 
 The web process creates or continues W3C context and places `traceparent`/`tracestate` in Pub/Sub attributes. The worker continues that context through `harmonia.stage.execute`, `harmonia.agent.invoke`, `harmonia.model.generate`, and `harmonia.output.validate`. Delegation is an explicit `harmonia.agent.delegate` event. Internal HTTP callbacks carry the same context.
 
-Before dispatch, every real ADK role, Gemini media-extraction call, and image generation reserves a deterministic operation cost in a Firestore transaction. Successful calls finalize immutable usage records grouped by job, stage, role, and model. Retried operation IDs reuse their reservation and usage document, preventing double charging. `/api/metrics` exposes calls, units, and estimated cost by role/model plus current reserved cost.
-
-Veo and Lyria reserve their current catalog amount before provider execution. Veo's long-running operation name is persisted in a Firestore subcollection before the first poll, so Pub/Sub redelivery resumes the same operation. Completed media is stored and independently digest-verified through the existing asset boundary. Both paid-media action types always wait for explicit operator approval.
+Before dispatch, every real ADK role, Muse Voice Transcribe call, web search, and Muse Image generation reserves a deterministic operation cost in a Firestore transaction. Successful calls finalize immutable usage records grouped by job, stage, role, and model. Retried operation IDs reuse their reservation and usage document, preventing double charging. `/api/metrics` exposes calls, units, and estimated cost by role/model plus current reserved cost.
 
 Trace attributes are metadata-only. Harmonia disables both current and legacy ADK message-content capture and never attaches prompts, responses, transcripts, drafts, or media bytes. The trace shows the execution graph and explicit structured decisions; it does not expose private chain-of-thought.
 
@@ -220,8 +215,8 @@ Verification never trusts the executor. Published posts are re-fetched from the 
 
 ### Learnings feed forward
 
-The learn stage measures published posts via public metrics and stores evidence-linked takeaways per job. Eligible learnings re-enter Ryan's single strategy contract on a future job or revision—closing the governed learning loop without granting Memory Bank authority.
+The learn stage measures published posts via public metrics and stores evidence-linked takeaways per job. Eligible learnings re-enter Ryan's single strategy contract on a future job or revision—closing the governed learning loop without granting workspace memory authority.
 
 <Warning>
-  Distinct role routing, Noni's skill-first writing trace, direct video attachment, managed-runtime adapter, exact-scope memory contracts, paid-media adapters, budget enforcement, usage normalization, and metadata-only trace behavior are verified offline. Authenticated Gemini team execution, Agent Engine, Memory Bank, Veo, Lyria, and exported Cloud Trace correlation remain unverified until separate live evidence is captured.
+  Distinct role routing, Noni's skill-first writing trace, direct video attachment, the in-process runtime, exact-scope memory contracts, budget enforcement, usage normalization, and metadata-only trace behavior are verified offline. Authenticated Muse Spark team execution, Muse Voice Transcribe, Muse Image, workspace memory, and exported Cloud Trace correlation remain unverified until separate live evidence is captured.
 </Warning>

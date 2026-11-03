@@ -8,8 +8,8 @@ describe("state ownership documentation", () => {
   const readme = readFileSync(join(process.cwd(), "README.md"), "utf8");
   const interfaces = readFileSync(join(process.cwd(), "docs/interfaces.mdx"), "utf8");
   it.each([
-    "Invocation state", "Managed ADK session", "Firestore job", "Approval decisions",
-    "Receipts and verification", "Chat history", "Memory Bank", "Secrets", "Private evidence",
+    "Invocation state", "ADK in-memory session", "Firestore job", "Approval decisions",
+    "Receipts and verification", "Chat history", "Workspace memory", "Secrets", "Private evidence",
     "Source of truth", "Retention",
   ])("documents %s", (required) => expect(document).toContain(required));
 
@@ -17,7 +17,7 @@ describe("state ownership documentation", () => {
     expect(document).toMatch(/complete Temi editorial plan/i);
     expect(document).toMatch(/canonical digest/i);
     expect(document).toMatch(/selected item lifecycle/i);
-    expect(document).toMatch(/Memory Bank[\s\S]*never.*authoriz/i);
+    expect(document).toMatch(/Workspace memory[\s\S]*never.*authoriz/i);
   });
 
   it("shows the plan worker stage and exact editorial item lifecycle without conflating effects", () => {

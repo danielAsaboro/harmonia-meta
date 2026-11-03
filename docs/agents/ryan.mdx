@@ -13,7 +13,7 @@ and source-grounded content briefs for Temi.
 | Property | Value |
 |---|---|
 | ADK name | `ryan_strategist` |
-| Default model | `gemini-3.5-flash` |
+| Default model | `muse-spark-1.3` |
 | Input | `StrategistInput` |
 | Output | `StrategistResult` containing `ContentStrategy` |
 | Runtime skill | `ryan-strategy-skills` |
@@ -46,7 +46,7 @@ themes, channel roles, format mix, cadence guidance, CTAs, KPIs, success criteri
 complete briefs.
 
 Evidence is closed-world. Ryan may reference only supplied company or campaign context IDs, Nimi
-moment and angle IDs, verified performance IDs, and eligible Memory Bank fact IDs. Every brief must
+moment and angle IDs, verified performance IDs, and eligible workspace memory fact IDs. Every brief must
 cite at least one Nimi moment or angle. Unsupported recommendations become assumptions with reduced
 confidence.
 
@@ -56,7 +56,7 @@ The source-coverage ledger is development documentation and is excluded from the
 ## Evidence and provenance
 
 The catalog is closed-world: operator context IDs, Nimi moment/angle IDs, verified performance IDs,
-eligible Memory Bank fact IDs, and validated search IDs retain their exact kind and provenance. Every
+eligible workspace memory fact IDs, and validated search IDs retain their exact kind and provenance. Every
 brief cites a Nimi moment or angle. Weak support becomes a bounded assumption with reduced confidence.
 
 ## Authority boundary
@@ -75,7 +75,7 @@ approval. Only an authenticated approval matching that digest passes the unchang
 Strict validators reject an invalid skill trace, invented references, ungrounded briefs, unsupported
 operational channels, performance claims without verified IDs, incoherent theses where mechanically
 detectable, unexplained high confidence, final-copy-shaped output, effects, approval claims, and
-Memory Bank used as authority. When an exact typed `researchRequest` establishes that current
+Workspace memory used as authority. When an exact typed `researchRequest` establishes that current
 external information is necessary, the isolated `ryan_web_search` tool runs Meta Model API
 `web_search` and returns a request-bound typed result. Deterministic code requires a completed
 search and a matching title, URL, and verbatim supported text in Meta's search results or URL

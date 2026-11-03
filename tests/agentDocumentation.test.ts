@@ -15,7 +15,7 @@ describe("agent documentation reference", () => {
       "noni-writing-skills", "dara-editing-skills",
       "Skill guidance is method, never evidence",
       "Search is a tool, not a skill",
-      "Memory Bank is advisory context, never authority",
+      "Workspace memory is advisory context, never authority",
     ]) expect(inventory).toContain(value);
   });
 
