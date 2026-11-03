@@ -11,7 +11,6 @@ Wire format: docs/meta-model-api/sam/reading-segmentation.md. Pricing: $0.20 per
 
 from __future__ import annotations
 
-import base64
 import logging
 import os
 import re
@@ -36,11 +35,12 @@ from .web_client import report_usage, reserve_budget, resolve_budget_reservation
 DEFAULT_SEGMENTATION_MODEL = "sam-3.1"
 SAM_USD_PER_FRAME = Decimal("0.20") / Decimal(1000)
 SAM_MIN_BILLED_FRAMES = 50
-# A 5 fps, 640 px proxy keeps a 60 s clip at 300 billed frames ($0.06) and well
-# under the 50 MB inline limit, while boxes stay precise enough to frame a person.
+# A 5 fps, 640 px proxy keeps a 60 s clip at 300 billed frames ($0.06) and
+# small enough to send inline, while boxes stay precise enough to frame a person.
+# Larger proxies go through the Files API (1 GiB cap).
 PROXY_FPS = 5
 PROXY_WIDTH = 640
-MAX_PROXY_BYTES = 45_000_000
+MAX_PROXY_BYTES = 1_000_000_000
 KEYFRAME_SECONDS = 0.5
 # Ignore subject drift smaller than this share of the frame so the crop holds still.
 DEAD_ZONE = 0.04
@@ -190,7 +190,7 @@ def _proxy(source: Path, start: float, end: float, workdir: Path) -> Path:
     if proc.returncode != 0 or not proxy.exists():
         raise SegmentationError(f"ffmpeg proxy encode failed: {(proc.stderr or '')[-200:]}")
     if proxy.stat().st_size > MAX_PROXY_BYTES:
-        raise SegmentationError("segmentation proxy exceeds the inline video limit")
+        raise SegmentationError("segmentation proxy exceeds the Files API limit")
     return proxy
 
 
@@ -206,14 +206,14 @@ def _output_text(body: dict[str, Any]) -> str:
 
 
 def _segment(client: httpx.Client, model: str, subject: str, video: bytes) -> tuple[str, int | None]:
-    response = client.post("/responses", json={
-        "model": model,
-        "input": [{"type": "message", "role": "user", "content": [
-            {"type": "input_text", "text": subject},
-            {"type": "input_video", "video_url": "data:video/mp4;base64," + base64.b64encode(video).decode()},
-        ]}],
-        "metadata": {"mask_encoding": "one_bit"},
-    })
+    with meta_api.video_input(client, video) as video_part:
+        response = client.post("/responses", json={
+            "model": model,
+            "input": [{"type": "message", "role": "user", "content": [
+                {"type": "input_text", "text": subject}, video_part,
+            ]}],
+            "metadata": {"mask_encoding": "one_bit"},
+        })
     if response.status_code >= 300:
         raise SegmentationError(f"SAM request failed ({response.status_code}): {response.text[:200]}")
     body = response.json()

@@ -10,10 +10,12 @@ returned unchanged so callers keep their own failure classification.
 from __future__ import annotations
 
 import asyncio
+import base64
 import os
 import random
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from typing import Any
 
 import httpx
@@ -125,3 +127,45 @@ def fetch_status(get: Callable[[str], httpx.Response] | None = None) -> dict[str
         **({"degradedModels": degraded} if degraded else {}),
         **({"message": str(body["service_message"])[:200]} if body.get("service_message") else {}),
     }
+
+
+# docs/meta/file-handling.md: inline media is capped at 50 MB per request; the
+# Files API accepts up to 1 GiB. Uploads expire after an hour and are deleted
+# as soon as the call that needed them returns.
+MAX_INLINE_MEDIA_BYTES = 45_000_000
+UPLOAD_TTL_SECONDS = 3600
+
+
+def upload_file(client: httpx.Client, data: bytes, *, filename: str, content_type: str) -> str:
+    response = client.post(
+        "/files",
+        data={"purpose": "user_data", "expires_after[anchor]": "created_at",
+              "expires_after[seconds]": str(UPLOAD_TTL_SECONDS)},
+        files={"file": (filename, data, content_type)},
+    )
+    if response.status_code >= 300:
+        raise RuntimeError(f"Meta Files API upload failed ({response.status_code}): {response.text[:200]}")
+    file_id = response.json().get("id")
+    if not isinstance(file_id, str) or not file_id:
+        raise RuntimeError("Meta Files API upload returned no file id")
+    return file_id
+
+
+def delete_file(client: httpx.Client, file_id: str) -> None:
+    try:
+        client.delete(f"/files/{file_id}")
+    except httpx.HTTPError:
+        pass  # the upload expires on its own within UPLOAD_TTL_SECONDS
+
+
+@contextmanager
+def video_input(client: httpx.Client, video: bytes) -> Iterator[dict[str, str]]:
+    """An ``input_video`` part: inline when small, otherwise a temporary Files API upload."""
+    if len(video) <= MAX_INLINE_MEDIA_BYTES:
+        yield {"type": "input_video", "video_url": "data:video/mp4;base64," + base64.b64encode(video).decode()}
+        return
+    file_id = upload_file(client, video, filename="harmonia-proxy.mp4", content_type="video/mp4")
+    try:
+        yield {"type": "input_video", "file_id": file_id}
+    finally:
+        delete_file(client, file_id)

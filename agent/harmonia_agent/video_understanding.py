@@ -11,7 +11,6 @@ Docs: docs/meta-model-api/video-understanding.md, structured-output.md.
 
 from __future__ import annotations
 
-import base64
 import logging
 import os
 import subprocess
@@ -31,7 +30,8 @@ from .web_client import report_usage, reserve_budget, resolve_budget_reservation
 
 MAX_OBSERVATIONS = 20
 PROXY_WIDTH = 480
-MAX_PROXY_BYTES = 45_000_000
+# Larger proxies go through the Files API (1 GiB cap) instead of inline.
+MAX_PROXY_BYTES = 1_000_000_000
 # Meta does not publish a per-second video token rate; reserve against a
 # deliberately high estimate and record the provider-reported usage afterwards.
 ESTIMATED_INPUT_TOKENS_PER_SECOND = 400
@@ -99,11 +99,10 @@ def _proxy(source: Path, workdir: Path, fps: int) -> Path:
 
 
 def _small_proxy(source: Path, workdir: Path) -> bytes:
-    for fps in (2, 1):
-        data = _proxy(source, workdir, fps).read_bytes()
-        if len(data) <= MAX_PROXY_BYTES:
-            return data
-    raise VideoUnderstandingError("video is too long for inline visual analysis")
+    data = _proxy(source, workdir, 2).read_bytes()
+    if len(data) > MAX_PROXY_BYTES:
+        raise VideoUnderstandingError("video proxy exceeds the Files API limit")
+    return data
 
 
 def extract_frame(source: Path, timestamp_sec: float, workdir: Path) -> bytes:
@@ -130,16 +129,16 @@ def _http_client(timeout: float) -> httpx.Client:
 
 
 def _observe(client: httpx.Client, model: str, video: bytes) -> tuple[str, dict[str, Any]]:
-    response = client.post("/responses", json={
-        "model": model,
-        "reasoning": {"effort": "low"},
-        "max_output_tokens": MAX_OUTPUT_TOKENS,
-        "input": [{"type": "message", "role": "user", "content": [
-            {"type": "input_text", "text": PROMPT},
-            {"type": "input_video", "video_url": "data:video/mp4;base64," + base64.b64encode(video).decode()},
-        ]}],
-        "text": {"format": {"type": "json_schema", "name": "VisualObservations", "schema": OBSERVATION_SCHEMA, "strict": True}},
-    })
+    with meta_api.video_input(client, video) as video_part:
+        response = client.post("/responses", json={
+            "model": model,
+            "reasoning": {"effort": "low"},
+            "max_output_tokens": MAX_OUTPUT_TOKENS,
+            "input": [{"type": "message", "role": "user", "content": [
+                {"type": "input_text", "text": PROMPT}, video_part,
+            ]}],
+            "text": {"format": {"type": "json_schema", "name": "VisualObservations", "schema": OBSERVATION_SCHEMA, "strict": True}},
+        })
     if response.status_code >= 300:
         raise VideoUnderstandingError(f"video understanding failed ({response.status_code}): {response.text[:200]}")
     body = response.json()

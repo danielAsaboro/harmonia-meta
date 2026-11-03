@@ -96,3 +96,32 @@ def test_status_summarizes_live_shape_and_degraded_models():
 def test_role_models_ask_litellm_to_retry():
     model = MetaLlm(model_id="muse-spark-1.3", provider="meta", reasoning_effort="low")
     assert model._additional_args["num_retries"] == 3
+
+
+def _files_client(seen: list[httpx.Request]) -> httpx.Client:
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if request.method == "POST" and request.url.path.endswith("/files"):
+            return httpx.Response(200, json={"id": "file-842549258569145", "object": "file"})
+        return httpx.Response(200, json={"deleted": True})
+    return httpx.Client(base_url="https://api.meta.ai/v1", transport=httpx.MockTransport(handler))
+
+
+def test_small_video_is_sent_inline_without_an_upload():
+    seen: list[httpx.Request] = []
+    with _files_client(seen) as client, meta_api.video_input(client, b"\x00\x00\x00\x18ftypmp42") as part:
+        assert part["type"] == "input_video" and part["video_url"].startswith("data:video/mp4;base64,")
+    assert seen == []
+
+
+def test_large_video_goes_through_the_files_api_and_is_deleted(monkeypatch):
+    monkeypatch.setattr(meta_api, "MAX_INLINE_MEDIA_BYTES", 4)
+    seen: list[httpx.Request] = []
+    with _files_client(seen) as client, meta_api.video_input(client, b"0123456789") as part:
+        assert part == {"type": "input_video", "file_id": "file-842549258569145"}
+        upload = seen[0]
+        body = upload.read()
+        assert b'name="purpose"' in body and b"user_data" in body
+        assert b'name="expires_after[seconds]"' in body and b"3600" in body
+        assert b"0123456789" in body
+    assert (seen[-1].method, seen[-1].url.path) == ("DELETE", "/v1/files/file-842549258569145")

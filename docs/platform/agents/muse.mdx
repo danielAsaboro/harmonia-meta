@@ -24,7 +24,7 @@ Meta Model API has no video, music, or speech synthesis model, so Harmonia does 
 
 ## Security and authority
 
-Models cannot approve strategies or effects, mutate Firestore, schedule externally, publish, or create verification receipts. Multimodal input is attached only from an authorized source package. The API key is read from the environment on every call and never stored on an agent.
+Models cannot approve strategies or effects, mutate Firestore, schedule externally, publish, or create verification receipts. Multimodal input is attached only from an authorized source package. The API key is read from the environment on every call and never stored on an agent. Video proxies over 45 MB go through the Files API as one-hour uploads that are deleted as soon as the call returns. Every direct call retries 429, 500, and 503 responses, honoring `Retry-After`, as Meta's error-handling guide recommends.
 
 ## Failure behavior
 
