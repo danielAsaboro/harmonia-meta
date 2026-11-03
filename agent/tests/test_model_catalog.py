@@ -30,3 +30,13 @@ def test_unknown_model_price_is_not_treated_as_free():
         estimate_text_cost("unpriced-model", 100, 100)
 
 
+
+
+def test_prompt_cached_input_bills_at_the_cached_rate():
+    # 1,000,000 input of which 800,000 cached: 200k x $1.25 + 800k x $0.15 = $0.37
+    assert estimate_text_cost("muse-spark-1.3", 1_000_000, 0, 800_000) == Decimal("0.370000")
+    assert estimate_text_cost("muse-wonder-1.0", 1_000_000, 0, 1_000_000) == Decimal("0.200000")
+    # Baseten publishes no cached rate, so cached tokens bill as ordinary input.
+    assert estimate_text_cost("meta-models/muse-spark-open-1026", 1_000_000, 0, 1_000_000) == Decimal("1.250000")
+    with pytest.raises(ValueError, match="subset"):
+        estimate_text_cost("muse-spark-1.3", 10, 0, 11)

@@ -50,6 +50,19 @@ def test_usage_record_id_is_stable_across_retries():
     assert first.id == second.id
 
 
+def test_accumulator_bills_prefix_cached_input_at_the_cached_rate():
+    accumulator = UsageAccumulator(
+        job_id="j1", operation_id="j1:draft:noni:0", stage="draft", role="noni", model="muse-spark-1.3",
+    )
+    accumulator.observe_event(SimpleNamespace(usage_metadata=SimpleNamespace(
+        prompt_token_count=10_000, candidates_token_count=1_000, cached_content_token_count=8_000,
+    )))
+    record = accumulator.finalize(trace_id="0" * 32)
+    # 2,000 x $1.25 + 8,000 x $0.15 + 1,000 x $4.25 per million
+    assert record.estimated_cost_usd == "0.007950"
+    assert record.to_wire()["cachedInputUnits"] == 8_000
+
+
 def test_endpoint_usage_records_elapsed_seconds_without_fake_token_pricing():
     record = endpoint_usage_record(
         invocation=InvocationContext(

@@ -18,6 +18,8 @@ Harmonia balances quality and cost per role rather than applying one model and o
 | presenter | Muse Spark 1.3 | low | 8,192 | bounded A2UI component/entity references |
 | liaison | Muse Spark 1.3 | low | 8,192 | grounded read-only answers |
 
+Meta Model API caches stable prompt prefixes automatically. Harmonia records `cachedInputUnits` from each response and bills those tokens at the cached rate ($0.15 per million for Muse Spark, $0.20 for Muse Wonder) instead of the full input rate. Specialist instructions come before the variable job payload so the prefix stays reusable.
+
 Set `<ROLE>_PROVIDER=baseten` to move any role to open-weight Muse Spark Open (`meta-models/muse-spark-open-1026`) on Baseten. Transcription uses Muse Voice Transcribe 1.0 and approved images use Muse Image 1.0.
 
 Every role records the policy version, provider/model identity, generation limits, and safety profile. An unavailable configured target fails visibly.

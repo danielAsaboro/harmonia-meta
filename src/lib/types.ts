@@ -349,6 +349,7 @@ export interface UsageRecord {
   model: string;
   inputUnits: number;
   outputUnits: number;
+  cachedInputUnits?: number;
   unitType: "tokens" | "images" | "video_seconds" | "video_frames" | "audio_seconds" | "endpoint_seconds" | "media_generations";
   estimatedCostUsd: string;
   observedCostUsd?: string;

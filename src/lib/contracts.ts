@@ -200,6 +200,7 @@ export const usageRecordSchema = z.object({
   model: z.string().min(1),
   inputUnits: z.number().int().nonnegative(),
   outputUnits: z.number().int().nonnegative(),
+  cachedInputUnits: z.number().int().nonnegative().optional(),
   unitType: z.enum(["tokens", "images", "video_seconds", "video_frames", "audio_seconds", "endpoint_seconds", "media_generations"]),
   estimatedCostUsd: usdDecimalSchema,
   observedCostUsd: usdDecimalSchema.optional(),

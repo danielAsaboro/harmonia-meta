@@ -55,6 +55,7 @@ class UsageRecord(BaseModel):
         "endpoint_seconds", "media_generations",
     ] = "tokens"
     estimated_cost_usd: str
+    cached_input_units: int | None = None
     observed_cost_usd: str | None = None
     pricing_version: str = PRICING_VERSION
     model_policy: dict[str, Any] | None = None
@@ -162,6 +163,7 @@ class UsageAccumulator:
         self.model_policy = model_policy
         self.input_tokens = 0
         self.output_tokens = 0
+        self.cached_input_tokens = 0
 
     def observe_event(self, event: object) -> None:
         metadata = getattr(event, "usage_metadata", None)
@@ -169,6 +171,7 @@ class UsageAccumulator:
             return
         self.input_tokens += int(getattr(metadata, "prompt_token_count", 0) or 0)
         self.output_tokens += int(getattr(metadata, "candidates_token_count", 0) or 0)
+        self.cached_input_tokens += int(getattr(metadata, "cached_content_token_count", 0) or 0)
 
     def finalize(self, *, trace_id: str) -> UsageRecord:
         return UsageRecord(
@@ -180,9 +183,11 @@ class UsageAccumulator:
             model=self.model,
             input_units=self.input_tokens,
             output_units=self.output_tokens,
-            estimated_cost_usd=str(
-                estimate_text_cost(self.model, self.input_tokens, self.output_tokens)
-            ),
+            cached_input_units=self.cached_input_tokens or None,
+            estimated_cost_usd=str(estimate_text_cost(
+                self.model, self.input_tokens, self.output_tokens,
+                min(self.cached_input_tokens, self.input_tokens),
+            )),
             trace_id=trace_id,
             model_policy=self.model_policy,
             created_at=datetime.now(timezone.utc).isoformat(),

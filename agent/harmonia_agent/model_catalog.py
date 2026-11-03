@@ -19,25 +19,31 @@ class PricingEntry:
     model: str
     input_usd_per_million: Decimal
     output_usd_per_million: Decimal
+    cached_input_usd_per_million: Decimal
     version: str = PRICING_VERSION
     source: str = RATE_SOURCE
 
 
-def _entry(model: str, input_usd: str, output_usd: str, source: str = RATE_SOURCE) -> PricingEntry:
+def _entry(
+    model: str, input_usd: str, output_usd: str, cached_usd: str | None = None, source: str = RATE_SOURCE,
+) -> PricingEntry:
     return PricingEntry(
         model=model,
         input_usd_per_million=Decimal(input_usd),
         output_usd_per_million=Decimal(output_usd),
+        # Without a published cached rate, cached tokens bill as ordinary input.
+        cached_input_usd_per_million=Decimal(cached_usd or input_usd),
         source=source,
     )
 
 
-# Standard-mode pay-as-you-go rates; reasoning tokens bill as output.
+# Standard-mode pay-as-you-go rates; reasoning tokens bill as output and
+# prefix-cached input bills at the cached rate (docs: prompt-caching).
 CATALOG = {
-    "muse-spark-1.3": _entry("muse-spark-1.3", "1.25", "4.25"),
-    "muse-spark-1.2": _entry("muse-spark-1.2", "1.25", "4.25"),
-    "muse-spark-1.1": _entry("muse-spark-1.1", "1.25", "4.25"),
-    "muse-wonder-1.0": _entry("muse-wonder-1.0", "4.00", "20.00"),
+    "muse-spark-1.3": _entry("muse-spark-1.3", "1.25", "4.25", "0.15"),
+    "muse-spark-1.2": _entry("muse-spark-1.2", "1.25", "4.25", "0.15"),
+    "muse-spark-1.1": _entry("muse-spark-1.1", "1.25", "4.25", "0.15"),
+    "muse-wonder-1.0": _entry("muse-wonder-1.0", "4.00", "20.00", "0.20"),
     "meta-models/muse-spark-open-1026": _entry(
         "meta-models/muse-spark-open-1026", "1.25", "4.25",
         source="https://www.baseten.co/pricing/",
@@ -54,12 +60,17 @@ def lookup_pricing(model_id: str) -> PricingEntry:
         raise UnknownModelPrice(f"no price configured for model: {model_id}") from exc
 
 
-def estimate_text_cost(model_id: str, input_tokens: int, output_tokens: int) -> Decimal:
-    if input_tokens < 0 or output_tokens < 0:
+def estimate_text_cost(
+    model_id: str, input_tokens: int, output_tokens: int, cached_input_tokens: int = 0,
+) -> Decimal:
+    if input_tokens < 0 or output_tokens < 0 or cached_input_tokens < 0:
         raise ValueError("token counts must be non-negative")
+    if cached_input_tokens > input_tokens:
+        raise ValueError("cached input tokens are a subset of input tokens")
     entry = lookup_pricing(model_id)
     total = (
-        Decimal(input_tokens) * entry.input_usd_per_million
+        Decimal(input_tokens - cached_input_tokens) * entry.input_usd_per_million
+        + Decimal(cached_input_tokens) * entry.cached_input_usd_per_million
         + Decimal(output_tokens) * entry.output_usd_per_million
     ) / MILLION
     return total.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)

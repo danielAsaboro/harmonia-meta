@@ -204,12 +204,13 @@ def observe_video(
                 text, usage = observe(client, model, video)
             input_tokens = int(usage.get("input_tokens") or estimated_input)
             output_tokens = int(usage.get("output_tokens") or 0)
-            cost = estimate_text_cost(model, input_tokens, output_tokens)
+            cached_tokens = min(int((usage.get("input_tokens_details") or {}).get("cached_tokens") or 0), input_tokens)
+            cost = estimate_text_cost(model, input_tokens, output_tokens, cached_tokens)
             usage_reporter(UsageRecord(
                 id=f"usage-{sha256(operation_id.encode()).hexdigest()[:24]}",
                 job_id=invocation.job_id, operation_id=operation_id, stage=invocation.stage,
                 role=role, model=model, input_units=input_tokens, output_units=output_tokens,
-                unit_type="tokens", estimated_cost_usd=str(cost),
+                cached_input_units=cached_tokens or None, unit_type="tokens", estimated_cost_usd=str(cost),
                 trace_id=current_trace_id(), created_at=datetime.now(timezone.utc).isoformat(),
             ).to_wire())
             state = "reported"
