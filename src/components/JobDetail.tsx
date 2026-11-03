@@ -8,6 +8,7 @@ import type { JobFull } from "@/components/jobTypes";
 import type { TimelineEvent } from "@/components/Timeline";
 import type { PlannedAction, Receipt } from "@/lib/types";
 import { isReplayableAction } from "@/lib/replayEligibility";
+import { SubjectTrackPreview, subjectTracks } from "@/components/SubjectTrackPreview";
 import { SteeringControls } from "@/components/studio/SteeringControls";
 import { contentArtifactPreview } from "@/lib/contentArtifacts/presentation";
 
@@ -364,6 +365,9 @@ export default function JobDetail({
                           className="mt-2 max-h-72 rounded-lg border border-zinc-200 dark:border-zinc-800"
                         />
                       )}
+                      {a.state === "executed" && subjectTracks(receipts.find((r) => r.actionId === a.id && r.outcome === "applied")?.detail).map((track) => (
+                        <SubjectTrackPreview key={track.momentId} track={track} />
+                      ))}
                       {a.state === "executed" && assetMime.get(a.id)?.startsWith("image/") && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img

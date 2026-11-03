@@ -209,6 +209,17 @@ def _subject_crop(
     return crop, [f"reframed to follow the tracked {payload.get('subject') or 'person'} (SAM 3.1)"]
 
 
+def _tracking_record(moment_id: str, source: Any, crop: "segmentation.SubjectCrop", subject: str) -> dict[str, Any]:
+    """The crop path SAM 3.1 produced, small enough for a receipt and a studio preview."""
+    width, height = clipper.probe_dimensions(source)
+    step = max(1, len(crop.keyframes) // 60)
+    return {
+        "momentId": moment_id, "model": segmentation.segmentation_model(), "subject": subject,
+        "sourceWidth": width, "sourceHeight": height, "cropWidth": crop.width, "cropHeight": crop.height,
+        "keyframes": [[round(t, 2), x] for t, x in crop.keyframes[::step]],
+    }
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -813,6 +824,7 @@ async def run_publish(job_id: str) -> None:
                     fmt = action["payload"].get("format", "vertical")
                     want_caps = action["payload"].get("captions", True)
                     render_notes: list[str] = []
+                    tracking: list[dict[str, Any]] = []
                     with tempfile.TemporaryDirectory() as td:
                         if action["type"] == "render_clip":
                             moment = next(
@@ -827,6 +839,8 @@ async def run_publish(job_id: str) -> None:
                                 job, action, src, float(moment["startSec"]), float(moment["endSec"]), fmt, moment["id"],
                             )
                             render_notes += crop_notes
+                            if crop is not None:
+                                tracking.append(_tracking_record(moment["id"], src, crop, str(action["payload"].get("subject") or "person")))
                             render_notes += clipper.render_clip(
                                 src, out,
                                 float(moment["startSec"]), float(moment["endSec"]),
@@ -846,6 +860,8 @@ async def run_publish(job_id: str) -> None:
                                     job, action, src, float(m["startSec"]), float(m["endSec"]), fmt, m["id"],
                                 )
                                 render_notes += crop_notes
+                                if crop is not None:
+                                    tracking.append(_tracking_record(m["id"], src, crop, str(action["payload"].get("subject") or "person")))
                                 render_notes += clipper.render_clip(
                                     src, part,
                                     float(m["startSec"]), float(m["endSec"]),
@@ -871,6 +887,7 @@ async def run_publish(job_id: str) -> None:
                         "digest": digest, "mime": "video/mp4",
                         "bytes": len(video_bytes), "format": fmt,
                         **({"notes": render_notes} if render_notes else {}),
+                        **({"tracking": tracking} if tracking else {}),
                     })
         except (x_client.XError, content.ImageGenError, ClipRenderError) as exc:
             outcome, detail["error"] = "failed", str(exc)

@@ -202,3 +202,16 @@ def test_stage_passes_the_requested_subject_and_a_per_moment_operation(monkeypat
     assert crop is not None and notes == ["reframed to follow the tracked guitar (SAM 3.1)"]
     assert (seen["subject"], seen["aspect"], seen["start"], seen["end"]) == ("guitar", 1.0, 3, 9)
     assert seen["invocation"].operation_id == "job-1:publish:reel-1:m2"
+
+
+def test_tracking_record_keeps_the_crop_path_for_the_studio_preview(monkeypatch):
+    from harmonia_agent import stages
+
+    monkeypatch.setattr(stages.clipper, "probe_dimensions", lambda _src: (1920, 1080))
+    monkeypatch.delenv("SEGMENTATION_MODEL_ID", raising=False)
+    keyframes = tuple((round(i * 0.2, 2), 400 + i) for i in range(150))
+    record = stages._tracking_record("m1", Path("s.mp4"), SubjectCrop(width=608, height=1080, keyframes=keyframes), "person")
+
+    assert record["model"] == "sam-3.1" and record["subject"] == "person"
+    assert (record["sourceWidth"], record["sourceHeight"], record["cropWidth"], record["cropHeight"]) == (1920, 1080, 608, 1080)
+    assert len(record["keyframes"]) <= 75 and record["keyframes"][0] == [0.0, 400]
