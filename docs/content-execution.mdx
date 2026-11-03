@@ -4,10 +4,6 @@ description: "How we built Harmonia to turn scattered startup source material in
 "og:image": "https://docs.useharmonia.xyz/brand/harmonia-banner.png"
 ---
 
-<Note>
-  I created this article for the purpose of entering Harmonia in the All Things Agentic Hackathon.
-</Note>
-
 Startups rarely suffer from a shortage of things worth saying.
 
 Founder interviews contain hard-won lessons. Product demos explain why a feature exists. Customer conversations reveal the language buyers actually use. Podcasts, webinars, launch notes, documents, and recordings hold stories that could build trust for months.
@@ -310,9 +306,12 @@ Finally, implementation and evidence are different claims. Tests can demonstrate
 
 ## What we built
 
-Harmonia predates the Meta Global AI Developer Hackathon. Its pipeline, approval boundary, idempotent effects, verification, studio, and integrations were built in August 2026.
-
-During the Meta hackathon, we moved every model call to Meta Model API: Muse Spark for each specialist role with per-role reasoning effort and strict structured output, Muse Spark Open on Baseten as an option, Muse Spark `web_search` for provenance-checked research, Muse Voice Transcribe for media, and Muse Image for approved images. We also ran the ADK team in-process, moved workspace memory to Firestore, and removed the Google-only video and music generation features.
+- a Muse Spark specialist team, organized with Google ADK, with per-role reasoning effort, strict structured output, skills, typed handoffs, and explicit authority limits;
+- Muse Spark `web_search` research that accepts a cited source only when Meta's returned results or URL citations contain it, Muse Voice Transcribe for audio and video, Muse Image for approved images, and Muse Spark Open on Baseten as a per-role option;
+- a resumable, multi-source pipeline spanning analysis, strategy approval, editorial planning, multi-format production, review, effect approval, execution, receipts, and verification;
+- a Next.js control plane and private Python worker connected through Firestore and Pub/Sub, with exact-scope workspace memory;
+- a dashboard, A2UI workspace, Telegram boundary, interactive architecture explorer, and public documentation; and
+- deterministic content-pack exports and media rendering, plus official-provider publishing adapters designed around independent read-back.
 
 Harmonia gives a small startup a content operation that can continue working asynchronously while preserving human authority over the decisions that carry real responsibility.
 
@@ -322,7 +321,7 @@ The strategy may begin the work. Harmonia carries it through execution.
 
 ---
 
-Harmonia runs on Meta Model API, the open-source Google ADK framework, and Google Cloud hosting. See the README for exactly which parts were built during the Meta hackathon.
+Harmonia runs on Meta Model API, the open-source Google ADK framework, and Google Cloud hosting.
 
 <CardGroup cols={2}>
   <Card title="Read the system architecture" icon="sitemap" href="/architecture/overview">

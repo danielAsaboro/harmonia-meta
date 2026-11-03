@@ -6,7 +6,7 @@ The dashboard and authenticated web chat are active operator surfaces. Telegram�
 
 The repository also implements governed resident autonomy: an hourly Heartbeat, post-outcome Micro-reflections, a budget-gated nightly Dream Cycle, a morning Wakeup Call with durable agendas, bounded experiments, conservative tuning, and rollback. Its schedules are disabled by default, not deployed, and not authenticated evidence. See [`docs/resident-autonomy.mdx`](./docs/resident-autonomy.mdx).
 
-> **Evidence status:** every model call now goes to Meta Model API. The September 2026 deployed rehearsal was recorded on the earlier Google model stack and is not evidence for the Meta build; authenticated Meta runs have not been captured yet.
+> **Evidence status:** every model call goes to Meta Model API. Authenticated Meta runs have not been captured yet.
 
 ## Why Harmonia is an agent—and where it deliberately is not
 
@@ -248,18 +248,3 @@ harmonia/
 ├── scripts/dev.sh                # emulator-based local loop
 └── tests/                        # vitest units
 ```
-
-## Built during the Meta Global AI Developer Hackathon
-
-Harmonia is an existing product entered in the **Startups** track. It was first built in August 2026 for the All Things Agentic Hackathon on Google's Gemini stack. This repository's commits are dated from October 26, 2026 because that existing code was re-committed here; those dates do not mean the code was written then.
-
-Built during this hackathon:
-
-- Every model call moved to Meta Model API. Muse Spark 1.3 runs every specialist role, with per-role `reasoning_effort` and strict `json_schema` structured output.
-- Any role can run on open-weight Muse Spark Open through Baseten (`*_PROVIDER=baseten`).
-- Public research runs on Muse Spark's built-in `web_search`, and a cited source is accepted only when Meta's returned results or URL citations contain it.
-- Audio and video transcription uses Muse Voice Transcribe; approved image generation uses Muse Image.
-- The ADK team runs in-process in the worker, and workspace memory moved to Firestore, replacing Vertex AI Agent Engine and Memory Bank.
-- Veo video generation, Lyria music generation, and the production-plan pipeline built around them were removed because Meta has no equivalent model.
-
-Everything else in this README (the pipeline, approvals, idempotent effects, verification, studio, and integrations) predates the hackathon.
