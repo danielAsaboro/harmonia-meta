@@ -157,7 +157,7 @@ describe("immutable effect commands", () => {
   });
 
   it("requeues a submitted long-running provider operation without losing its identity", () => {
-    const draft = { ...input(), actionType: "generate_video" as const, payload: { providerOperationId: "operations/123" } };
+    const draft = { ...input(), actionType: "generate_image" as const, payload: { providerOperationId: "operations/123" } };
     const prepared = createEffectCommand({ ...draft, authorization: { kind: "approval", approvalId: "approval-1", approvedPayloadDigest: effectCommandDigest(draft) } });
     const dispatched = markEffectDispatched(prepared, { operationId: "job:job-1:effect:command-1", operationEpoch: 1, attempt: 1, now: "2026-08-31T00:00:00.000Z" });
     const waiting = markEffectWaitingProvider(dispatched, { operationId: dispatched.operationId!, operationEpoch: 1, providerOperationId: "operations/123", nextPollAt: "2026-08-31T00:00:10.000Z", now: "2026-08-31T00:00:01.000Z" });

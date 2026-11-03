@@ -57,13 +57,6 @@ export function evaluateActionPolicy(
         requiresApproval: true,
         reason: "incurs paid Muse Image generation; output remains internal until separately published",
       };
-    case "generate_video":
-    case "generate_music":
-      return {
-        risk: "medium",
-        requiresApproval: true,
-        reason: "incurs paid generative media usage; output remains internal until separately published",
-      };
     case "render_clip":
     case "render_reel":
       return {

@@ -394,8 +394,6 @@ export type ActionType =
   | "publish_x_thread"
   | "publish_linkedin_post"
   | "generate_image"
-  | "generate_video"
-  | "generate_music"
   | "render_clip"
   | "render_reel";
 

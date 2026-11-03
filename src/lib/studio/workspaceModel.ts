@@ -11,7 +11,7 @@ export interface StudioAsset {
   title: string;
   sizeBytes: number;
   digest: string;
-  provider?: "veo" | "lyria";
+  provider?: "muse-image";
   momentId?: string;
   momentTitle?: string;
   startSec?: number;
@@ -51,9 +51,7 @@ export interface StudioWorkspaceModel {
 }
 
 function providerFor(type: PlannedAction["type"]): StudioAsset["provider"] {
-  if (type === "generate_video") return "veo";
-  if (type === "generate_music") return "lyria";
-  return undefined;
+  return type === "generate_image" ? "muse-image" : undefined;
 }
 
 function kindForMime(mime: string): StudioMediaKind | null {

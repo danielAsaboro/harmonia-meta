@@ -6,17 +6,17 @@ import { WorkingCanvas } from "../src/components/studio/WorkingCanvas";
 import { surfaceRevisionRequest } from "../src/lib/a2ui/workspaceActions";
 
 describe("studio canvas", () => {
-  it("renders native audio only for a persisted audio asset", () => {
+  it("labels a persisted Muse Image asset with its model", () => {
     const html = renderToStaticMarkup(createElement(MediaWorkspace, {
-      kind: "audio",
+      kind: "visual",
       jobId: "job-1",
-      assets: [{ actionId: "sound", kind: "audio", mime: "audio/mpeg", title: "Launch score", sizeBytes: 2400, digest: "d", provider: "lyria" }],
+      assets: [{ actionId: "img", kind: "visual", mime: "image/png", title: "Launch visual", sizeBytes: 2400, digest: "d", provider: "muse-image" }],
       selectedArtifactId: null,
       onSelect: () => {},
     }));
-    expect(html).toContain("<audio");
-    expect(html).toContain("Lyria");
-    expect(html).toContain("/api/jobs/job-1/assets/sound");
+    expect(html).toContain("<img");
+    expect(html).toContain("Muse Image");
+    expect(html).toContain("/api/jobs/job-1/assets/img");
   });
 
   it("shows an honest generated-video empty state", () => {
@@ -24,7 +24,6 @@ describe("studio canvas", () => {
       kind: "motion", jobId: "job-1", assets: [], selectedArtifactId: null, onSelect: () => {},
     }));
     expect(html).toContain("No motion asset exists for this working set");
-    expect(html).not.toContain("Veo generated");
   });
 
   it("mounts a generated canvas without a collapsed appendix label", () => {

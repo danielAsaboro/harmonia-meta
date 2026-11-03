@@ -7,17 +7,6 @@ const required = {
 };
 
 describe("runtime configuration", () => {
-  it("treats blank optional media prices as unavailable", () => {
-    expect(parseConfig({
-      ...required,
-      LYRIA_3_CLIP_COST_USD: "",
-      VEO_3_1_COST_PER_SECOND_USD: "",
-    })).toMatchObject({
-      LYRIA_3_CLIP_COST_USD: undefined,
-      VEO_3_1_COST_PER_SECOND_USD: undefined,
-    });
-  });
-
   it("preserves the explicit attachment origin allowlist", () => {
     expect(parseConfig({
       ...required,

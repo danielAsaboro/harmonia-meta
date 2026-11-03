@@ -41,15 +41,6 @@ describe("evaluateActionPolicy", () => {
     expect(evaluateActionPolicy("export_content_artifact", { outputType: "linkedin_post" }).requiresApproval).toBe(false);
   });
 
-  it("always gates Veo and Lyria generation behind operator approval", () => {
-    for (const type of ["generate_video", "generate_music"] as const) {
-      const decision = evaluateActionPolicy(type, { prompt: "launch energy" });
-      expect(decision.risk).toBe("medium");
-      expect(decision.requiresApproval).toBe(true);
-      expect(decision.reason).toContain("paid generative media");
-    }
-  });
-
   it("gates Muse Image generation because it consumes paid model capacity", () => {
     const decision = evaluateActionPolicy("generate_image", { prompt: "launch energy" });
     expect(decision).toEqual({

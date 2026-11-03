@@ -12,8 +12,6 @@ const envSchema = z.object({
   META_API_BASE_URL: z.string().url().default("https://api.meta.ai/v1"),
   MODEL_ID: z.string().min(1).default("muse-spark-1.3"),
   MODEL_PRICING_VERSION: z.string().min(1).default("unconfigured"),
-  LYRIA_3_CLIP_COST_USD: z.preprocess((value) => value === "" ? undefined : value, z.string().regex(/^\d+\.\d{6}$/).optional()),
-  VEO_3_1_COST_PER_SECOND_USD: z.preprocess((value) => value === "" ? undefined : value, z.string().regex(/^\d+\.\d{6}$/).optional()),
   DEFAULT_JOB_BUDGET_USD: z.string().regex(/^\d+\.\d{1,6}$/).default("5.00"),
   DEFAULT_JOB_APPROVAL_THRESHOLD_USD: z.string().regex(/^\d+\.\d{1,6}$/).default("0.25"),
   DEFAULT_WORKSPACE_BUDGET_USD: z.string().regex(/^\d+\.\d{1,6}$/).default("100.00"),
