@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // The public /proof page reads committed, metadata-only evidence files.
+  outputFileTracingIncludes: { "/proof": ["./evidence/**/*"], "/api/proof": ["./evidence/**/*"] },
   // The private parent workspace owns agent instructions. Do not generate
   // public-repo AGENTS.md/CLAUDE.md files during local development.
   agentRules: false,
