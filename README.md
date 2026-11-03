@@ -8,6 +8,12 @@ The repository also implements governed resident autonomy: an hourly Heartbeat, 
 
 > **Evidence status:** every model call goes to Meta Model API. Authenticated Meta runs have not been captured yet.
 
+To prove the calls with a key set, run one live request to every model Harmonia uses (Muse Spark, Muse Wonder, Muse Voice Transcribe, SAM 3.1, token counting, `/status`, plus Muse Spark Open when `BASETEN_API_KEY` is set). The report keeps only model ids, request ids, latency and usage:
+
+```bash
+cd agent && .venv/bin/python -m harmonia_agent.meta_probe --out ../evidence/meta-probe.json
+```
+
 ## Why Harmonia is an agent—and where it deliberately is not
 
 Harmonia is agentic where the problem is ambiguous: Muse Spark specialists, organized with Google ADK, interpret multimodal source material, identify grounded moments and angles, produce and review typed content artifacts, and propose bounded actions. It is deliberately deterministic where mistakes have consequences: Firestore/Pub/Sub progression, schema validation, cost reservation, policy, approval, idempotent execution, receipts, and independent verification. Humans retain final publishing authority. This is bounded agency inside a durable workflow, not an unrestricted model loop; the full stage/authority and KPI contract is in [`docs/operational-model.mdx`](./docs/operational-model.mdx).
