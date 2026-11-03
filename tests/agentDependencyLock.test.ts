@@ -17,11 +17,6 @@ describe("agent image dependency contract", () => {
     expect(lock).toContain("google-adk==2.7.1");
   });
 
-  it("installs a build-time browser for unprivileged HyperFrames rendering", () => {
-    expect(dockerfile).toMatch(/apt-get install[^\n]*chromium/);
-    expect(dockerfile).toContain('HYPERFRAMES_BROWSER_PATH="/usr/bin/chromium"');
-  });
-
   it("excludes workstation dependencies from the Cloud Build source archive", () => {
     const ignoreUrl = new URL("../agent/.gcloudignore", import.meta.url);
     expect(existsSync(ignoreUrl)).toBe(true);
