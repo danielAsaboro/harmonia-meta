@@ -114,7 +114,7 @@ const nodes: ArchitectureNode[] = [
   ...[
     ["youtube", "YouTube / oEmbed / yt-dlp", "implemented"], ["x", "X API v2", "approval-gated"], ["calendar", "Google Calendar API", "approval-gated"],
     ["hn", "Hacker News / Algolia", "read-only"], ["muse-spark", "Muse Spark reasoning + web search", "pending-live"],
-    ["muse-voice", "Muse Voice Transcribe", "pending-live"], ["muse-image", "Muse Image", "pending-live"],
+    ["muse-voice", "Muse Voice Transcribe", "pending-live"], ["muse-image", "Muse Image", "pending-live"], ["sam", "SAM 3.1 subject tracking", "pending-live"],
   ].map(([id, name, status]) => node({ id: `external-${id}`, name, kind: "integration", layer: "external", parentId: "group-external", summary: `${name} integration through an official or authorized boundary.`, statuses: [status as ArchitectureNode["statuses"][number]], authorities: status === "read-only" ? ["read"] : ["none"], dataScope: id === "hn" || id === "youtube" ? "public" : "external", stateLifetime: "external" })),
 
   group("group-observability", "Observability + cost", "observability", "Metadata-only trace correlation and deterministic cost accounting."),

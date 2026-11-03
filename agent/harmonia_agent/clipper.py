@@ -1,12 +1,13 @@
-"""ffmpeg-native clip rendering: Harmonia's answer to HeyGen AI Clipping.
+"""ffmpeg-native clip rendering.
 
 Composable skills over one source video:
   cut       — frame-accurate segment extraction (re-encoded)
-  reframe   — vertical (1080x1920) / square (1080x1080) center-crop
+  reframe   — vertical (1080x1920) / square (1080x1080); pans to follow a SAM 3.1
+              tracked subject when one is supplied, otherwise letterboxes the full frame
   captions  — transcript segments burned in as styled SRT via libass
   stitch    — concat uniform clips into a highlight reel
 
-Everything is local compute; no external service, no fake progress.
+Rendering is local compute; subject tracking lives in ``segmentation.py``.
 """
 
 from __future__ import annotations
@@ -14,6 +15,10 @@ from __future__ import annotations
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .segmentation import SubjectCrop
 
 
 class ClipError(RuntimeError):
@@ -69,6 +74,19 @@ def probe_duration(path: Path) -> float:
         raise ClipError(f"ffprobe failed on {path}") from exc
 
 
+def probe_dimensions(path: Path) -> tuple[int, int]:
+    proc = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+         "-of", "csv=s=x:p=0", str(path)],
+        capture_output=True, text=True, timeout=60,
+    )
+    try:
+        width, height = proc.stdout.strip().split("x")[:2]
+        return int(width), int(height)
+    except ValueError as exc:
+        raise ClipError(f"ffprobe could not read video dimensions of {path}") from exc
+
+
 def _write_srt(segments: list[dict], start: float, end: float, path: Path) -> None:
     """Shifts transcript segments into clip-local time and writes an SRT."""
     def ts(sec: float) -> str:
@@ -105,6 +123,7 @@ def render_clip(
     end: float,
     fmt: str = "vertical",
     captions: list[dict] | None = None,
+    crop: SubjectCrop | None = None,
 ) -> list[str]:
     """Cut [start,end] seconds, reframe to fmt, optionally burn captions.
     Returns notes describing any degradation (e.g. missing subtitle filter).
@@ -119,9 +138,12 @@ def render_clip(
     notes: list[str] = []
     if geom:
         w_h = geom[0]
-        # A generic center crop can erase source claims, attribution, or diagrams.
-        # Preserve the full source unless a separately approved crop exists.
-        vf.append(f"scale={w_h}:force_original_aspect_ratio=decrease:force_divisible_by=2,pad={w_h}:(ow-iw)/2:(oh-ih)/2,setsar=1")
+        if crop is not None:
+            vf.append(f"{crop.filter()},scale={w_h},setsar=1")
+        else:
+            # A blind center crop can erase source claims, attribution, or diagrams.
+            # Without a tracked subject, keep the full source and letterbox it.
+            vf.append(f"scale={w_h}:force_original_aspect_ratio=decrease:force_divisible_by=2,pad={w_h}:(ow-iw)/2:(oh-ih)/2,setsar=1")
 
     srt_path: Path | None = None
     if captions and has_filter("subtitles"):

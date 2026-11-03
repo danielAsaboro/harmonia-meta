@@ -8,7 +8,7 @@ ffmpeg performs deterministic media transformation after cognitive stages have p
 ## How Harmonia uses it
 
 - Cut authorized source media to validated Nimi time ranges.
-- Reframe output for vertical social formats.
+- Reframe output for vertical and square formats. SAM 3.1 tracks the subject (a person by default, or the action's `subject`) on a 5 fps proxy, and the crop pans between half-second keyframes to follow it. Small drift is ignored so the frame holds still. Set `reframe: "none"` to letterbox instead; tracking failures also fall back to the letterboxed full frame with a recorded note.
 - Burn captions when the installed build supports the subtitles filter.
 - Concatenate selected moments into reels.
 - Produce internal clip assets before any external publishing proposal.
@@ -31,5 +31,6 @@ Real local ffmpeg invocations and artifact checks have automated coverage. Exter
 ## Relevant files
 
 - `agent/harmonia_agent/clipper.py`
+- `agent/harmonia_agent/segmentation.py`
 - `agent/harmonia_agent/stages.py`
 - `agent/tests/test_clipper_geometry.py`

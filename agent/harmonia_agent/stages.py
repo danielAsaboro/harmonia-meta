@@ -21,7 +21,7 @@ import httpx
 from opentelemetry.trace import Status, StatusCode
 from pydantic import ValidationError
 
-from . import clipper, content, x_client, youtube
+from . import clipper, content, segmentation, x_client, youtube
 from .linkedin_client import LinkedInClient
 from .agent_models import (
     SourceAnalysis,
@@ -174,6 +174,38 @@ def _segments_in_window(job_id: str, start: float, end: float) -> list[dict[str,
             if end_sec > start and start_sec < end:
                 result.append({"id": f"{source['sourceId']}:{segment['id']}", "startSec": start_sec, "endSec": end_sec, "text": segment["text"]})
     return result
+
+
+_REFRAME_ASPECTS = {"vertical": 9 / 16, "square": 1.0}
+
+
+def _subject_crop(
+    job: dict[str, Any], action: dict[str, Any], source: Any, start: float, end: float,
+    fmt: str, part: str,
+) -> tuple["segmentation.SubjectCrop | None", list[str]]:
+    """Ask SAM 3.1 where the subject is so a vertical/square cut can follow it."""
+    payload = action.get("payload") or {}
+    aspect = _REFRAME_ASPECTS.get(fmt)
+    if aspect is None or payload.get("reframe", "subject") != "subject":
+        return None, []
+    width, height = clipper.probe_dimensions(source)
+    try:
+        crop = segmentation.track_subject_crop(
+            source, start=start, end=end, source_width=width, source_height=height,
+            aspect=aspect, subject=str(payload.get("subject") or "person"),
+            invocation=InvocationContext(
+                job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"],
+                user_id=job["createdByUserId"], stage="publish",
+                operation_id=f"{job['id']}:publish:{action['id']}:{part}",
+            ),
+        )
+    except (segmentation.SegmentationError, httpx.HTTPError, RuntimeError) as exc:
+        # Tracking is an enhancement; the clip still renders letterboxed.
+        logger.warning("subject tracking failed for %s: %s", action.get("id"), exc)
+        return None, ["subject tracking unavailable; kept the full frame"]
+    if crop is None:
+        return None, ["no tracked subject; kept the full frame"]
+    return crop, [f"reframed to follow the tracked {payload.get('subject') or 'person'} (SAM 3.1)"]
 
 
 def _now() -> str:
@@ -785,11 +817,16 @@ async def run_publish(job_id: str) -> None:
                                 raise ClipRenderError("moment referenced by render_clip no longer exists")
                             src = _materialize_source_video(job_id, moment, td)
                             out = Path(td) / "clip.mp4"
+                            crop, crop_notes = _subject_crop(
+                                job, action, src, float(moment["startSec"]), float(moment["endSec"]), fmt, moment["id"],
+                            )
+                            render_notes += crop_notes
                             render_notes += clipper.render_clip(
                                 src, out,
                                 float(moment["startSec"]), float(moment["endSec"]),
                                 fmt=fmt,
                                 captions=_segments_in_window(job_id, float(moment["startSec"]), float(moment["endSec"])) if want_caps else None,
+                                crop=crop,
                             )
                         else:
                             parts: list[Path] = []
@@ -799,11 +836,16 @@ async def run_publish(job_id: str) -> None:
                                     raise ClipRenderError(f"moment {mid} no longer exists")
                                 src = _materialize_source_video(job_id, m, td)
                                 part = Path(td) / f"part{i}.mp4"
+                                crop, crop_notes = _subject_crop(
+                                    job, action, src, float(m["startSec"]), float(m["endSec"]), fmt, m["id"],
+                                )
+                                render_notes += crop_notes
                                 render_notes += clipper.render_clip(
                                     src, part,
                                     float(m["startSec"]), float(m["endSec"]),
                                     fmt=fmt,
                                     captions=_segments_in_window(job_id, float(m["startSec"]), float(m["endSec"])) if want_caps else None,
+                                    crop=crop,
                                 )
                                 parts.append(part)
                             out = Path(td) / "reel.mp4"

@@ -14,6 +14,7 @@ Every cognitive call in Harmonia goes to a Meta model. Role policy fixes the con
 | Public research for Nimi and Ryan | Muse Spark with the built-in `web_search` tool (Responses API) |
 | Audio and video transcription | Muse Voice Transcribe 1.0 (`/v1/asr/transcribe`) |
 | Approved image generation | Muse Image 1.0 (`/v1/images/generations`) |
+| Subject tracking for vertical and square clips | SAM 3.1 (`/v1/responses`, boxes only) on a 5 fps, 640 px proxy |
 
 Roles set `reasoning_effort` instead of temperature, and structured output uses strict `json_schema` response formats. Inputs are typed and bounded. Source-derived claims must keep their evidence references. The application reserves budget before each call, records normalized usage, and validates output before advancing a stage.
 
@@ -38,5 +39,6 @@ Model routing and output contracts are locally tested. Authenticated Meta Model 
 - `agent/harmonia_agent/meta_search.py`
 - `agent/harmonia_agent/model_catalog.py`
 - `agent/harmonia_agent/content.py`
+- `agent/harmonia_agent/segmentation.py`
 - `src/lib/metaChatCompletion.ts`
 - `docs/models-cost-evaluation.mdx`

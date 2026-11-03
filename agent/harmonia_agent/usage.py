@@ -51,8 +51,8 @@ class UsageRecord(BaseModel):
     input_units: int
     output_units: int
     unit_type: Literal[
-        "tokens", "images", "video_seconds", "audio_seconds", "endpoint_seconds",
-        "media_generations",
+        "tokens", "images", "video_seconds", "video_frames", "audio_seconds",
+        "endpoint_seconds", "media_generations",
     ] = "tokens"
     estimated_cost_usd: str
     observed_cost_usd: str | None = None
