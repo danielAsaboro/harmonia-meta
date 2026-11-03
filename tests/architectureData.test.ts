@@ -8,7 +8,7 @@ describe("Harmonia architecture dataset", () => {
   it("contains the exact agent and model team", () => {
     expect(byId("agent-harmonia").model?.name).toBe("Muse Spark 1.3");
     expect(byId("agent-intent-router").model?.name).toBe("Muse Spark 1.3");
-    expect(byId("agent-ryan").model?.name).toBe("Muse Spark 1.3");
+    expect(byId("agent-ryan").model?.name).toBe("Muse Wonder 1.0");
     expect(byId("agent-nimi").model?.name).toBe("Muse Spark 1.3");
     expect(byId("agent-noni").model?.name).toBe("Muse Spark 1.3");
     expect(byId("agent-dara").model?.name).toBe("Muse Spark 1.3");

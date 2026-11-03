@@ -109,6 +109,9 @@ def _policy(reasoning_effort: ReasoningEffort) -> RoleGenerationPolicy:
 
 
 DEFAULT_META_MODEL = "muse-spark-1.3"
+# Ryan plans a month of content in one long, high-effort pass: Meta's guidance
+# puts long-horizon agentic work on Muse Wonder and high-volume roles on Spark.
+STRATEGIST_META_MODEL = "muse-wonder-1.0"
 BASETEN_OPEN_MODEL = "meta-models/muse-spark-open-1026"
 
 
@@ -144,7 +147,7 @@ def load_role_model_catalog() -> RoleModelCatalog:
             ("route",),
         ),
         strategist=_role(
-            "ryan_strategist", "STRATEGIST_MODEL_ID", DEFAULT_META_MODEL, 32768, "high",
+            "ryan_strategist", "STRATEGIST_MODEL_ID", STRATEGIST_META_MODEL, 32768, "high",
             ("strategize",), 300,
         ),
         analyst=_role(

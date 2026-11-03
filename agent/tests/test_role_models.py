@@ -37,6 +37,25 @@ def test_copywriter_uses_meta_model_api_by_default(monkeypatch):
     assert catalog.copywriter.reservation_usd is None
 
 
+def test_strategist_defaults_to_muse_wonder_and_the_rest_to_spark(monkeypatch):
+    for name in ("STRATEGIST_MODEL_ID", "STRATEGIST_PROVIDER", "ANALYST_MODEL_ID", "ANALYST_PROVIDER"):
+        monkeypatch.delenv(name, raising=False)
+
+    catalog = load_role_model_catalog()
+
+    assert catalog.strategist.provider == "meta"
+    assert catalog.strategist.model_id == "muse-wonder-1.0"
+    assert catalog.analyst.model_id == "muse-spark-1.3"
+    assert catalog.strategist.reservation_usd is None
+
+
+def test_strategist_on_baseten_falls_back_to_muse_spark_open(monkeypatch):
+    monkeypatch.delenv("STRATEGIST_MODEL_ID", raising=False)
+    monkeypatch.setenv("STRATEGIST_PROVIDER", "baseten")
+
+    assert load_role_model_catalog().strategist.model_id == "meta-models/muse-spark-open-1026"
+
+
 def test_each_role_can_raise_its_timeout_without_weakening_other_roles(monkeypatch):
     monkeypatch.setenv("STRATEGIST_TIMEOUT_SECONDS", "300")
 
