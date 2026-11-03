@@ -22,6 +22,7 @@ from opentelemetry import context as otel_context
 
 from . import meta_api
 from .config import settings
+from .roster import agent_roster
 from .a2ui_api import router as a2ui_router
 from .ask_api import router as ask_router
 from .intent_api import router as intent_router
@@ -73,6 +74,12 @@ async def healthz() -> dict[str, Any]:
             },
         },
     }
+
+
+@app.get("/roster")
+async def roster() -> dict[str, Any]:
+    """The agent team as built: models, tools, skills and definition digests, no prompt text."""
+    return await asyncio.to_thread(agent_roster)
 
 
 @app.post("/durable/recover")
