@@ -11,6 +11,11 @@ function app() {
   });
 }
 
+/** False on a local emulator stack with no Identity Platform web app configured. */
+export function hasFirebaseConfig(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+}
+
 export function clientAuth() {
   return getAuth(app());
 }

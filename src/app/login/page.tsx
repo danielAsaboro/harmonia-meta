@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/dashboard/Button";
-import { clientAuth } from "@/lib/firebaseClient";
+import { clientAuth, hasFirebaseConfig } from "@/lib/firebaseClient";
 import { establishPersistedIdentity, restorePersistedSession, shouldRestorePersistedSession } from "@/lib/sessionPersistence";
 import styles from "./login.module.css";
 
@@ -26,6 +26,8 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
+    // The local development session needs no Firebase web app.
+    if (!hasFirebaseConfig()) return;
     return onAuthStateChanged(clientAuth(), async (user) => {
       if (!user || interactiveSignIn.current) return;
       if (!shouldRestorePersistedSession(user.metadata.lastSignInTime)) {
