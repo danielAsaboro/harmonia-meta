@@ -154,6 +154,10 @@ For generated campaign workspaces, `AGENT_SERVICE_URL` must point to the FastAPI
 
 > Full documentation lives in [`docs/`](./docs) — a Mintlify site covering the [architecture](./docs/architecture.mdx), [pipeline](./docs/pipeline.mdx), the [proactive agent](./docs/proactive-agent.mdx), offline mock modes, configuration, and deployment.
 
+### Other agents: MCP and A2A
+
+An operator can mint a revocable workspace token (`POST /api/settings/agent-tokens`; only its SHA-256 is stored). With it, any MCP client runs `python -m harmonia_agent.mcp_server` (tools `ask_harmonia`, `list_campaigns`, `get_campaign`), and any A2A agent reads the card at `/.well-known/agent-card.json` and calls `message/send` and `tasks/get` on `/api/a2a`. A campaign waiting for a human shows up as `input-required`. The token reaches only chat, A2A and the campaign reads; approving a strategy or a post, publishing and spending answer 403 to it, because those routes accept only a human operator.
+
 ### Operator chat
 
 Click the chat bubble on the dashboard (or `POST /api/chat` with `{message}`):

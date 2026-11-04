@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   // The private parent workspace owns agent instructions. Do not generate
   // public-repo AGENTS.md/CLAUDE.md files during local development.
   agentRules: false,
+  async rewrites() {
+    return [{ source: "/.well-known/agent-card.json", destination: "/api/agent-card" }];
+  },
 };
 
 export default nextConfig;

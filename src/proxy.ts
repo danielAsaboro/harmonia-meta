@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // With HARMONIA_PUBLIC_LOCK=1 a public deployment serves only read-only pages, so
 // a shared link cannot start jobs or spend model budget on someone's behalf.
 const PUBLIC_PATHS = [
-  /^\/$/, /^\/proof$/, /^\/api\/proof$/, /^\/api\/health$/, /^\/docs(\/.*)?$/,
+  /^\/$/, /^\/proof$/, /^\/api\/proof$/, /^\/api\/health$/, /^\/api\/agent-card$/, /^\/\.well-known\/agent-card\.json$/, /^\/docs(\/.*)?$/,
   /^\/privacy$/, /^\/terms$/, /^\/data-deletion$/,
   /^\/_next\//, /^\/(favicon\.ico|icon\.png|apple-icon\.png|og\.png|brand\/.*|architecture\/.*)$/,
 ];

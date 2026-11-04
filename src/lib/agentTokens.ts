@@ -12,6 +12,7 @@ export const AGENT_TOKEN_PREFIX = "hmn_";
 /** Routes an MCP client may call: ask, read campaigns, read proof. */
 export const AGENT_TOKEN_ROUTES: ReadonlyArray<{ method: string; pattern: RegExp }> = [
   { method: "POST", pattern: /^\/api\/chat$/ },
+  { method: "POST", pattern: /^\/api\/a2a$/ },
   { method: "GET", pattern: /^\/api\/jobs$/ },
   { method: "GET", pattern: /^\/api\/jobs\/[A-Za-z0-9_-]{1,128}$/ },
 ];
