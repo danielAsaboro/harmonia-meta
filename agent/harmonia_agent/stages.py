@@ -232,7 +232,8 @@ def _tracking_record(moment_id: str, source: Any, crop: "segmentation.SubjectCro
     return {
         "momentId": moment_id, "model": segmentation.segmentation_model(), "subject": subject,
         "sourceWidth": width, "sourceHeight": height, "cropWidth": crop.width, "cropHeight": crop.height,
-        "keyframes": [[round(t, 2), x] for t, x in crop.keyframes[::step]],
+        # Objects, not [t, x] pairs: Firestore rejects arrays nested in arrays.
+        "keyframes": [{"t": round(t, 2), "x": x} for t, x in crop.keyframes[::step]],
     }
 
 

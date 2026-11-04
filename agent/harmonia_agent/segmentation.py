@@ -43,6 +43,8 @@ PROXY_WIDTH = 640
 MAX_PROXY_BYTES = 1_000_000_000
 KEYFRAME_SECONDS = 0.5
 # Ignore subject drift smaller than this share of the frame so the crop holds still.
+# Median share of the frame the tracked subject must cover before a crop follows it.
+MIN_SUBJECT_SHARE = 0.04
 DEAD_ZONE = 0.04
 logger = logging.getLogger("harmonia.segmentation")
 
@@ -147,6 +149,15 @@ def plan_subject_crop(
     if not totals:
         return None
     subject = max(totals, key=lambda object_id: (totals[object_id], -object_id))
+    # A subject this small (a webcam bubble over slides, a distant figure) does not
+    # justify cutting away most of the frame; keep the full frame instead.
+    shares = [
+        box.area / (box.width * box.height)
+        for boxes in frames.values() for box in boxes
+        if box.object_id == subject and box.width > 0 and box.height > 0
+    ]
+    if not shares or median(shares) < MIN_SUBJECT_SHARE:
+        return None
     centers: dict[int, list[float]] = {}
     for index, boxes in frames.items():
         for box in boxes:

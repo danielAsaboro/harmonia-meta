@@ -5,7 +5,7 @@ import { SubjectTrackPreview, subjectTracks } from "@/components/SubjectTrackPre
 
 const track = {
   momentId: "m1", model: "sam-3.1", subject: "person", sourceWidth: 1920, sourceHeight: 1080,
-  cropWidth: 608, cropHeight: 1080, keyframes: [[12, 400], [13.2, 520], [14.4, 900]] as [number, number][],
+  cropWidth: 608, cropHeight: 1080, keyframes: [{ t: 12, x: 400 }, { t: 13.2, x: 520 }, { t: 14.4, x: 900 }],
 };
 
 describe("SAM subject track preview", () => {

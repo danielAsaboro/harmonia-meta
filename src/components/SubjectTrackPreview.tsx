@@ -6,7 +6,7 @@ export interface SubjectTrack {
   sourceHeight: number;
   cropWidth: number;
   cropHeight: number;
-  keyframes: [number, number][];
+  keyframes: { t: number; x: number }[];
 }
 
 export function subjectTracks(detail: Record<string, unknown> | undefined): SubjectTrack[] {
@@ -23,10 +23,10 @@ export function subjectTracks(detail: Record<string, unknown> | undefined): Subj
 /** The source frame with the crop window SAM 3.1 steered, replayed over the moment's duration. */
 export function SubjectTrackPreview({ track }: { track: SubjectTrack }) {
   const { sourceWidth: width, sourceHeight: height, cropWidth, cropHeight, keyframes } = track;
-  const start = keyframes[0][0];
-  const duration = Math.max(keyframes.at(-1)![0] - start, 0.5);
-  const xs = keyframes.map(([, x]) => x);
-  const keyTimes = keyframes.map(([t]) => ((t - start) / duration).toFixed(4));
+  const start = keyframes[0].t;
+  const duration = Math.max(keyframes.at(-1)!.t - start, 0.5);
+  const xs = keyframes.map((frame) => frame.x);
+  const keyTimes = keyframes.map((frame) => ((frame.t - start) / duration).toFixed(4));
   keyTimes[0] = "0";
   if (keyframes.length > 1) keyTimes[keyTimes.length - 1] = "1";
   return (

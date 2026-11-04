@@ -14,6 +14,13 @@ import httpx
 from .. import content, video_understanding, youtube
 from ..agent_models import ContentSegment, FrameLocator, NormalizedSource, TimeRangeLocator
 from ..usage import InvocationContext
+from ..operation_context import current_operation
+
+
+def _fenced_operation_id(invocation: InvocationContext) -> str:
+    """Artifacts are written under the stage's durable operation fence, not the per-source accounting id."""
+    fence = current_operation()
+    return fence.operation_id if fence is not None else invocation.operation_id
 
 logger = logging.getLogger("harmonia.extraction.media")
 
@@ -23,7 +30,7 @@ def _store_frame(invocation: InvocationContext) -> Callable[[bytes], str]:
 
     def store(jpeg: bytes) -> str:
         return str(create_artifact(
-            job_id=invocation.job_id, operation_id=invocation.operation_id, content=jpeg,
+            job_id=invocation.job_id, operation_id=_fenced_operation_id(invocation), content=jpeg,
             content_type="image/jpeg", trust="operator",
             producer={"kind": "extractor", "id": "video-frame", "version": "1"},
             retention_class="source",

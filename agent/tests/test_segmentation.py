@@ -214,4 +214,10 @@ def test_tracking_record_keeps_the_crop_path_for_the_studio_preview(monkeypatch)
 
     assert record["model"] == "sam-3.1" and record["subject"] == "person"
     assert (record["sourceWidth"], record["sourceHeight"], record["cropWidth"], record["cropHeight"]) == (1920, 1080, 608, 1080)
-    assert len(record["keyframes"]) <= 75 and record["keyframes"][0] == [0.0, 400]
+    assert len(record["keyframes"]) <= 75 and record["keyframes"][0] == {"t": 0.0, "x": 400}
+
+
+def test_a_tiny_subject_keeps_the_full_frame():
+    # A 60x60 webcam bubble in a 1080x1080 slide recording covers 0.3% of the frame.
+    bubble = {index: [Box(object_id=1, x1=20, y1=900, x2=80, y2=960, width=1080, height=1080)] for index in range(10)}
+    assert plan_subject_crop(bubble, fps=5, source_width=1080, source_height=1080, aspect=9 / 16) is None

@@ -28,6 +28,7 @@ from ..telemetry import current_trace_id, safe_attributes, tracer
 from ..usage import InvocationContext, UsageRecord
 from ..video_understanding import _output_text, video_model
 from ..web_client import report_usage, reserve_budget, resolve_budget_reservation
+from .media import _fenced_operation_id
 
 IMAGE_MIME_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 MAX_OBSERVATIONS = 12
@@ -205,7 +206,7 @@ def _store_image(invocation: InvocationContext) -> Callable[[bytes, str], str]:
         if len(image) > MAX_STORED_IMAGE_BYTES:
             image, mime = _downscale(image), "image/jpeg"
         return str(create_artifact(
-            job_id=invocation.job_id, operation_id=invocation.operation_id, content=image,
+            job_id=invocation.job_id, operation_id=_fenced_operation_id(invocation), content=image,
             content_type=mime, trust="operator",
             producer={"kind": "extractor", "id": "source-image", "version": "1"},
             retention_class="source",
