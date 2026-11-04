@@ -63,6 +63,7 @@ from .effect_executor import execute_effect_command, production_adapters
 from .extraction import extract_docx, extract_html, extract_image, extract_media, extract_pdf, extract_text
 from .extraction.security import assert_public_url
 from .source_guard import screen_segments
+from .role_models import load_role_model_catalog
 from .operation_context import current_operation, operation_scope
 from .web_client import (
     EffectClaimInProgress,
@@ -207,6 +208,11 @@ def _subject_crop(
     if crop is None:
         return None, ["no tracked subject; kept the full frame"]
     return crop, [f"reframed to follow the tracked {payload.get('subject') or 'person'} (SAM 3.1)"]
+
+
+def _role_model_id(role: str) -> str:
+    """The Meta model a specialist role runs on, for the stage's event log."""
+    return getattr(load_role_model_catalog(), role).model_id
 
 
 def _shift_crop(crop: "segmentation.SubjectCrop | None", delta: float) -> "segmentation.SubjectCrop | None":
@@ -435,7 +441,7 @@ async def run_understand(job_id: str) -> None:
         "jobId": job_id, "stage": "understand",
         "analysis": result,
         "analysisDigest": digest,
-        "modelUsed": content.model_used(),
+        "modelUsed": _role_model_id("analyst"),
         "researchRequest": (
             analyst_input.researchRequest.model_dump(mode="json")
             if analyst_input.researchRequest else None
@@ -523,7 +529,7 @@ async def run_strategize(job_id: str) -> None:
     result = await strategize_with_team(prepared, invocation=invocation, prepared=True)
     web_post("/api/internal/strategy", {
         "jobId": job_id, "stage": "strategize", "revision": revision,
-        "strategy": result.strategy.model_dump(mode="json"), "modelUsed": content.model_used(),
+        "strategy": result.strategy.model_dump(mode="json"), "modelUsed": _role_model_id("strategist"),
         "searchEvidence": [
             {"evidenceId": evidence_id, "supportedText": values[0], "title": values[1], "url": values[2]}
             for evidence_id, values in result.searchEvidence.items()
@@ -570,7 +576,7 @@ async def run_plan(job_id: str) -> None:
     ))
     web_post("/api/internal/editorial-plan", {
         "jobId": job_id, "stage": "plan", "revision": revision,
-        "plan": result.model_dump(mode="json"), "modelUsed": content.model_used(),
+        "plan": result.model_dump(mode="json"), "modelUsed": _role_model_id("planner"),
     })
 
 

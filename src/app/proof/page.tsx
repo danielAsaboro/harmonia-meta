@@ -76,7 +76,7 @@ function Run({ run }: { run: RunSummary }) {
       )}
       {run.cost.length > 0 && (
         <div className="mt-4 overflow-x-auto"><table className="w-full min-w-[560px] text-left text-sm">
-          <thead className="text-xs text-slate-500"><tr><th className="py-1">Model</th><th>Input tokens</th><th>Output tokens</th><th className="text-right">Cost</th></tr></thead>
+          <thead className="text-xs text-slate-500"><tr><th className="py-1">Model</th><th>Input tokens</th><th>Output budget</th><th className="text-right">Reserved cost</th></tr></thead>
           <tbody>
             {run.cost.map((row) => (
               <tr key={row.model} className="border-t border-slate-100">

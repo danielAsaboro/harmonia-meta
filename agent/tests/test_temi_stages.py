@@ -145,7 +145,7 @@ def test_plan_runs_temi_and_persists_complete_plan_before_any_draft(monkeypatch)
     assert invocation.operation_id == "job:job-1:stage:plan:generation:12"
     assert posts == [("/api/internal/editorial-plan", {
         "jobId": "job-1", "stage": "plan", "revision": 1,
-        "plan": plan(), "modelUsed": stages.content.model_used(),
+        "plan": plan(), "modelUsed": stages._role_model_id("planner"),
     })]
 
 

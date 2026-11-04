@@ -1,0 +1,397 @@
+{
+  "schema": "harmonia.authenticated-replay",
+  "schemaVersion": "1.0.0",
+  "bundleId": "c9fa9b51-b95c-464f-a3bc-ea834d961279-1793803249097",
+  "executionMode": "recorded_replay",
+  "evidenceClassification": "historical_replay",
+  "scenario": "success",
+  "capturedAt": "2026-11-04T14:36:48.870Z",
+  "captureEndedAt": "2026-11-04T14:39:44.771Z",
+  "release": "approved_public_bundle",
+  "provenance": {
+    "sourceRunId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+    "sourceJobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+    "environment": "local_emulator",
+    "sanitizerVersion": "1.0.0",
+    "sourceCaptureAuthorized": true
+  },
+  "events": [
+    {
+      "sequence": 0,
+      "capturedAt": "2026-11-04T14:36:48.870Z",
+      "offsetMs": 0,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "a13b40b157a160df81b5ad2065efa2b8",
+        "stage": "collect_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 1,
+      "capturedAt": "2026-11-04T14:36:49.448Z",
+      "offsetMs": 578,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "00000000000000000000000000000000",
+        "stage": "extract_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 2,
+      "capturedAt": "2026-11-04T14:37:08.341Z",
+      "offsetMs": 19471,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "40874053f9b301bc2a4ab473879c40f9",
+        "model": "muse-spark-1.3",
+        "inputTokens": 283,
+        "outputTokens": 16384,
+        "estimatedCostUsd": 0.069986
+      }
+    },
+    {
+      "sequence": 3,
+      "capturedAt": "2026-11-04T14:37:08.467Z",
+      "offsetMs": 19597,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "40874053f9b301bc2a4ab473879c40f9",
+        "stage": "understand",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 4,
+      "capturedAt": "2026-11-04T14:37:08.467Z",
+      "offsetMs": 19597,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "40874053f9b301bc2a4ab473879c40f9",
+        "from": "nimi_analyst",
+        "to": "ryan_strategist",
+        "summary": "analysis: 0 grounded moment(s), 3 grounded angle(s), with muse-voice-transcribe-1.0"
+      }
+    },
+    {
+      "sequence": 5,
+      "capturedAt": "2026-11-04T14:37:24.080Z",
+      "offsetMs": 35210,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "ad1443116a336fb32308ba364bdf0613",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 1292,
+        "outputTokens": 32768,
+        "estimatedCostUsd": 0.660528
+      }
+    },
+    {
+      "sequence": 6,
+      "capturedAt": "2026-11-04T14:37:24.190Z",
+      "offsetMs": 35320,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "ad1443116a336fb32308ba364bdf0613",
+        "stage": "strategize",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 7,
+      "capturedAt": "2026-11-04T14:37:24.190Z",
+      "offsetMs": 35320,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "ad1443116a336fb32308ba364bdf0613",
+        "from": "ryan_strategist",
+        "to": "coordinator_system",
+        "summary": "Ryan strategy v1 awaiting digest-bound approval"
+      }
+    },
+    {
+      "sequence": 8,
+      "capturedAt": "2026-11-04T14:37:38.864Z",
+      "offsetMs": 49994,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "152738ff520b9e3b919721e27b4a23c9",
+        "stage": "awaiting_strategy_approval",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 9,
+      "capturedAt": "2026-11-04T14:38:03.334Z",
+      "offsetMs": 74464,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "2f5b5b1783c748b9145a95857070e66a",
+        "model": "muse-spark-1.3",
+        "inputTokens": 1886,
+        "outputTokens": 16384,
+        "estimatedCostUsd": 0.07199
+      }
+    },
+    {
+      "sequence": 10,
+      "capturedAt": "2026-11-04T14:38:03.670Z",
+      "offsetMs": 74800,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "2f5b5b1783c748b9145a95857070e66a",
+        "stage": "plan",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 11,
+      "capturedAt": "2026-11-04T14:38:03.670Z",
+      "offsetMs": 74800,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "2f5b5b1783c748b9145a95857070e66a",
+        "from": "temi_editorial_planner",
+        "to": "noni_copywriter",
+        "summary": "Temi editorial plan 068dbb72fbb2f1227009b7b96ff7cf612d14e6dbfd43b3b2e806193daf768778 persisted; selected item-brief-1-linkedin-01"
+      }
+    },
+    {
+      "sequence": 12,
+      "capturedAt": "2026-11-04T14:38:21.199Z",
+      "offsetMs": 92329,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "7c9edbd7a9f54b76926d71c950aee4a3",
+        "model": "muse-spark-1.3",
+        "inputTokens": 567,
+        "outputTokens": 16384,
+        "estimatedCostUsd": 0.070341
+      }
+    },
+    {
+      "sequence": 13,
+      "capturedAt": "2026-11-04T14:38:40.179Z",
+      "offsetMs": 111309,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "7c9edbd7a9f54b76926d71c950aee4a3",
+        "model": "muse-spark-1.3",
+        "inputTokens": 564,
+        "outputTokens": 16384,
+        "estimatedCostUsd": 0.070337
+      }
+    },
+    {
+      "sequence": 14,
+      "capturedAt": "2026-11-04T14:39:10.501Z",
+      "offsetMs": 141631,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "7c9edbd7a9f54b76926d71c950aee4a3",
+        "model": "muse-spark-1.3",
+        "inputTokens": 818,
+        "outputTokens": 8192,
+        "estimatedCostUsd": 0.035839
+      }
+    },
+    {
+      "sequence": 15,
+      "capturedAt": "2026-11-04T14:39:39.533Z",
+      "offsetMs": 170663,
+      "kind": "usage",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "7c9edbd7a9f54b76926d71c950aee4a3",
+        "model": "muse-spark-1.3",
+        "inputTokens": 698,
+        "outputTokens": 8192,
+        "estimatedCostUsd": 0.035689
+      }
+    },
+    {
+      "sequence": 16,
+      "capturedAt": "2026-11-04T14:39:40.080Z",
+      "offsetMs": 171210,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "7c9edbd7a9f54b76926d71c950aee4a3",
+        "stage": "draft",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 17,
+      "capturedAt": "2026-11-04T14:39:43.036Z",
+      "offsetMs": 174166,
+      "kind": "receipt",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "12123ecd6aa3dada2110d4a5b3a1efe2",
+        "receiptId": "fd589526-66b4-422b-be87-9125071062c2",
+        "actionId": "export-artifact-output-1-linkedin_post-5600074e8908",
+        "outcome": "applied",
+        "verified": true
+      }
+    },
+    {
+      "sequence": 18,
+      "capturedAt": "2026-11-04T14:39:43.052Z",
+      "offsetMs": 174182,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "12123ecd6aa3dada2110d4a5b3a1efe2",
+        "stage": "publish",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 19,
+      "capturedAt": "2026-11-04T14:39:43.190Z",
+      "offsetMs": 174320,
+      "kind": "receipt",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "12123ecd6aa3dada2110d4a5b3a1efe2",
+        "receiptId": "5bc8384b-70a7-44e2-b5ec-1fa79c6001ea",
+        "actionId": "export-artifact-output-2-x_post-a41db0103e39",
+        "outcome": "applied",
+        "verified": true
+      }
+    },
+    {
+      "sequence": 20,
+      "capturedAt": "2026-11-04T14:39:44.283Z",
+      "offsetMs": 175413,
+      "kind": "verification",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "6e2027355bc5a08bc151d70f319f1383",
+        "receiptId": "fd589526-66b4-422b-be87-9125071062c2",
+        "verified": true,
+        "method": "artifact_digest_reread"
+      }
+    },
+    {
+      "sequence": 21,
+      "capturedAt": "2026-11-04T14:39:44.283Z",
+      "offsetMs": 175413,
+      "kind": "verification",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "6e2027355bc5a08bc151d70f319f1383",
+        "receiptId": "5bc8384b-70a7-44e2-b5ec-1fa79c6001ea",
+        "verified": true,
+        "method": "artifact_digest_reread"
+      }
+    },
+    {
+      "sequence": 22,
+      "capturedAt": "2026-11-04T14:39:44.300Z",
+      "offsetMs": 175430,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "6e2027355bc5a08bc151d70f319f1383",
+        "stage": "verify",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 23,
+      "capturedAt": "2026-11-04T14:39:44.759Z",
+      "offsetMs": 175889,
+      "kind": "draft",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "draftId": "artifact-output-1-linkedin_post",
+        "platform": "linkedin_post",
+        "text": "Founders shouldn't have to trust AI agents. They should be able to test them.\n\nWe run Harmonia — a team of AI agents for startup content — through an injection screen on 22 labelled texts.\n\nRules alone caught 7 of 12 hidden instructions.\n\nAdd Muse Glimmer, Meta's open-weight model running on a laptop, and it caught all 12 — with none of the 10 clean texts wrongly flagged.\n\nSame approach for reliability: every agent request now goes through a test that checks it against Meta's schema rules. That test caught a missing dependency that would have broken every tool-using agent on launch day.\n\nMy takeaway: don't debate if agents are safe. Publish the test.",
+        "valid": true
+      }
+    },
+    {
+      "sequence": 24,
+      "capturedAt": "2026-11-04T14:39:44.759Z",
+      "offsetMs": 175889,
+      "kind": "draft",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "draftId": "artifact-output-2-x_post",
+        "platform": "x_post",
+        "text": "Rules caught 7 of 12 hidden instructions. + Meta's Muse Glimmer on a laptop: 12 of 12, flagged none of the 10 clean texts. Same schema test caught a missing dep that would've broken every tool agent on launch. Test before you trust.",
+        "valid": true
+      }
+    },
+    {
+      "sequence": 25,
+      "capturedAt": "2026-11-04T14:39:44.759Z",
+      "offsetMs": 175889,
+      "kind": "action",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "actionId": "export-artifact-output-1-linkedin_post-5600074e8908",
+        "actionType": "export_content_artifact",
+        "state": "executed"
+      }
+    },
+    {
+      "sequence": 26,
+      "capturedAt": "2026-11-04T14:39:44.759Z",
+      "offsetMs": 175889,
+      "kind": "action",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "actionId": "export-artifact-output-2-x_post-a41db0103e39",
+        "actionType": "export_content_artifact",
+        "state": "executed"
+      }
+    },
+    {
+      "sequence": 27,
+      "capturedAt": "2026-11-04T14:39:44.759Z",
+      "offsetMs": 175889,
+      "kind": "job_snapshot",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "stage": "complete",
+        "status": "complete"
+      }
+    },
+    {
+      "sequence": 28,
+      "capturedAt": "2026-11-04T14:39:44.771Z",
+      "offsetMs": 175901,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "c9fa9b51-b95c-464f-a3bc-ea834d961279",
+        "traceId": "f57d35a9832bc1a167c13aed46f9ef55",
+        "stage": "learn",
+        "status": "running"
+      }
+    }
+  ],
+  "terminalStateDigest": "f0b1961dc32f87d59bcbe805cd49720f9acca3f6c76627b5fef8fec25d420c8e",
+  "integrity": {
+    "algorithm": "sha256-canonical-json",
+    "digest": "6b38d1166173ffa9062a23f0b2ff152001e3cf854fd1bd8a9378f42ddd69326e"
+  }
+}
