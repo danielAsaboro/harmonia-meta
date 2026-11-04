@@ -5,7 +5,9 @@ description: "Deterministic rendering and approval-gated generative media capabi
 
 ## How Harmonia uses it
 
-ffmpeg performs deterministic cuts, captions, reframing, and reel assembly from operator-supplied footage. Muse Image creates images only through an explicit approved action, under the same budget and approval boundaries as other effects. Harmonia does not generate video or music.
+ffmpeg performs deterministic cuts, captions, reframing, and reel assembly from operator-supplied footage. Muse Image creates images only through an explicit approved action, under the same budget and approval boundaries as other effects. Two approved actions generate new media. **Generate voiceover** turns the job's lead angle into a narrated M4A, and **Render narrated video** turns it into a vertical 1080x1920 MP4: Muse Spark plans 3 to 5 scenes with the `narrated-video-production` skill, Muse Image draws each frame, Meta MMS-TTS narrates each line, and ffmpeg adds a slow push-in, burns the caption, and cuts the scenes together. Muse Voice Transcribe then listens to the result, and the asset is stored only if it heard the approved words. Harmonia does not generate music.
+
+Run it outside a job with `python -m harmonia_agent.media_studio --plan plan.json --out video.mp4 --verify`, or `--out voiceover.m4a` for audio only.
 
 <CardGroup cols={1}>
   <Card title="ffmpeg" href="/platform/media/ffmpeg">Local deterministic media transforms.</Card>

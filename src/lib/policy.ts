@@ -64,6 +64,18 @@ export function evaluateActionPolicy(
         requiresApproval: true,
         reason: "renders the reviewed video selection with ffmpeg after approval; nothing is published",
       };
+    case "generate_voiceover":
+      return {
+        risk: "low",
+        requiresApproval: true,
+        reason: "Muse Spark writes the narration and Meta MMS-TTS speaks it; the audio stays internal until separately published",
+      };
+    case "render_narrated_video":
+      return {
+        risk: "medium",
+        requiresApproval: true,
+        reason: "incurs paid Muse Image frames plus Muse Spark planning; MMS-TTS narration and ffmpeg assembly run self-hosted; nothing is published",
+      };
   }
 }
 

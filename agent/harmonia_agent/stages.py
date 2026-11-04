@@ -21,7 +21,7 @@ import httpx
 from opentelemetry.trace import Status, StatusCode
 from pydantic import ValidationError
 
-from . import clip_critic, clip_review, clipper, content, segmentation, x_client, youtube
+from . import clip_critic, clip_review, clipper, content, media_studio, segmentation, x_client, youtube
 from .linkedin_client import LinkedInClient
 from .agent_models import (
     SourceAnalysis,
@@ -1010,7 +1010,21 @@ async def run_publish(job_id: str) -> None:
                         **({"review": reviews} if reviews else {}),
                         **({"critique": critique} if critique else {}),
                     })
-        except (x_client.XError, content.ImageGenError, ClipRenderError) as exc:
+            elif action["type"] in ("generate_voiceover", "render_narrated_video"):
+                if key in done_keys:
+                    outcome, detail["note"] = "already_applied", "receipt exists; skipped"
+                else:
+                    media_bytes, mime, media_detail = _render_narrated_media(job, action)
+                    digest = hashlib.sha256(media_bytes).hexdigest()
+                    web_post_raw_asset(job_id, action["id"], mime, digest, media_bytes)
+                    outcome = "applied"
+                    artifact = {
+                        "kind": "asset_store",
+                        "url": f"/api/jobs/{job_id}/assets/{action['id']}",
+                        "fetchedAt": _now(), "digest": digest,
+                    }
+                    detail.update({"digest": digest, "mime": mime, "bytes": len(media_bytes), **media_detail})
+        except (x_client.XError, content.ImageGenError, ClipRenderError, media_studio.MediaStudioError) as exc:
             outcome, detail["error"] = "failed", str(exc)
         except Exception as exc:
             with operation_scope(operation_id, operation_epoch):
@@ -1033,6 +1047,42 @@ async def run_publish(job_id: str) -> None:
     refreshed = get_job(job_id)
     if refreshed["stage"] == "publish":
         web_post(f"/api/internal/publish/{job_id}/complete", {"stage": "publish"})
+
+
+def _render_narrated_media(job: dict[str, Any], action: dict[str, Any]) -> tuple[bytes, str, dict[str, Any]]:
+    """Plan, voice, draw, and cut one narrated asset, then listen back to it."""
+    invocation = InvocationContext(
+        job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"],
+        user_id=job["createdByUserId"], stage="publish", operation_id=f"{job['id']}:publish:{action['id']}",
+    )
+    context = media_studio.plan_context_from_job(job)
+    wanted = set((action.get("payload") or {}).get("angleIds") or [])
+    if wanted:
+        angles = (job.get("sourceAnalysis") or {}).get("angles") or []
+        context["angles"] = [
+            {"title": a.get("title"), "rationale": a.get("rationale"), "kind": a.get("kind")}
+            for a in angles if a.get("id") in wanted
+        ] or context["angles"]
+    if action["type"] == "generate_voiceover":
+        context["request"] = "voiceover only"
+    plan = media_studio.plan_narrated_video(context, invocation=invocation)
+    if action["type"] == "generate_voiceover":
+        data, report = media_studio.render_voiceover(plan, invocation=invocation)
+        mime = "audio/mp4"
+    else:
+        data, report = media_studio.render_narrated_video(
+            plan, images=media_studio.muse_image_frames(invocation), invocation=invocation,
+        )
+        mime = "video/mp4"
+    check = media_studio.verify_narration(
+        data, mime, plan,
+        invocation=invocation.model_copy(update={"operation_id": f"{invocation.operation_id}:listen"}),
+    )
+    if not check["passed"]:
+        raise media_studio.MediaStudioError(
+            f"Voice Transcribe heard only {check['score']:.0%} of the planned narration",
+        )
+    return data, mime, {**report, "plan": plan.model_dump(), "narrationCheck": check}
 
 
 async def run_verify(job_id: str) -> None:
@@ -1148,7 +1198,7 @@ async def run_verify(job_id: str) -> None:
             })
         elif action["type"] in (
             "generate_image",
-            "render_clip", "render_reel",
+            "render_clip", "render_reel", "generate_voiceover", "render_narrated_video",
         ) and detail.get("digest"):
             stored = get_asset(job_id, action["id"])
             actual = (stored or {}).get("digest", "")

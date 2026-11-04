@@ -11,7 +11,7 @@ export interface StudioAsset {
   title: string;
   sizeBytes: number;
   digest: string;
-  provider?: "muse-image";
+  provider?: "muse-image" | "meta-mms-tts";
   momentId?: string;
   momentTitle?: string;
   startSec?: number;
@@ -51,7 +51,8 @@ export interface StudioWorkspaceModel {
 }
 
 function providerFor(type: PlannedAction["type"]): StudioAsset["provider"] {
-  return type === "generate_image" ? "muse-image" : undefined;
+  if (type === "generate_image" || type === "render_narrated_video") return "muse-image";
+  return type === "generate_voiceover" ? "meta-mms-tts" : undefined;
 }
 
 function kindForMime(mime: string): StudioMediaKind | null {

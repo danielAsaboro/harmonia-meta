@@ -16,11 +16,15 @@ Every cognitive call in Harmonia goes to a Meta model. Role policy fixes the con
 | Uploaded images (screenshots, slides, charts, photos) | Muse Spark image understanding (`/v1/responses`, strict JSON): verbatim visible text plus up to 12 observations, each a `frame` segment pointing at the stored image |
 | Visual evidence from uploaded video | Muse Spark video understanding (`/v1/responses`, strict JSON) on a 2 fps, 480 px proxy; each observation becomes a `frame` segment backed by an ffmpeg still |
 | Approved image generation | Muse Image 1.0 (`/v1/images/generations`) |
+| Narrated video scene plan | Muse Spark (`/v1/responses`, strict JSON) with the `narrated-video-production` skill |
+| Narrated video frames | Muse Image 1.0, one vertical 2:3 frame per scene |
+| Voiceover and video narration | Meta MMS-TTS (`facebook/mms-tts-eng`, open weights, self-hosted on CPU) |
+| Listen-back check on generated audio and video | Muse Voice Transcribe 1.0 |
 | Subject tracking for vertical and square clips | SAM 3.1 (`/v1/responses`, boxes only) on a 5 fps, 640 px proxy |
 
 Roles set `reasoning_effort` instead of temperature, and structured output uses strict `json_schema` response formats. Inputs are typed and bounded. Source-derived claims must keep their evidence references. The application reserves budget before each call, records normalized usage, and validates output before advancing a stage.
 
-Meta Model API has no video, music, or speech synthesis model, so Harmonia does not generate any of those.
+Meta Model API has no speech synthesis or video generation endpoint, so Harmonia composes both from Meta parts: Muse Spark plans the scenes, Muse Image draws them, Meta's open-weight MMS-TTS speaks them, ffmpeg cuts the MP4, and Muse Voice Transcribe listens back. A render whose transcript matches less than 60% of the approved narration fails instead of shipping. Harmonia does not generate music.
 
 ## Security and authority
 

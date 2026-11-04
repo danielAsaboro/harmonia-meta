@@ -4,7 +4,7 @@ import { assertResourceWorkspace, currentTenant, tenantCollectionPath, tenantSub
 
 export type PendingOperationDecision = "approved" | "rejected";
 export type PendingOperationState = "pending" | "processing" | PendingOperationDecision | "failed" | "expired";
-export type PendingOperationHandler = "decide_job_action" | "decide_strategy" | "publish_preview" | "export_content_artifact" | "generate_image" | "render_clip" | "render_reel" | "publish_x_post" | "publish_x_thread" | "publish_linkedin_post";
+export type PendingOperationHandler = "decide_job_action" | "decide_strategy" | "publish_preview" | "export_content_artifact" | "generate_image" | "render_clip" | "render_reel" | "generate_voiceover" | "render_narrated_video" | "publish_x_post" | "publish_x_thread" | "publish_linkedin_post";
 
 const REGISTERED_HANDLERS = new Set<PendingOperationHandler>([
   "decide_job_action",
@@ -14,6 +14,8 @@ const REGISTERED_HANDLERS = new Set<PendingOperationHandler>([
   "generate_image",
   "render_clip",
   "render_reel",
+  "generate_voiceover",
+  "render_narrated_video",
   "publish_x_post",
   "publish_x_thread",
   "publish_linkedin_post",

@@ -24,6 +24,15 @@ RUN apt-get update \
 COPY requirements.lock .
 RUN pip install --no-cache-dir -r requirements.lock
 
+# Meta MMS-TTS (open weights) speaks narrated videos and voiceovers on CPU. The
+# CPU-only torch wheel keeps the image small; the voice is baked in at build time
+# so a render never waits on a model download.
+ENV HF_HOME=/opt/hf
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.4,<3" \
+    && pip install --no-cache-dir "transformers>=4.45,<6" \
+    && python -c "from transformers import AutoTokenizer, VitsModel; VitsModel.from_pretrained('facebook/mms-tts-eng'); AutoTokenizer.from_pretrained('facebook/mms-tts-eng')" \
+    && chmod -R a+rX /opt/hf
+
 COPY harmonia_agent ./harmonia_agent
 
 RUN useradd -m worker

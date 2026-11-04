@@ -537,6 +537,8 @@ export const receiptSubmissionSchema = z.object({
     "generate_image",
     "render_clip",
     "render_reel",
+    "generate_voiceover",
+    "render_narrated_video",
   ]),
   idempotencyKey: z.string().min(16),
   operationId: z.string().min(1).max(240),
@@ -553,7 +555,7 @@ export const effectClaimSubmissionSchema = z.object({
   actionId: z.string().min(1),
   actionType: z.enum([
     "export_content_artifact", "publish_x_post", "publish_x_thread", "publish_linkedin_post", "generate_image",
-    "render_clip", "render_reel",
+    "render_clip", "render_reel", "generate_voiceover", "render_narrated_video",
   ]),
   idempotencyKey: z.string().regex(/^[a-f0-9]{64}$/),
   operationId: z.string().min(1).max(240),

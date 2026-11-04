@@ -68,7 +68,7 @@ function actionDestination(type: JobFull["actions"][number]["type"]): string {
   if (type === "publish_x_thread") return "X";
   if (type === "publish_linkedin_post") return "LinkedIn";
   if (type === "export_content_artifact") return "Verified Harmonia artifact store";
-  if (type === "render_clip" || type === "render_reel") return "Harmonia asset library";
+  if (type === "render_clip" || type === "render_reel" || type === "generate_voiceover" || type === "render_narrated_video") return "Harmonia asset library";
   return "Harmonia working set";
 }
 

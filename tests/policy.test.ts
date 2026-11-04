@@ -9,6 +9,13 @@ describe("evaluateActionPolicy", () => {
     expect(approvedPendingExecution(actions)).toEqual([]);
     expect(OUTPUT_CAPABILITIES[type === "render_clip" ? "short_clip" : "reel"].approvalClass).toBe("effect");
   });
+  it.each(["generate_voiceover", "render_narrated_video"] as const)("requires approval before %s generation", (type) => {
+    const actions = applyPolicy([{ id: "media-1", jobId: "j1", type, title: "Media", description: "", payload: {} }]);
+    expect(actions[0].approvalState).toBe("pending");
+    expect(actions[0].requiresApproval).toBe(true);
+    expect(approvedPendingExecution(actions)).toEqual([]);
+    expect(evaluateActionPolicy(type, {}).reason).toContain("MMS-TTS");
+  });
   it.each([
     ["publish_linkedin_post", "LinkedIn"],
   ] as const)("requires approval for %s", (type, provider) => {

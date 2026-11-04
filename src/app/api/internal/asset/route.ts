@@ -8,7 +8,7 @@ const MAX_BYTES = 64 * 1024 * 1024; // clips stay well under this at 720p CRF23
 const assetMetaSchema = z.object({
   jobId: z.string().min(1),
   actionId: z.string().min(1),
-  mime: z.enum(["image/png", "image/jpeg", "image/webp", "video/mp4"]),
+  mime: z.enum(["image/png", "image/jpeg", "image/webp", "video/mp4", "audio/mp4"]),
   digest: z.string().min(16),
 });
 
@@ -57,7 +57,9 @@ async function post(req: Request) {
     !(
       action.type === "generate_image" ||
       action.type === "render_clip" ||
-      action.type === "render_reel"
+      action.type === "render_reel" ||
+      action.type === "generate_voiceover" ||
+      action.type === "render_narrated_video"
     )
   ) {
     return Response.json({ error: "action is not an asset-producing action for this job" }, { status: 409 });

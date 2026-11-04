@@ -239,8 +239,13 @@ def generate_image(
     budget_reserver: Callable[[dict[str, object]], None] = reserve_budget,
     budget_resolver: Callable[[dict[str, object]], None] = resolve_budget_reservation,
     usage_reporter: Callable[[dict[str, object]], None] = report_usage,
+    size: str | None = None,
 ) -> tuple[bytes, str]:
-    """Generate one image with Muse Image and return its bytes and MIME type."""
+    """Generate one image with Muse Image and return its bytes and MIME type.
+
+    ``size`` is a "WxH" aspect-ratio hint such as "1024x1536"; omitted, Muse
+    Image picks its default.
+    """
     if invocation is None:
         raise ValueError("real image generation requires invocation context")
     role = "image_generator"
@@ -267,13 +272,16 @@ def generate_image(
                 "model": model,
             }))
             dispatched = True
-            response = client.post("/images/generations", json={
+            request: dict[str, object] = {
                 "model": model,
                 "prompt": prompt,
                 "n": 1,
                 "response_format": "b64_json",
                 "output_format": "png",
-            })
+            }
+            if size:
+                request["size"] = size
+            response = client.post("/images/generations", json=request)
             response.raise_for_status()
             body = response.json()
             images = body.get("data") or []

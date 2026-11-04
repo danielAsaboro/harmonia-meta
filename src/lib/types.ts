@@ -398,7 +398,9 @@ export type ActionType =
   | "publish_linkedin_post"
   | "generate_image"
   | "render_clip"
-  | "render_reel";
+  | "render_reel"
+  | "generate_voiceover"
+  | "render_narrated_video";
 
 export interface PlannedAction {
   id: string;

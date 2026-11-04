@@ -16,6 +16,11 @@ function derivePlannedMediaActions(job: Awaited<ReturnType<typeof getJob>>): Act
   for (const [index, outputType] of ["social_image", "quote_card", "diagram"].filter((item) => outputs.has(item as never)).entries()) { const angle = angles[index]; if (!angle) continue; const prompt = `${outputType.replaceAll("_", " ")} for a startup campaign. Evidence-grounded concept: ${angle.title}. ${angle.rationale}. No unsupported claims or watermarks.`; actions.push({ id: `generate-${outputType}-${createHash("sha256").update(prompt).digest("hex").slice(0, 12)}`, jobId: job.id, type: "generate_image", title: `Generate ${outputType.replaceAll("_", " ")}`, description: "Generate an internal evidence-grounded image asset.", angleId: angle.id, payload: { type: "generate_image", prompt } }); }
   if (outputs.has("short_clip")) for (const moment of moments.slice(0, 2)) actions.push({ id: `clip-${moment.id}`, jobId: job.id, type: "render_clip", title: `Cut clip: ${moment.title}`, description: "Render an internal captioned source clip.", momentId: moment.id, payload: { type: "render_clip", momentId: moment.id, format: "vertical", captions: true } });
   if (outputs.has("reel") && moments.length >= 2) actions.push({ id: "reel-top-moments", jobId: job.id, type: "render_reel", title: "Render source highlight reel", description: "Render an internal reel from grounded source moments.", payload: { type: "render_reel", momentIds: moments.slice(0, 6).map((item) => item.id), format: "vertical", captions: true } });
+  if (angles.length > 0) {
+    const narrated = { angleIds: angles.slice(0, 3).map((item) => item.id), format: "vertical", captions: true };
+    actions.push({ id: "narrated-video", jobId: job.id, type: "render_narrated_video", title: "Render narrated video", description: "Muse Spark plans the scenes, Muse Image draws each frame, Meta MMS-TTS narrates, and Voice Transcribe checks the spoken words.", angleId: angles[0].id, payload: { type: "render_narrated_video", ...narrated } });
+    actions.push({ id: "voiceover", jobId: job.id, type: "generate_voiceover", title: "Generate voiceover", description: "A narrated audio version of the campaign's lead angle, spoken by Meta MMS-TTS.", angleId: angles[0].id, payload: { type: "generate_voiceover", angleIds: narrated.angleIds } });
+  }
   return actions;
 }
 
