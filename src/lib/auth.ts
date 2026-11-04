@@ -67,7 +67,7 @@ async function ensurePersonalWorkspace(uid: string, email?: string): Promise<Use
         observedUsd: "0.00",
         reservedUsd: "0.00",
         limitUsd: process.env.DEFAULT_WORKSPACE_BUDGET_USD ?? "100.00",
-        approvalThresholdUsd: process.env.DEFAULT_JOB_APPROVAL_THRESHOLD_USD ?? "0.25",
+        approvalThresholdUsd: process.env.DEFAULT_JOB_APPROVAL_THRESHOLD_USD ?? "1.00",
       },
       createdAt: now,
       updatedAt: now,

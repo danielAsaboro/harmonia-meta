@@ -6,11 +6,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-if [[ ! -f .env.local ]] || ! grep -q '^MODEL_API_KEY=.' .env.local; then
-  echo "add MODEL_API_KEY=... to .env.local first" >&2
+for env_file in .env .env.local; do
+  if [[ -f "$env_file" ]]; then set -a; source "$env_file"; set +a; fi
+done
+if [[ -z "${MODEL_API_KEY:-}" ]]; then
+  echo "add MODEL_API_KEY=... to .env or .env.local first" >&2
   exit 2
 fi
-set -a; source .env.local; set +a
 
 echo "== 1/3 Live call to every Meta model =="
 (cd agent && .venv/bin/python -m harmonia_agent.meta_probe --out ../evidence/meta-probe.json) || echo "probe reported failures; see evidence/meta-probe.json"

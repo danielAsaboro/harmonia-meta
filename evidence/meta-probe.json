@@ -1,0 +1,76 @@
+{
+  "probe": "harmonia-meta-models",
+  "ranAt": "2026-11-04T14:25:05.753485+00:00",
+  "baseUrl": "https://api.meta.ai/v1",
+  "passed": true,
+  "checks": [
+    {
+      "check": "status",
+      "provider": "meta",
+      "status": "operational",
+      "alive": true
+    },
+    {
+      "check": "count_input_tokens",
+      "model": "muse-spark-1.3",
+      "ok": true,
+      "inputTokens": 202
+    },
+    {
+      "check": "responses",
+      "model": "muse-spark-1.3",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3197,
+      "requestId": "eb04f40b-cd8f-418b-8142-6a8693d3fafa",
+      "responseId": "resp_6aeb4035369bbc816bae4d57",
+      "usage": {
+        "input_tokens": 15,
+        "output_tokens": 154
+      }
+    },
+    {
+      "check": "count_input_tokens",
+      "model": "muse-wonder-1.0",
+      "ok": true,
+      "inputTokens": 169
+    },
+    {
+      "check": "responses",
+      "model": "muse-wonder-1.0",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1456,
+      "requestId": "06d53145-54b5-475c-8a79-93e9391f7c4f",
+      "responseId": "resp_6aeb4038995ffe3771fb4197",
+      "usage": {
+        "input_tokens": 15,
+        "output_tokens": 39
+      }
+    },
+    {
+      "check": "transcribe",
+      "model": "muse-voice-transcribe-1.0",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3208,
+      "requestId": null,
+      "responseId": null,
+      "usage": {
+        "words": 7
+      }
+    },
+    {
+      "check": "segment_video",
+      "model": "sam-3.1",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 4084,
+      "requestId": "05703106-721e-4e42-979a-a91bdd1d4f1e",
+      "responseId": "resp_6aeb404086c7c7f5c52f430a",
+      "usage": {
+        "video_frames_processed": 50
+      }
+    }
+  ]
+}

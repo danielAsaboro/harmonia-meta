@@ -83,12 +83,16 @@ export const jobSourceManifestSchema = z.object({
 
 const usdDecimalSchema = z.string().regex(/^\d+\.\d{1,6}$/);
 
+// Meta roles carry provider + reasoning effort; sampling fields remain only for
+// records written before the Meta migration.
 const modelPolicySchema = z.object({
   policyVersion: z.string().min(1),
   pricingVersion: z.string().min(1),
-  temperature: z.number().min(0).max(2).nullable(),
-  topP: z.number().positive().max(1).nullable(),
-  topK: z.number().int().positive().nullable(),
+  provider: z.enum(["meta", "baseten"]).optional(),
+  reasoningEffort: z.enum(["minimal", "low", "medium", "high", "xhigh", "max"]).optional(),
+  temperature: z.number().min(0).max(2).nullable().optional(),
+  topP: z.number().positive().max(1).nullable().optional(),
+  topK: z.number().int().positive().nullable().optional(),
   safetyProfile: z.string().min(1),
   maxOutputTokens: z.number().int().positive(),
   timeoutSeconds: z.number().int().positive(),

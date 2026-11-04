@@ -12,9 +12,11 @@ export DURABLE_RECOVERY_DEADLINE_SECONDS="${DURABLE_RECOVERY_DEADLINE_SECONDS:-1
 export DURABLE_RECOVERY_MAX_RETRIES="${DURABLE_RECOVERY_MAX_RETRIES:-3}"
 export DURABLE_RECOVERY_MAX_COST_USD="${DURABLE_RECOVERY_MAX_COST_USD:-0.250000}"
 
-if [[ -f .env.local ]]; then
-  set -a; source .env.local; set +a
-fi
+for env_file in .env .env.local; do
+  if [[ -f "$env_file" ]]; then
+    set -a; source "$env_file"; set +a
+  fi
+done
 
 # macOS ships a /usr/bin/java launcher even when no JRE is available. Prefer
 # Homebrew's JDK when the launcher cannot report a working runtime.

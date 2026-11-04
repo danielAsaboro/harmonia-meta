@@ -41,7 +41,7 @@ This page documents supported operator-facing configuration. It deliberately exc
 | `PROACTIVE_<NAME>_INTERVAL_SECONDS` | no | per check | Override a single proactive check's cadence (see [Proactive Agent](/proactive-agent)) |
 | `MODEL_PRICING_VERSION` | no | `2026-08-23` | Immutable rate-catalog version; unknown versions fail startup |
 | `DEFAULT_JOB_BUDGET_USD` | no | `5.00` | Maximum reserved plus observed model cost per job |
-| `DEFAULT_JOB_APPROVAL_THRESHOLD_USD` | no | `0.25` | Cost threshold surfaced for operator policy |
+| `DEFAULT_JOB_APPROVAL_THRESHOLD_USD` | no | `1.00` | Largest single model call reserved without operator approval; Ryan's Muse Wonder strategy pass reserves about $0.70 |
 | `MODEL_API_KEY` | for media | — | Meta Model API bearer key for transcription and image generation |
 | `META_API_BASE_URL` | no | `https://api.meta.ai/v1` | Meta Model API base URL |
 | `TRANSCRIBER_MODEL_ID` | no | `muse-voice-transcribe-1.0` | Muse Voice Transcribe model for timed media transcripts |

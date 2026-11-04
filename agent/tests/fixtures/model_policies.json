@@ -1,0 +1,108 @@
+{
+  "harmonia_coordinator": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "low",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 4096,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "route"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "ryan_strategist": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "high",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 32768,
+    "timeoutSeconds": 300,
+    "eligibleTasks": [
+      "strategize"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "nimi_analyst": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "medium",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 16384,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "analyze_media",
+      "analyze_sources"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "noni_copywriter": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "medium",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 8192,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "draft_or_revise_x"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "dara_editor": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "medium",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 8192,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "review_drafts"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "temi_editorial_planner": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "medium",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 16384,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "propose_editorial_plan"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "maya_presenter": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "low",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 8192,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "compose_surface"
+    ],
+    "minimumPassRate": "0.95"
+  },
+  "nova_liaison": {
+    "policyVersion": "gear-2026-11-03",
+    "pricingVersion": "2026-11-03",
+    "provider": "meta",
+    "reasoningEffort": "low",
+    "safetyProfile": "harmonia-standard",
+    "maxOutputTokens": 8192,
+    "timeoutSeconds": 120,
+    "eligibleTasks": [
+      "answer_status",
+      "answer_insights"
+    ],
+    "minimumPassRate": "0.95"
+  }
+}
