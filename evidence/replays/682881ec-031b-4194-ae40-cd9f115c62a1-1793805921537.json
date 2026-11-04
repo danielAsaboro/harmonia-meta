@@ -1,0 +1,317 @@
+{
+  "schema": "harmonia.authenticated-replay",
+  "schemaVersion": "1.0.0",
+  "bundleId": "682881ec-031b-4194-ae40-cd9f115c62a1-1793805921537",
+  "executionMode": "recorded_replay",
+  "evidenceClassification": "historical_replay",
+  "scenario": "success",
+  "capturedAt": "2026-11-04T15:02:43.295Z",
+  "captureEndedAt": "2026-11-04T15:25:03.088Z",
+  "release": "approved_public_bundle",
+  "provenance": {
+    "sourceRunId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+    "sourceJobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+    "environment": "local_emulator",
+    "sanitizerVersion": "1.0.0",
+    "sourceCaptureAuthorized": true
+  },
+  "events": [
+    {
+      "sequence": 0,
+      "capturedAt": "2026-11-04T15:02:43.295Z",
+      "offsetMs": 0,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "66e505429f4e8e9e0b46cc2b85e78a1b",
+        "stage": "collect_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 1,
+      "capturedAt": "2026-11-04T15:03:16.042Z",
+      "offsetMs": 32747,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "00000000000000000000000000000000",
+        "stage": "extract_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 2,
+      "capturedAt": "2026-11-04T15:03:29.914Z",
+      "offsetMs": 46619,
+      "kind": "usage",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "f86ae2736a6bb0a220ecd60d96f4e7ab",
+        "model": "muse-spark-1.3",
+        "inputTokens": 4138,
+        "outputTokens": 1527,
+        "estimatedCostUsd": 0.011662
+      }
+    },
+    {
+      "sequence": 3,
+      "capturedAt": "2026-11-04T15:03:30.031Z",
+      "offsetMs": 46736,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "f86ae2736a6bb0a220ecd60d96f4e7ab",
+        "stage": "understand",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 4,
+      "capturedAt": "2026-11-04T15:03:30.031Z",
+      "offsetMs": 46736,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "f86ae2736a6bb0a220ecd60d96f4e7ab",
+        "from": "nimi_analyst",
+        "to": "ryan_strategist",
+        "summary": "analysis: 0 grounded moment(s), 2 grounded angle(s), with muse-spark-1.3"
+      }
+    },
+    {
+      "sequence": 5,
+      "capturedAt": "2026-11-04T15:04:02.831Z",
+      "offsetMs": 79536,
+      "kind": "usage",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "6b073fb99e2c6fcdc62f8581895943cb",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 6253,
+        "outputTokens": 3509,
+        "estimatedCostUsd": 0.075295
+      }
+    },
+    {
+      "sequence": 6,
+      "capturedAt": "2026-11-04T15:04:02.940Z",
+      "offsetMs": 79645,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "6b073fb99e2c6fcdc62f8581895943cb",
+        "stage": "strategize",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 7,
+      "capturedAt": "2026-11-04T15:04:02.940Z",
+      "offsetMs": 79645,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "6b073fb99e2c6fcdc62f8581895943cb",
+        "from": "ryan_strategist",
+        "to": "coordinator_system",
+        "summary": "Ryan strategy v1 awaiting digest-bound approval"
+      }
+    },
+    {
+      "sequence": 8,
+      "capturedAt": "2026-11-04T15:22:34.446Z",
+      "offsetMs": 1191151,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "991c74402b8af29d1c186ed187c9d49a",
+        "stage": "awaiting_strategy_approval",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 9,
+      "capturedAt": "2026-11-04T15:23:36.775Z",
+      "offsetMs": 1253480,
+      "kind": "usage",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "fb15b3a027dff1b6e830018f5e1b330c",
+        "model": "muse-spark-1.3",
+        "inputTokens": 5236,
+        "outputTokens": 5065,
+        "estimatedCostUsd": 0.024145
+      }
+    },
+    {
+      "sequence": 10,
+      "capturedAt": "2026-11-04T15:23:36.884Z",
+      "offsetMs": 1253589,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "fb15b3a027dff1b6e830018f5e1b330c",
+        "stage": "plan",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 11,
+      "capturedAt": "2026-11-04T15:23:36.884Z",
+      "offsetMs": 1253589,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "fb15b3a027dff1b6e830018f5e1b330c",
+        "from": "temi_editorial_planner",
+        "to": "noni_copywriter",
+        "summary": "Temi editorial plan a8800830ba92029045d89526d817292df79c21c8fa6893db712d4c6a63a6bbb3 persisted; selected item-brief-1-01"
+      }
+    },
+    {
+      "sequence": 12,
+      "capturedAt": "2026-11-04T15:24:47.920Z",
+      "offsetMs": 1324625,
+      "kind": "usage",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "e8cbc307442ae1e9052421ea08238de0",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2711,
+        "outputTokens": 2617,
+        "estimatedCostUsd": 0.012134
+      }
+    },
+    {
+      "sequence": 13,
+      "capturedAt": "2026-11-04T15:25:00.311Z",
+      "offsetMs": 1337016,
+      "kind": "usage",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "e8cbc307442ae1e9052421ea08238de0",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2870,
+        "outputTokens": 2268,
+        "estimatedCostUsd": 0.010849
+      }
+    },
+    {
+      "sequence": 14,
+      "capturedAt": "2026-11-04T15:25:00.488Z",
+      "offsetMs": 1337193,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "e8cbc307442ae1e9052421ea08238de0",
+        "stage": "draft",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 15,
+      "capturedAt": "2026-11-04T15:25:01.623Z",
+      "offsetMs": 1338328,
+      "kind": "receipt",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "65d88298a9e252ca293a45bbbbe72fb0",
+        "receiptId": "53c36b5a-d4c1-4a8f-be85-06e7065dc72d",
+        "actionId": "export-artifact-output-1-linkedin_post-2c9e032c591e",
+        "outcome": "applied",
+        "verified": true
+      }
+    },
+    {
+      "sequence": 16,
+      "capturedAt": "2026-11-04T15:25:01.636Z",
+      "offsetMs": 1338341,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "65d88298a9e252ca293a45bbbbe72fb0",
+        "stage": "publish",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 17,
+      "capturedAt": "2026-11-04T15:25:02.483Z",
+      "offsetMs": 1339188,
+      "kind": "verification",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "041811faed3ef0847a68d76d4f584259",
+        "receiptId": "53c36b5a-d4c1-4a8f-be85-06e7065dc72d",
+        "verified": true,
+        "method": "artifact_digest_reread"
+      }
+    },
+    {
+      "sequence": 18,
+      "capturedAt": "2026-11-04T15:25:02.495Z",
+      "offsetMs": 1339200,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "041811faed3ef0847a68d76d4f584259",
+        "stage": "verify",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 19,
+      "capturedAt": "2026-11-04T15:25:03.085Z",
+      "offsetMs": 1339790,
+      "kind": "draft",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "draftId": "artifact-output-1-linkedin_post",
+        "platform": "linkedin_post",
+        "text": "Ecommerce owners: not every checkout win is a bigger basket.\n\nAbandoned carts fell 18% after we added a one-tap Apple Pay button and removed account creation from checkout. Average order value stayed flat at $54.\n\nThe takeaway I'm keeping: remove forced steps before payment instead of expecting the same checkout to also lift order value.\n\nWhat's one friction point you could remove from your checkout?",
+        "valid": true
+      }
+    },
+    {
+      "sequence": 20,
+      "capturedAt": "2026-11-04T15:25:03.085Z",
+      "offsetMs": 1339790,
+      "kind": "action",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "actionId": "export-artifact-output-1-linkedin_post-2c9e032c591e",
+        "actionType": "export_content_artifact",
+        "state": "executed"
+      }
+    },
+    {
+      "sequence": 21,
+      "capturedAt": "2026-11-04T15:25:03.085Z",
+      "offsetMs": 1339790,
+      "kind": "job_snapshot",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "stage": "complete",
+        "status": "complete"
+      }
+    },
+    {
+      "sequence": 22,
+      "capturedAt": "2026-11-04T15:25:03.088Z",
+      "offsetMs": 1339793,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "682881ec-031b-4194-ae40-cd9f115c62a1",
+        "traceId": "89f64f79e8c9a3891152dd4211082739",
+        "stage": "learn",
+        "status": "running"
+      }
+    }
+  ],
+  "terminalStateDigest": "e9d66000156f9d3df0463f2f2f4de1a1495ce911fed4dffe2bc062b775a319bd",
+  "integrity": {
+    "algorithm": "sha256-canonical-json",
+    "digest": "afa217542750fbe671ae57fb61df1a611e5f7f3af9cfd02a9d0283a9341d555c"
+  }
+}

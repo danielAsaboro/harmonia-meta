@@ -1,0 +1,317 @@
+{
+  "schema": "harmonia.authenticated-replay",
+  "schemaVersion": "1.0.0",
+  "bundleId": "53c65599-e584-4415-a22d-f82069f2cba9-1793805919868",
+  "executionMode": "recorded_replay",
+  "evidenceClassification": "historical_replay",
+  "scenario": "success",
+  "capturedAt": "2026-11-04T15:02:41.425Z",
+  "captureEndedAt": "2026-11-04T15:25:02.743Z",
+  "release": "approved_public_bundle",
+  "provenance": {
+    "sourceRunId": "53c65599-e584-4415-a22d-f82069f2cba9",
+    "sourceJobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+    "environment": "local_emulator",
+    "sanitizerVersion": "1.0.0",
+    "sourceCaptureAuthorized": true
+  },
+  "events": [
+    {
+      "sequence": 0,
+      "capturedAt": "2026-11-04T15:02:41.425Z",
+      "offsetMs": 0,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "6703287a5b1ae6970995061e09b6f090",
+        "stage": "collect_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 1,
+      "capturedAt": "2026-11-04T15:02:41.968Z",
+      "offsetMs": 543,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "00000000000000000000000000000000",
+        "stage": "extract_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 2,
+      "capturedAt": "2026-11-04T15:03:01.105Z",
+      "offsetMs": 19680,
+      "kind": "usage",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "91ccf8c2433d65f6824aed6f06f23f8e",
+        "model": "muse-spark-1.3",
+        "inputTokens": 4155,
+        "outputTokens": 2799,
+        "estimatedCostUsd": 0.01709
+      }
+    },
+    {
+      "sequence": 3,
+      "capturedAt": "2026-11-04T15:03:01.225Z",
+      "offsetMs": 19800,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "91ccf8c2433d65f6824aed6f06f23f8e",
+        "stage": "understand",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 4,
+      "capturedAt": "2026-11-04T15:03:01.225Z",
+      "offsetMs": 19800,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "91ccf8c2433d65f6824aed6f06f23f8e",
+        "from": "nimi_analyst",
+        "to": "ryan_strategist",
+        "summary": "analysis: 0 grounded moment(s), 2 grounded angle(s), with muse-spark-1.3"
+      }
+    },
+    {
+      "sequence": 5,
+      "capturedAt": "2026-11-04T15:03:15.666Z",
+      "offsetMs": 34241,
+      "kind": "usage",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "80c4aa4e1a34439beac0e1e535b65312",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 6469,
+        "outputTokens": 3626,
+        "estimatedCostUsd": 0.078499
+      }
+    },
+    {
+      "sequence": 6,
+      "capturedAt": "2026-11-04T15:03:15.779Z",
+      "offsetMs": 34354,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "80c4aa4e1a34439beac0e1e535b65312",
+        "stage": "strategize",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 7,
+      "capturedAt": "2026-11-04T15:03:15.779Z",
+      "offsetMs": 34354,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "80c4aa4e1a34439beac0e1e535b65312",
+        "from": "ryan_strategist",
+        "to": "coordinator_system",
+        "summary": "Ryan strategy v1 awaiting digest-bound approval"
+      }
+    },
+    {
+      "sequence": 8,
+      "capturedAt": "2026-11-04T15:22:34.216Z",
+      "offsetMs": 1192791,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "5838e81e4bfea3d0cbcb263fa55fcb15",
+        "stage": "awaiting_strategy_approval",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 9,
+      "capturedAt": "2026-11-04T15:22:56.713Z",
+      "offsetMs": 1215288,
+      "kind": "usage",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "5f3caf586141f0bb81d437a00126a23a",
+        "model": "muse-spark-1.3",
+        "inputTokens": 5220,
+        "outputTokens": 5483,
+        "estimatedCostUsd": 0.029828
+      }
+    },
+    {
+      "sequence": 10,
+      "capturedAt": "2026-11-04T15:22:56.871Z",
+      "offsetMs": 1215446,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "5f3caf586141f0bb81d437a00126a23a",
+        "stage": "plan",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 11,
+      "capturedAt": "2026-11-04T15:22:56.871Z",
+      "offsetMs": 1215446,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "5f3caf586141f0bb81d437a00126a23a",
+        "from": "temi_editorial_planner",
+        "to": "noni_copywriter",
+        "summary": "Temi editorial plan 512af5a470bd45da88730c2a45915648a726e377c2b54c50f646fe4450d20919 persisted; selected item-brief-1"
+      }
+    },
+    {
+      "sequence": 12,
+      "capturedAt": "2026-11-04T15:23:49.068Z",
+      "offsetMs": 1267643,
+      "kind": "usage",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "d07496feed1dd5dd0ea6c2fea244fc42",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2699,
+        "outputTokens": 1748,
+        "estimatedCostUsd": 0.010803
+      }
+    },
+    {
+      "sequence": 13,
+      "capturedAt": "2026-11-04T15:24:07.234Z",
+      "offsetMs": 1285809,
+      "kind": "usage",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "d07496feed1dd5dd0ea6c2fea244fc42",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2936,
+        "outputTokens": 4051,
+        "estimatedCostUsd": 0.020887
+      }
+    },
+    {
+      "sequence": 14,
+      "capturedAt": "2026-11-04T15:24:07.416Z",
+      "offsetMs": 1285991,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "d07496feed1dd5dd0ea6c2fea244fc42",
+        "stage": "draft",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 15,
+      "capturedAt": "2026-11-04T15:25:00.815Z",
+      "offsetMs": 1339390,
+      "kind": "receipt",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "f5fd00c44222bae88b0143436af83eae",
+        "receiptId": "e8157bbc-6d81-4d68-ab4b-8546cc1e1f67",
+        "actionId": "export-artifact-output-1-linkedin_post-6f3687b447d2",
+        "outcome": "applied",
+        "verified": true
+      }
+    },
+    {
+      "sequence": 16,
+      "capturedAt": "2026-11-04T15:25:00.833Z",
+      "offsetMs": 1339408,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "f5fd00c44222bae88b0143436af83eae",
+        "stage": "publish",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 17,
+      "capturedAt": "2026-11-04T15:25:01.922Z",
+      "offsetMs": 1340497,
+      "kind": "verification",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "9045d22ac22bd10cd8bcef4e9327480b",
+        "receiptId": "e8157bbc-6d81-4d68-ab4b-8546cc1e1f67",
+        "verified": true,
+        "method": "artifact_digest_reread"
+      }
+    },
+    {
+      "sequence": 18,
+      "capturedAt": "2026-11-04T15:25:01.937Z",
+      "offsetMs": 1340512,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "9045d22ac22bd10cd8bcef4e9327480b",
+        "stage": "verify",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 19,
+      "capturedAt": "2026-11-04T15:25:02.740Z",
+      "offsetMs": 1341315,
+      "kind": "draft",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "draftId": "artifact-output-1-linkedin_post",
+        "platform": "linkedin_post",
+        "text": "We killed the setup call\n\nWe killed the onboarding setup call.\n\nReplaced it with a 3-minute Loom.\n\nOnboarding went from nine days to 40 hours.\nActivation went from 41% to 63% in six weeks.\n\nFor founders still doing manual setup calls:\n\nThat call feels like high-touch service.\nFor the customer, it’s usually scheduling friction.\n\nBook. Wait. Show up. Then start.\n\nWe just let them start.\n\nOne short video. Watch when ready. No waiting to get moving.\n\nUnlike manual setup-call onboarding, this was 3 minutes to watch vs. days to schedule.\n\nIf activation is stuck, don’t add more onboarding.\nTry removing the meeting.",
+        "valid": true
+      }
+    },
+    {
+      "sequence": 20,
+      "capturedAt": "2026-11-04T15:25:02.740Z",
+      "offsetMs": 1341315,
+      "kind": "action",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "actionId": "export-artifact-output-1-linkedin_post-6f3687b447d2",
+        "actionType": "export_content_artifact",
+        "state": "executed"
+      }
+    },
+    {
+      "sequence": 21,
+      "capturedAt": "2026-11-04T15:25:02.740Z",
+      "offsetMs": 1341315,
+      "kind": "job_snapshot",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "stage": "complete",
+        "status": "complete"
+      }
+    },
+    {
+      "sequence": 22,
+      "capturedAt": "2026-11-04T15:25:02.743Z",
+      "offsetMs": 1341318,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "53c65599-e584-4415-a22d-f82069f2cba9",
+        "traceId": "c5d975e9221460cd1d1690b721d74a7b",
+        "stage": "learn",
+        "status": "running"
+      }
+    }
+  ],
+  "terminalStateDigest": "5a55be588de9802daba66bbd1abc7e6dd2a42d36beb32e26452796551d1ca2f0",
+  "integrity": {
+    "algorithm": "sha256-canonical-json",
+    "digest": "130a417e25d46cf29d7b2e7f74ba8371f59b4fc6039333dea4a7b8c5529a4e54"
+  }
+}

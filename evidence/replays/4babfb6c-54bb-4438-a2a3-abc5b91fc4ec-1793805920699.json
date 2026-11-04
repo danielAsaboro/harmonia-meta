@@ -1,0 +1,345 @@
+{
+  "schema": "harmonia.authenticated-replay",
+  "schemaVersion": "1.0.0",
+  "bundleId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec-1793805920699",
+  "executionMode": "recorded_replay",
+  "evidenceClassification": "historical_replay",
+  "scenario": "success",
+  "capturedAt": "2026-11-04T15:02:46.264Z",
+  "captureEndedAt": "2026-11-04T15:25:02.918Z",
+  "release": "approved_public_bundle",
+  "provenance": {
+    "sourceRunId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+    "sourceJobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+    "environment": "local_emulator",
+    "sanitizerVersion": "1.0.0",
+    "sourceCaptureAuthorized": true
+  },
+  "events": [
+    {
+      "sequence": 0,
+      "capturedAt": "2026-11-04T15:02:46.264Z",
+      "offsetMs": 0,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "1010e06d18a2f0031a7738ba8330dd14",
+        "stage": "collect_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 1,
+      "capturedAt": "2026-11-04T15:03:16.263Z",
+      "offsetMs": 29999,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "00000000000000000000000000000000",
+        "stage": "extract_sources",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 2,
+      "capturedAt": "2026-11-04T15:03:47.305Z",
+      "offsetMs": 61041,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "703966e4729d42724c5755df2b200294",
+        "model": "muse-spark-1.3",
+        "inputTokens": 4136,
+        "outputTokens": 2596,
+        "estimatedCostUsd": 0.011996
+      }
+    },
+    {
+      "sequence": 3,
+      "capturedAt": "2026-11-04T15:03:47.412Z",
+      "offsetMs": 61148,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "703966e4729d42724c5755df2b200294",
+        "stage": "understand",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 4,
+      "capturedAt": "2026-11-04T15:03:47.412Z",
+      "offsetMs": 61148,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "703966e4729d42724c5755df2b200294",
+        "from": "nimi_analyst",
+        "to": "ryan_strategist",
+        "summary": "analysis: 0 grounded moment(s), 2 grounded angle(s), with muse-spark-1.3"
+      }
+    },
+    {
+      "sequence": 5,
+      "capturedAt": "2026-11-04T15:04:47.000Z",
+      "offsetMs": 120736,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "553fbd0f77036cfeeafde130983aac9d",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 6385,
+        "outputTokens": 3473,
+        "estimatedCostUsd": 0.075103
+      }
+    },
+    {
+      "sequence": 6,
+      "capturedAt": "2026-11-04T15:04:47.031Z",
+      "offsetMs": 120767,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "553fbd0f77036cfeeafde130983aac9d",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 6460,
+        "outputTokens": 3430,
+        "estimatedCostUsd": 0.074543
+      }
+    },
+    {
+      "sequence": 7,
+      "capturedAt": "2026-11-04T15:04:47.058Z",
+      "offsetMs": 120794,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "553fbd0f77036cfeeafde130983aac9d",
+        "model": "muse-wonder-1.0",
+        "inputTokens": 6460,
+        "outputTokens": 3399,
+        "estimatedCostUsd": 0.073437
+      }
+    },
+    {
+      "sequence": 8,
+      "capturedAt": "2026-11-04T15:04:47.171Z",
+      "offsetMs": 120907,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "553fbd0f77036cfeeafde130983aac9d",
+        "stage": "strategize",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 9,
+      "capturedAt": "2026-11-04T15:04:47.171Z",
+      "offsetMs": 120907,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "553fbd0f77036cfeeafde130983aac9d",
+        "from": "ryan_strategist",
+        "to": "coordinator_system",
+        "summary": "Ryan strategy v1 awaiting digest-bound approval"
+      }
+    },
+    {
+      "sequence": 10,
+      "capturedAt": "2026-11-04T15:22:34.344Z",
+      "offsetMs": 1188080,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "2283308cb4d8cd89cfc4e33b933419fb",
+        "stage": "awaiting_strategy_approval",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 11,
+      "capturedAt": "2026-11-04T15:23:14.307Z",
+      "offsetMs": 1228043,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "b304e7d617e86b2884537761d38450ae",
+        "model": "muse-spark-1.3",
+        "inputTokens": 5086,
+        "outputTokens": 4001,
+        "estimatedCostUsd": 0.023362
+      }
+    },
+    {
+      "sequence": 12,
+      "capturedAt": "2026-11-04T15:23:14.417Z",
+      "offsetMs": 1228153,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "b304e7d617e86b2884537761d38450ae",
+        "stage": "plan",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 13,
+      "capturedAt": "2026-11-04T15:23:14.417Z",
+      "offsetMs": 1228153,
+      "kind": "specialist_handoff",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "b304e7d617e86b2884537761d38450ae",
+        "from": "temi_editorial_planner",
+        "to": "noni_copywriter",
+        "summary": "Temi editorial plan f5c4d3f90f70e18791d0f4731555fb17931951128271bc8fbab57b07c5b59f60 persisted; selected item-1"
+      }
+    },
+    {
+      "sequence": 14,
+      "capturedAt": "2026-11-04T15:24:17.603Z",
+      "offsetMs": 1291339,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "d4f651ade10e6d17d3e859555778d5ac",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2649,
+        "outputTokens": 1589,
+        "estimatedCostUsd": 0.010065
+      }
+    },
+    {
+      "sequence": 15,
+      "capturedAt": "2026-11-04T15:24:29.072Z",
+      "offsetMs": 1302808,
+      "kind": "usage",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "d4f651ade10e6d17d3e859555778d5ac",
+        "model": "muse-spark-1.3",
+        "inputTokens": 2820,
+        "outputTokens": 2141,
+        "estimatedCostUsd": 0.012624
+      }
+    },
+    {
+      "sequence": 16,
+      "capturedAt": "2026-11-04T15:24:29.247Z",
+      "offsetMs": 1302983,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "d4f651ade10e6d17d3e859555778d5ac",
+        "stage": "draft",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 17,
+      "capturedAt": "2026-11-04T15:25:01.250Z",
+      "offsetMs": 1334986,
+      "kind": "receipt",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "a409c5cce261b942c63613cc7d614594",
+        "receiptId": "5aa196cf-1acf-4611-aaed-9bd57798ade7",
+        "actionId": "export-artifact-output-1-x_post-de8ffb4359d5",
+        "outcome": "applied",
+        "verified": true
+      }
+    },
+    {
+      "sequence": 18,
+      "capturedAt": "2026-11-04T15:25:01.265Z",
+      "offsetMs": 1335001,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "a409c5cce261b942c63613cc7d614594",
+        "stage": "publish",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 19,
+      "capturedAt": "2026-11-04T15:25:02.207Z",
+      "offsetMs": 1335943,
+      "kind": "verification",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "31e8c8d294cc9f04f47e28e29cb55f51",
+        "receiptId": "5aa196cf-1acf-4611-aaed-9bd57798ade7",
+        "verified": true,
+        "method": "artifact_digest_reread"
+      }
+    },
+    {
+      "sequence": 20,
+      "capturedAt": "2026-11-04T15:25:02.217Z",
+      "offsetMs": 1335953,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "31e8c8d294cc9f04f47e28e29cb55f51",
+        "stage": "verify",
+        "status": "running"
+      }
+    },
+    {
+      "sequence": 21,
+      "capturedAt": "2026-11-04T15:25:02.915Z",
+      "offsetMs": 1336651,
+      "kind": "draft",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "draftId": "artifact-output-1-x_post",
+        "platform": "x_post",
+        "text": "API p95: 820 ms → 190 ms\nMoved auth checks to the edge + cached tenant config for 60 seconds.\nNo customer-facing changes needed.",
+        "valid": true
+      }
+    },
+    {
+      "sequence": 22,
+      "capturedAt": "2026-11-04T15:25:02.915Z",
+      "offsetMs": 1336651,
+      "kind": "action",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "actionId": "export-artifact-output-1-x_post-de8ffb4359d5",
+        "actionType": "export_content_artifact",
+        "state": "executed"
+      }
+    },
+    {
+      "sequence": 23,
+      "capturedAt": "2026-11-04T15:25:02.915Z",
+      "offsetMs": 1336651,
+      "kind": "job_snapshot",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "stage": "complete",
+        "status": "complete"
+      }
+    },
+    {
+      "sequence": 24,
+      "capturedAt": "2026-11-04T15:25:02.918Z",
+      "offsetMs": 1336654,
+      "kind": "stage_transition",
+      "payload": {
+        "jobId": "4babfb6c-54bb-4438-a2a3-abc5b91fc4ec",
+        "traceId": "bfcf7b41a09cff0dd17891f49e689feb",
+        "stage": "learn",
+        "status": "running"
+      }
+    }
+  ],
+  "terminalStateDigest": "8633b1e8bf105b06306bc2263f4de2d6f9efbdad6763e4132728ddde636782f9",
+  "integrity": {
+    "algorithm": "sha256-canonical-json",
+    "digest": "69d787ddd96fe6182bbcbfbac8276495ae08c9b71ec9c38bf0f0db3c4ec9b492"
+  }
+}
