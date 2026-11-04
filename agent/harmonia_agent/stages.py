@@ -243,6 +243,35 @@ def _measured_for_critic(reviews: list[dict[str, Any]], out: Any) -> dict[str, A
     return {"durationSec": clipper.probe_duration(out), "faults": faults if len(reviews) == 1 else []}
 
 
+def _recut_on_critique(
+    job: dict[str, Any], action: dict[str, Any], moment: dict[str, Any], source: Any, fmt: str,
+    captions: bool, crop: "segmentation.SubjectCrop | None", workdir: Any, out: Any,
+    reviews: list[dict[str, Any]], critique: dict[str, Any],
+) -> tuple[Any, dict[str, Any]]:
+    """Act on a low blind score once: move the cut, render, review again, keep the better clip."""
+    start, end = float(moment["startSec"]), float(moment["endSec"])
+    window = clip_review.critic_window(start, end, critique)
+    if window is None:
+        return out, critique
+    recut, notes, review = clip_review.render_reviewed(
+        _clip_renderer(job["id"], source, fmt, captions, crop, start), workdir, "recut", *window,
+    )
+    second = clip_critic.critique_clip(
+        recut, title=str(action.get("title") or action["type"]),
+        measured=_measured_for_critic([{"momentId": moment["id"], **review}], recut),
+        invocation=InvocationContext(
+            job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"],
+            user_id=job["createdByUserId"], stage="publish",
+            operation_id=f"{job['id']}:publish:{action['id']}:critic:recut",
+        ),
+    )
+    attempt = {"window": [round(window[0], 3), round(window[1], 3)], "score": second["score"] if second else None}
+    if second and second["score"] > critique["score"]:
+        reviews.append({"momentId": moment["id"], "recut": True, **review})
+        return recut, {**second, "previousScore": critique["score"], "recut": {**attempt, "kept": True}}
+    return out, {**critique, "recut": {**attempt, "kept": False}}
+
+
 def _clip_renderer(
     job_id: str, source: Any, fmt: str, captions: bool, crop: "segmentation.SubjectCrop | None", moment_start: float,
 ) -> Callable[[Any, float, float], list[str]]:
@@ -914,6 +943,10 @@ async def run_publish(job_id: str) -> None:
                                 operation_id=f"{job['id']}:publish:{action['id']}:critic",
                             ),
                         )
+                        if action["type"] == "render_clip" and critique:
+                            out, critique = _recut_on_critique(
+                                job, action, moment, src, fmt, want_caps, crop, Path(td), out, reviews, critique,
+                            )
                         video_bytes = out.read_bytes()
 
                     digest = hashlib.sha256(video_bytes).hexdigest()

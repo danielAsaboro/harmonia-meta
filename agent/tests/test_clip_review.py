@@ -105,3 +105,17 @@ def test_clipped_words_widen_the_cut():
     ))
     assert review.trimmed_window(10.0, 15.0, measurement) == (9.6, 15.4)
     assert review.trimmed_window(0.1, 5.1, measurement) == (0.0, 5.5)
+
+
+def test_a_low_blind_score_moves_a_weak_opening_and_extends_an_unfinished_ending():
+    critique = {"score": 38, "issues": [
+        {"tSec": 0.0, "criterion": "hook", "severity": "major", "note": "static title card"},
+        {"tSec": 25.0, "criterion": "ending", "severity": "major", "note": "ends mid-thought"},
+        {"tSec": 3.0, "criterion": "pacing", "severity": "minor", "note": "static"},
+    ]}
+    assert review.critic_window(10.0, 36.0, critique) == (11.0, 38.0)
+
+
+def test_a_good_score_or_no_actionable_issue_leaves_the_cut_alone():
+    assert review.critic_window(10.0, 36.0, {"score": 82, "issues": [{"tSec": 0, "criterion": "hook", "severity": "major"}]}) is None
+    assert review.critic_window(10.0, 36.0, {"score": 40, "issues": [{"tSec": 9, "criterion": "framing", "severity": "major"}]}) is None

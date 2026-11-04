@@ -171,6 +171,35 @@ def trimmed_window(start: float, end: float, measurement: Measurement) -> tuple[
     return round(new_start, 3), round(new_end, 3)
 
 
+CRITIC_RECUT_BELOW = 60
+HOOK_SEARCH_SEC = 3.0
+ENDING_EXTENSION_SEC = 2.0
+
+
+def critic_window(start: float, end: float, critique: dict[str, Any]) -> tuple[float, float] | None:
+    """A new window answering the blind critic's major hook and ending issues, or None.
+
+    A weak opening inside the first seconds moves the start past it; an
+    incomplete ending extends the cut so the thought can finish. Only a score
+    under CRITIC_RECUT_BELOW acts, and the result is re-rendered and re-scored
+    before anything replaces the first cut.
+    """
+    if critique.get("score", 100) >= CRITIC_RECUT_BELOW:
+        return None
+    new_start, new_end = start, end
+    for issue in critique.get("issues") or []:
+        if issue.get("severity") != "major":
+            continue
+        t = float(issue.get("tSec") or 0.0)
+        if issue.get("criterion") == "hook" and t <= HOOK_SEARCH_SEC:
+            new_start = max(new_start, start + max(t, 1.0))
+        elif issue.get("criterion") == "ending":
+            new_end = end + ENDING_EXTENSION_SEC
+    if (new_start, new_end) == (start, end) or new_end - new_start < MIN_CLIP_SEC:
+        return None
+    return round(new_start, 3), round(new_end, 3)
+
+
 def render_reviewed(
     render: Callable[[Path, float, float], list[str]],
     out_dir: Path,
