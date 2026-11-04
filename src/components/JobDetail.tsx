@@ -9,6 +9,7 @@ import type { TimelineEvent } from "@/components/Timeline";
 import type { PlannedAction, Receipt } from "@/lib/types";
 import { isReplayableAction } from "@/lib/replayEligibility";
 import { SubjectTrackPreview, subjectTracks } from "@/components/SubjectTrackPreview";
+import { ClipReviewSummary, clipReviews } from "@/components/ClipReviewSummary";
 import { SteeringControls } from "@/components/studio/SteeringControls";
 import { contentArtifactPreview } from "@/lib/contentArtifacts/presentation";
 
@@ -365,6 +366,9 @@ export default function JobDetail({
                           className="mt-2 max-h-72 rounded-lg border border-zinc-200 dark:border-zinc-800"
                         />
                       )}
+                      {a.state === "executed" && clipReviews(receipts.find((r) => r.actionId === a.id && r.outcome === "applied")?.detail).map((review) => (
+                        <ClipReviewSummary key={review.momentId} review={review} />
+                      ))}
                       {a.state === "executed" && subjectTracks(receipts.find((r) => r.actionId === a.id && r.outcome === "applied")?.detail).map((track) => (
                         <SubjectTrackPreview key={track.momentId} track={track} />
                       ))}

@@ -21,7 +21,7 @@ import httpx
 from opentelemetry.trace import Status, StatusCode
 from pydantic import ValidationError
 
-from . import clipper, content, segmentation, x_client, youtube
+from . import clip_review, clipper, content, segmentation, x_client, youtube
 from .linkedin_client import LinkedInClient
 from .agent_models import (
     SourceAnalysis,
@@ -209,6 +209,16 @@ def _subject_crop(
     return crop, [f"reframed to follow the tracked {payload.get('subject') or 'person'} (SAM 3.1)"]
 
 
+def _shift_crop(crop: "segmentation.SubjectCrop | None", delta: float) -> "segmentation.SubjectCrop | None":
+    """The same crop path for a window that starts ``delta`` seconds later."""
+    if crop is None or delta <= 0:
+        return crop
+    before = [(t, x) for t, x in crop.keyframes if t <= delta]
+    after = [(round(t - delta, 3), x) for t, x in crop.keyframes if t > delta]
+    head = [(0.0, before[-1][1])] if before else []
+    return segmentation.SubjectCrop(width=crop.width, height=crop.height, keyframes=tuple(head + after) or crop.keyframes[-1:])
+
+
 def _tracking_record(moment_id: str, source: Any, crop: "segmentation.SubjectCrop", subject: str) -> dict[str, Any]:
     """The crop path SAM 3.1 produced, small enough for a receipt and a studio preview."""
     width, height = clipper.probe_dimensions(source)
@@ -218,6 +228,19 @@ def _tracking_record(moment_id: str, source: Any, crop: "segmentation.SubjectCro
         "sourceWidth": width, "sourceHeight": height, "cropWidth": crop.width, "cropHeight": crop.height,
         "keyframes": [[round(t, 2), x] for t, x in crop.keyframes[::step]],
     }
+
+
+def _clip_renderer(
+    job_id: str, source: Any, fmt: str, captions: bool, crop: "segmentation.SubjectCrop | None", moment_start: float,
+) -> Callable[[Any, float, float], list[str]]:
+    """Render one version of a moment's clip for ``clip_review`` to measure."""
+    def render(out: Any, start: float, end: float) -> list[str]:
+        return clipper.render_clip(
+            source, out, start, end, fmt=fmt,
+            captions=_segments_in_window(job_id, start, end) if captions else None,
+            crop=_shift_crop(crop, start - moment_start),
+        )
+    return render
 
 
 def _now() -> str:
@@ -825,6 +848,7 @@ async def run_publish(job_id: str) -> None:
                     want_caps = action["payload"].get("captions", True)
                     render_notes: list[str] = []
                     tracking: list[dict[str, Any]] = []
+                    reviews: list[dict[str, Any]] = []
                     with tempfile.TemporaryDirectory() as td:
                         if action["type"] == "render_clip":
                             moment = next(
@@ -834,20 +858,18 @@ async def run_publish(job_id: str) -> None:
                             if not moment:
                                 raise ClipRenderError("moment referenced by render_clip no longer exists")
                             src = _materialize_source_video(job_id, moment, td)
-                            out = Path(td) / "clip.mp4"
                             crop, crop_notes = _subject_crop(
                                 job, action, src, float(moment["startSec"]), float(moment["endSec"]), fmt, moment["id"],
                             )
                             render_notes += crop_notes
                             if crop is not None:
                                 tracking.append(_tracking_record(moment["id"], src, crop, str(action["payload"].get("subject") or "person")))
-                            render_notes += clipper.render_clip(
-                                src, out,
-                                float(moment["startSec"]), float(moment["endSec"]),
-                                fmt=fmt,
-                                captions=_segments_in_window(job_id, float(moment["startSec"]), float(moment["endSec"])) if want_caps else None,
-                                crop=crop,
+                            out, notes, review = clip_review.render_reviewed(
+                                _clip_renderer(job_id, src, fmt, want_caps, crop, float(moment["startSec"])),
+                                Path(td), "clip", float(moment["startSec"]), float(moment["endSec"]),
                             )
+                            render_notes += notes
+                            reviews.append({"momentId": moment["id"], **review})
                         else:
                             parts: list[Path] = []
                             for i, mid in enumerate(action["payload"]["momentIds"]):
@@ -855,20 +877,18 @@ async def run_publish(job_id: str) -> None:
                                 if not m:
                                     raise ClipRenderError(f"moment {mid} no longer exists")
                                 src = _materialize_source_video(job_id, m, td)
-                                part = Path(td) / f"part{i}.mp4"
                                 crop, crop_notes = _subject_crop(
                                     job, action, src, float(m["startSec"]), float(m["endSec"]), fmt, m["id"],
                                 )
                                 render_notes += crop_notes
                                 if crop is not None:
                                     tracking.append(_tracking_record(m["id"], src, crop, str(action["payload"].get("subject") or "person")))
-                                render_notes += clipper.render_clip(
-                                    src, part,
-                                    float(m["startSec"]), float(m["endSec"]),
-                                    fmt=fmt,
-                                    captions=_segments_in_window(job_id, float(m["startSec"]), float(m["endSec"])) if want_caps else None,
-                                    crop=crop,
+                                part, notes, review = clip_review.render_reviewed(
+                                    _clip_renderer(job_id, src, fmt, want_caps, crop, float(m["startSec"])),
+                                    Path(td), f"part{i}", float(m["startSec"]), float(m["endSec"]),
                                 )
+                                render_notes += notes
+                                reviews.append({"momentId": m["id"], **review})
                                 parts.append(part)
                             out = Path(td) / "reel.mp4"
                             clipper.render_reel(parts, out)
@@ -888,6 +908,7 @@ async def run_publish(job_id: str) -> None:
                         "bytes": len(video_bytes), "format": fmt,
                         **({"notes": render_notes} if render_notes else {}),
                         **({"tracking": tracking} if tracking else {}),
+                        **({"review": reviews} if reviews else {}),
                     })
         except (x_client.XError, content.ImageGenError, ClipRenderError) as exc:
             outcome, detail["error"] = "failed", str(exc)
