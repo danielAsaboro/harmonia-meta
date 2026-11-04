@@ -4,6 +4,12 @@ import { handleChat, type ChatResponse } from "@/lib/chatHandler";
 import { requireReadyAttachments } from "@/lib/chatAttachments";
 import { appendChatRunEvent, createChatRun, type UnsequencedChatStreamEvent } from "@/lib/chatRuns";
 import { loadGeneratedPresentation } from "@/lib/a2ui/generatedPresentation";
+import { summarizeBrief } from "@/lib/brandBrief";
+import { getGoals } from "@/lib/firestore";
+import { watchOnboardingRun } from "@/lib/onboardingRuns";
+import { ONBOARDING_STEP_LABELS, type OnboardingStep } from "@/lib/onboardingSteps";
+
+const ACTIVITY_STATUS = { pending: "pending", running: "active", done: "complete", failed: "failed" } as const satisfies Record<OnboardingStep["status"], string>;
 
 const streamRequestSchema = z.object({
   message: z.string().min(1).max(2_000),
@@ -89,7 +95,26 @@ async function post(req: Request): Promise<Response> {
           for (let offset = 0; offset < payload.reply.length; offset += 512) {
             await emit({ type: "text_delta", delta: payload.reply.slice(offset, offset + 512) });
           }
-          await emit({ type: "run_completed", completedAt: new Date().toISOString(), reply: payload.reply });
+          let reply = payload.reply;
+          if (payload.onboardingRunId) {
+            // Show each onboarding step in the conversation as it lands, then the brief.
+            const shown = new Map<string, string>();
+            let finished: { status: string; error?: string } | null = null;
+            for await (const onboarding of watchOnboardingRun(payload.onboardingRunId)) {
+              for (const step of onboarding.steps) {
+                const key = `${step.status}:${step.detail ?? ""}`;
+                if (shown.get(step.id) === key) continue;
+                shown.set(step.id, key);
+                await emit({ type: "activity", activity: { id: `onboarding-${step.id.replace(/_/g, "-")}`, label: ONBOARDING_STEP_LABELS[step.id], ...(step.detail ? { description: step.detail } : {}), status: ACTIVITY_STATUS[step.status] } });
+              }
+              if (onboarding.status !== "running") finished = onboarding;
+            }
+            const brief = finished?.status === "done" ? (await getGoals()).brandBrief : undefined;
+            const outcome = brief ? summarizeBrief(brief) : `I could not finish the brand brief: ${finished?.error ?? "the run is still going; check the dashboard"}.`;
+            await emit({ type: "text_delta", delta: `\n\n${outcome}`.slice(0, 4_000) });
+            reply = `${reply}\n\n${outcome}`;
+          }
+          await emit({ type: "run_completed", completedAt: new Date().toISOString(), reply });
         } catch (error) {
           const failure = error as Error & { permanent?: boolean };
           try {

@@ -24,9 +24,16 @@ Harmonia is agentic where the problem is ambiguous: Muse Spark specialists, orga
 
 ## Start from a website
 
-Tell Harmonia "here's our website: acme.com" (or `POST /api/onboarding/website`) and it builds a cited brand brief before any content job runs. It reads the homepage plus up to four same-site pages chosen by role (pricing, product, about, customers, blog) through the SSRF-guarded fetcher and the source guard. Muse Spark reads what the site says, quoting page segments verbatim. Two Muse Spark calls with Meta's `web_search` find competitors and customer pain in the customer's own words (Reddit, Hacker News, X, review sites), and an item is kept only if Meta's search returned its source. Muse Wonder then writes ICP segments, a competitor wedge, messaging pillars and voice rules that may cite only that evidence.
+A new workspace opens on one question: your website. Type a domain on the dashboard (or say "here's our website: acme.com" in chat, or `POST /api/onboarding/website`) and Harmonia starts a background onboarding run that returns at once. The dashboard, the Settings "Brand brief" card and the chat reply all show the same live stepper, polled every two seconds from `GET /api/onboarding/website/status`, and each step's result appears as it lands:
 
-The brief becomes the workspace strategy context and a set of memory facts. From then on, company facts and ICPs in every job come from the brief, not from a model's reading of one chat message, and the router only sets that job's campaign fields. A live run on cal.com (`evidence/onboarding/cal.com-2026-11-04.json`) took 71 seconds and about $0.18: 5 pages, 5 competitors, 3 ICP segments with outside pain quotes, 6 unconfirmed research items dropped.
+1. **Reading your website**: the homepage plus up to four same-site pages chosen by role (pricing, product, about, customers, blog), through the SSRF-guarded fetcher and the source guard ("Read 5 pages: home, pricing, product, about, customers").
+2. **Understanding what you sell**: Muse Spark reads what the site says, quoting page segments verbatim.
+3. **Finding your competitors** and 4. **Listening to your customers**: two parallel Muse Spark calls with Meta's `web_search` find competitors and customer pain in the customer's own words (Reddit, Hacker News, X, review sites). An item is kept only if Meta's search returned its source.
+5. **Writing your brand brief**: Muse Wonder writes ICP segments, a competitor wedge, messaging pillars and voice rules that may cite only that evidence.
+
+The agent reports each step to `/api/internal/onboarding/progress`; the run lives in Firestore under the workspace (`onboardingRuns`), and a failed run says which step failed and offers a retry. When it finishes, the dashboard shows the cited brief and hands off to the chat: "Now send a YouTube link, a post or an idea". Operators can correct positioning, customers, pains and voice in Settings; later jobs use the edit.
+
+The brief becomes the workspace strategy context and a set of memory facts. From then on, company facts and ICPs in every job come from the brief, not from a model's reading of one chat message, and the router only sets that job's campaign fields. Nimi ranks moments by the customers' pains, Ryan's briefs target the brief's audience ids, and Noni and Dara write for that customer's pain in the brief's voice. Plain questions and answers about a job, a post or a proposal carry the brief too. A live run on cal.com (`evidence/onboarding/cal.com-2026-11-04.json`) took 71 seconds and about $0.18: 5 pages, 5 competitors, 3 ICP segments with outside pain quotes, 6 unconfirmed research items dropped. Screenshots of the flow are in `evidence/onboarding/screenshots/`.
 
 ## The pipeline
 

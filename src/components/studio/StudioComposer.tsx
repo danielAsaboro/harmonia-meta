@@ -22,6 +22,8 @@ export function StudioComposer({ value, onChange, attachments, onAttachmentsChan
       <div className="flex items-end gap-2 rounded-[14px] border border-[#11110f] bg-white p-1.5 shadow-[3px_3px_0_#11110f]">
         <AttachmentComposer attachments={[]} onChange={onAttachmentsChange} disabled={busy || attachments.length >= 20} />
         <textarea
+          id="studio-composer"
+          aria-label="Message Harmonia"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {

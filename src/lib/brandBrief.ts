@@ -6,6 +6,8 @@ import { getConfig } from "@/lib/config";
 import { strategyContextSchema } from "@/lib/contracts";
 import { getGoals, saveGoals } from "@/lib/firestore";
 import { saveMemoryFacts, type MemoryFact } from "@/lib/memoryFacts";
+import { createOnboardingRun, finishRun, updateOnboardingRun } from "@/lib/onboardingRuns";
+import type { OnboardingRun } from "@/lib/onboardingSteps";
 import { currentTenant } from "@/lib/tenancy";
 import type { StrategyContext } from "@/lib/types";
 
@@ -43,7 +45,7 @@ export interface StoredBrandBrief extends Omit<OnboardingResult, "strategyContex
   editedAt?: string;
 }
 
-export async function requestWebsiteOnboarding(url: string, channels: string[] = ["x", "linkedin"], options: { fetchImpl?: typeof fetch } = {}): Promise<OnboardingResult> {
+export async function requestWebsiteOnboarding(url: string, channels: string[] = ["x", "linkedin"], options: { fetchImpl?: typeof fetch; runId?: string } = {}): Promise<OnboardingResult> {
   const config = getConfig();
   const tenant = currentTenant();
   const baseUrl = new URL(config.AGENT_SERVICE_URL).toString().replace(/\/$/, "");
@@ -53,7 +55,7 @@ export async function requestWebsiteOnboarding(url: string, channels: string[] =
     const response = await authorizedAgentFetch(`${baseUrl}/internal/agent/onboard-website`, {
       method: "POST", signal: controller.signal,
       headers: { "content-type": "application/json", "x-harmonia-internal-token": config.INTERNAL_API_TOKEN, "x-workspace-id": tenant.workspaceId, "x-brand-id": tenant.brandId },
-      body: JSON.stringify({ url, channels }),
+      body: JSON.stringify({ url, channels, ...(options.runId ? { runId: options.runId } : {}) }),
     }, options.fetchImpl);
     const body = await response.json().catch(() => null);
     if (!response.ok) {
@@ -95,6 +97,26 @@ export async function saveBrandBrief(result: OnboardingResult): Promise<StoredBr
   await saveGoals({ ...goals, strategyContext, brandBrief: stored });
   await saveMemoryFacts(tenant.brandId, briefMemoryFacts(result, digest, tenant));
   return stored;
+}
+
+/**
+ * Start onboarding in the background and return the run at once. The agent reports each
+ * step to /api/internal/onboarding/progress; the dashboard polls the run.
+ */
+export async function startWebsiteOnboarding(url: string, options: { fetchImpl?: typeof fetch } = {}): Promise<OnboardingRun> {
+  const run = await createOnboardingRun(url);
+  void completeWebsiteOnboarding(run.id, url, options);
+  return run;
+}
+
+async function completeWebsiteOnboarding(runId: string, url: string, options: { fetchImpl?: typeof fetch }): Promise<void> {
+  try {
+    const brief = await saveBrandBrief(await requestWebsiteOnboarding(url, undefined, { ...options, runId }));
+    await updateOnboardingRun(runId, (run) => finishRun(run, { briefDigest: brief.digest }));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await updateOnboardingRun(runId, (run) => finishRun(run, { error: message })).catch(() => null);
+  }
 }
 
 export const briefEditSchema = z.object({

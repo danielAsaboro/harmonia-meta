@@ -21,7 +21,8 @@ import { actionPayloadDigest } from "@/lib/idempotency";
 import { createPendingOperation, type PendingOperation } from "@/lib/pendingOperations";
 import { hasRightsAttestation, RIGHTS_ATTESTATION_PHRASE, sourceRightsAuthorization, sourceRightsAuthorizationId } from "@/lib/sourceRights";
 import { createSourceJob } from "@/lib/sourceManifest";
-import { requestWebsiteOnboarding, saveBrandBrief, summarizeBrief, websiteOnboardingTarget, withBrandContext } from "@/lib/brandBrief";
+import { startWebsiteOnboarding, websiteOnboardingTarget, withBrandContext } from "@/lib/brandBrief";
+import { brandBriefContext } from "@/lib/brandBriefContext";
 import { requireContentOperator } from "@/lib/authority";
 import { latestHealthySnapshot, listLibraryConnections } from "@/lib/brandLibraries/repository";
 import { outputKindSchema } from "@/lib/contracts";
@@ -85,6 +86,8 @@ export interface ChatResponse {
   jobId?: string;
   /** Durable stream run linked to a persisted assistant message. */
   chatRunId?: string;
+  /** Background website onboarding run the reply reports on. */
+  onboardingRunId?: string;
 }
 
 type FullJob = Awaited<ReturnType<typeof getJob>>;
@@ -281,7 +284,7 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
     }
     let reply: string;
     try {
-      reply = await answerFromContext(message, record);
+      reply = await answerFromContext(message, record, brandBriefContext((await getGoals()).brandBrief));
     } catch (e) {
       return { payload: {
         intent: "context_qa",
@@ -304,8 +307,8 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
       return { payload: { intent: "website_onboarding", reply: "Only a signed-in content operator can set the brand brief." } satisfies ChatResponse };
     }
     try {
-      const brief = await saveBrandBrief(await requestWebsiteOnboarding(website));
-      return { payload: { intent: "website_onboarding", reply: summarizeBrief(brief) } satisfies ChatResponse };
+      const run = await startWebsiteOnboarding(website);
+      return { payload: { intent: "website_onboarding", reply: `Reading ${website} now. I'll show each step here and on the dashboard, then the brand brief every job starts from.`, onboardingRunId: run.id } satisfies ChatResponse };
     } catch (e) {
       return { payload: { intent: "website_onboarding", reply: `I could not build the brand brief from ${website}: ${e instanceof Error ? e.message : String(e)}` } satisfies ChatResponse };
     }
@@ -510,7 +513,7 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
     default: {
       {
         try {
-          const result = await requestAgentAnswer(message);
+          const result = await requestAgentAnswer(message, { brandContext: brandBriefContext((await getGoals()).brandBrief) });
           const askJobId = result.operationId;
           for (const item of result.activity) {
             await appendEvent(askJobId, "learn", item.publicMessage, "agent", {

@@ -155,7 +155,18 @@ def test_onboard_website_runs_read_research_synthesize_with_meta_models(monkeypa
         return value, WebSearchProvenance(responseId=f"resp-{len(calls)}", model=model_id, searchCalls=0, results=[], citations=[], inputTokens=1, outputTokens=1)
 
     monkeypatch.setattr(onboarding, "_structured", structured)
-    result = asyncio.run(onboarding.onboard_website("acme.test"))
+    reports = []
+
+    async def progress(step, status, detail):
+        reports.append((step, status, detail))
+
+    result = asyncio.run(onboarding.onboard_website("acme.test", progress=progress))
+    done = {step: detail for step, status, detail in reports if status == "done"}
+    assert set(done) == {"fetching_site", "reading_site", "researching_competitors", "researching_customers", "writing_brief"}
+    assert all(any(r == (step, "running", None) for r in reports) for step in done)
+    assert done["fetching_site"].startswith("Read ")
+    assert "competitor" in done["researching_competitors"]
+    assert "unconfirmed research items dropped" in done["writing_brief"]
     assert calls == [
         ("muse-spark-1.3", "SiteReading", False), ("muse-spark-1.3", "CompetitorResearch", True),
         ("muse-spark-1.3", "PainResearch", True), ("muse-wonder-1.0", "BrandBriefDraft", False),
@@ -182,7 +193,7 @@ def test_onboarding_endpoint_requires_internal_auth_and_tenant():
 
 
 def test_onboarding_endpoint_maps_failures_to_retryable_dependency_error(monkeypatch):
-    async def fail(url, *, channels):
+    async def fail(url, *, channels, progress):
         raise onboarding.OnboardingError("could not read the website: ConnectError")
 
     monkeypatch.setattr(onboarding_api, "onboard_website", fail)
@@ -219,3 +230,32 @@ def test_noni_and_dara_receive_the_briefs_target_customer_voice_and_a_pain_const
     assert extra["brandVoice"] == ["Numbers first"]
     assert constraints == ["Write for Agency owners: speak to one of their pains (Reporting eats a day; Clients ignore dashboards)"]
     assert brand_writing_context(_job_with_brief(), "unknown")[1] == []
+
+
+def test_onboarding_endpoint_reports_progress_to_the_run(monkeypatch):
+    posted = []
+
+    async def onboard(url, *, channels, progress):
+        await progress("fetching_site", "running", None)
+        await progress("fetching_site", "done", "Read 2 pages: home, pricing")
+        return {"ok": True}
+
+    monkeypatch.setattr(onboarding_api, "onboard_website", onboard)
+    monkeypatch.setattr(onboarding_api, "web_post", lambda path, payload: posted.append((path, payload)) or {})
+    response = _app().post("/internal/agent/onboard-website", json={"url": "acme.test", "runId": "run-1"}, headers={
+        "x-harmonia-internal-token": "test-token-not-a-secret", "x-workspace-id": "w1", "x-brand-id": "b1"})
+    assert response.status_code == 200
+    assert posted == [
+        ("/api/internal/onboarding/progress", {"runId": "run-1", "step": "fetching_site", "status": "running"}),
+        ("/api/internal/onboarding/progress", {"runId": "run-1", "step": "fetching_site", "status": "done", "detail": "Read 2 pages: home, pricing"}),
+    ]
+
+
+def test_onboarding_progress_failures_never_fail_onboarding(monkeypatch):
+    def broken(path, payload):
+        raise RuntimeError("web down")
+
+    monkeypatch.setattr(onboarding_api, "web_post", broken)
+    report = onboarding_api.progress_reporter("run-1")
+    asyncio.run(report("fetching_site", "running", None))
+    assert onboarding_api.progress_reporter(None) is None

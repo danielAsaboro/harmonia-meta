@@ -9,6 +9,8 @@ import { ConversationPane } from "@/components/studio/ConversationPane";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { WorkingCanvas } from "@/components/studio/WorkingCanvas";
 import { useHarmoniaChat } from "@/hooks/useHarmoniaChat";
+import { useWebsiteOnboarding } from "@/hooks/useWebsiteOnboarding";
+import { WelcomeOnboarding } from "@/components/onboarding/WelcomeOnboarding";
 import type { ChatRunState } from "@/lib/a2ui/chatReducer";
 import { historyRunState } from "@/lib/a2ui/historyReplay";
 import { latestSurfaceOperations } from "@/lib/a2ui/surfaceSlots";
@@ -107,6 +109,8 @@ export default function ChatConsole({ conversationId }: { conversationId?: strin
   const submittedConversationId = useRef<string | null>(conversationId ?? null);
   const detailRequest = useRef<AbortController | null>(null);
   const chat = useHarmoniaChat();
+  const onboarding = useWebsiteOnboarding();
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -282,6 +286,13 @@ export default function ChatConsole({ conversationId }: { conversationId?: strin
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{[...sessions].reverse().map((session) => { const current = activeConversationId === session.conversationId; return <button key={session.id} type="button" onClick={() => { setActiveConversationId(session.conversationId); submittedConversationId.current = session.conversationId; router.push(conversationPath(session.conversationId)); setHistoryOpen(false); }} className={`mb-2 w-full rounded-[16px] border p-3 text-left transition ${current ? "border-[#11110f] bg-[#d9ff43]" : "border-black/10 bg-white/65 hover:bg-white"}`}><div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.1em] text-[#68645d]"><span>{dayLabel(session.day)}</span><span className="ml-auto">{session.messages.length} turns</span></div><p className="mt-2 line-clamp-2 text-sm font-bold leading-snug">{sessionPreview(session) || "Untitled conversation"}</p><p className="mt-1 text-[10px] text-[#77736b]">{session.surface === "telegram" ? "Telegram" : "Studio"}</p></button>; })}</div>
     </aside>
   </> : null;
+
+  if (onboarding.loaded && !onboarding.hadBriefAtLoad && !welcomeDismissed) {
+    return <WelcomeOnboarding run={onboarding.run} brief={onboarding.brief} error={onboarding.error} onStart={onboarding.start} onContinue={() => {
+      setWelcomeDismissed(true);
+      window.requestAnimationFrame(() => document.getElementById("studio-composer")?.focus());
+    }} />;
+  }
 
   return <StudioConsoleView messages={visibleMessages} loaded={loaded} detail={detail} detailLoading={detailLoading} detailError={detailError} liveRun={chat.run?.status === "running" ? chat.run : null} input={input} onInputChange={setInput} attachments={attachments} onAttachmentsChange={setAttachments} busy={busy} onSend={send} onOpenJob={openJob} selectedArtifactId={selectedArtifactId} onSelectedArtifactChange={setSelectedArtifactId} mobilePane={mobilePane} onMobilePaneChange={setMobilePane} onDecide={decide} onOperationDecision={decideOperation} onRetryJob={detail?.job.failure ? retryJob : undefined} historyAccessory={historyAccessory} historyDrawer={historyDrawer} />;
 }

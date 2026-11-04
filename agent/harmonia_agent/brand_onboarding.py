@@ -22,7 +22,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from typing import Any, Literal
+from typing import Any, Awaitable, Callable, Literal
 from urllib.parse import urldefrag, urljoin, urlparse
 
 import httpx
@@ -451,23 +451,66 @@ def _call(step: str, provenance: WebSearchProvenance) -> ModelCall:
                      searchCalls=provenance.searchCalls)
 
 
-async def onboard_website(url: str, *, channels: list[str] | None = None) -> dict[str, Any]:
+Progress = Callable[[str, str, str | None], Awaitable[None]]
+
+
+async def _no_progress(_step: str, _status: str, _detail: str | None) -> None:
+    return None
+
+
+def _plural(count: int, word: str) -> str:
+    return f"{count} {word}{'' if count == 1 else 's'}"
+
+
+async def onboard_website(url: str, *, channels: list[str] | None = None, progress: Progress | None = None) -> dict[str, Any]:
     channels = channels or ["x", "linkedin"]
-    pages = await asyncio.to_thread(crawl_site, url)
-    pages, screen = await asyncio.to_thread(screen_pages, pages)
-    if not pages:
-        raise OnboardingError("every page segment was quarantined by the source guard")
+    report = progress or _no_progress
+
+    async def step(name: str, work: Callable[[], Awaitable[Any]], detail: Callable[[Any], str]) -> Any:
+        await report(name, "running", None)
+        try:
+            result = await work()
+        except Exception:
+            await report(name, "failed", None)
+            raise
+        await report(name, "done", detail(result)[:240])
+        return result
+
+    async def fetch() -> tuple[list[CrawledPage], dict[str, Any]]:
+        pages = await asyncio.to_thread(crawl_site, url)
+        pages, screen = await asyncio.to_thread(screen_pages, pages)
+        if not pages:
+            raise OnboardingError("every page segment was quarantined by the source guard")
+        return pages, screen
+
+    pages, screen = await step("fetching_site", fetch, lambda result: (
+        f"Read {_plural(len(result[0]), 'page')}: " + ", ".join(dict.fromkeys(page.role for page in result[0]))))
     site_host = _site_key(urlparse(pages[0].url).hostname or "")
     corpus = [{"pageId": p.pageId, "role": p.role, "url": p.url, "title": p.title,
                "segments": [{"id": s["id"], "text": s["text"]} for s in p.segments]} for p in pages]
-    reading, read_call = await _structured(DEFAULT_META_MODEL, _READ_INSTRUCTIONS, json.dumps({"pages": corpus}), SiteReading)
-    reading, site_evidence = _site_evidence(reading, pages)
+
+    async def read() -> tuple[SiteReading, Any, dict[str, dict[str, str]]]:
+        reading, read_call = await _structured(DEFAULT_META_MODEL, _READ_INSTRUCTIONS, json.dumps({"pages": corpus}), SiteReading)
+        reading, site_evidence = _site_evidence(reading, pages)
+        return reading, read_call, site_evidence
+
+    reading, read_call, site_evidence = await step("reading_site", read, lambda result: (
+        f"{result[0].company}: {result[0].positioning}"))
 
     profile = reading.model_dump(include={"company", "product", "category", "positioning", "differentiators", "statedCustomers"})
     request = json.dumps({"companyProfile": profile, "website": pages[0].url})
+
+    async def competitors() -> tuple[CompetitorResearch, Any]:
+        return await _structured(DEFAULT_META_MODEL, _COMPETITOR_INSTRUCTIONS, request, CompetitorResearch, search=True)
+
+    async def customers() -> tuple[PainResearch, Any]:
+        return await _structured(DEFAULT_META_MODEL, _PAIN_INSTRUCTIONS, request, PainResearch, search=True)
+
     (rivals, rivals_call), (pains, pains_call) = await asyncio.gather(
-        _structured(DEFAULT_META_MODEL, _COMPETITOR_INSTRUCTIONS, request, CompetitorResearch, search=True),
-        _structured(DEFAULT_META_MODEL, _PAIN_INSTRUCTIONS, request, PainResearch, search=True),
+        step("researching_competitors", competitors, lambda result: (
+            f"Found {_plural(len(result[0].competitors), 'competitor')}" + (f": {', '.join(c.name for c in result[0].competitors[:4])}" if result[0].competitors else ""))),
+        step("researching_customers", customers, lambda result: (
+            f"Found {_plural(len(result[0].painSignals), 'customer pain quote')} on public forums and review sites")),
     )
     rival_kept, rival_evidence, rival_dropped = _web_evidence(
         MarketResearch(competitors=rivals.competitors, painSignals=[], trends=rivals.trends), rivals_call, site_host)
@@ -483,7 +526,12 @@ async def onboard_website(url: str, *, channels: list[str] | None = None) -> dic
         "research": research.model_dump(),
         "evidence": [{"id": key, **value} for key, value in evidence.items()],
     }
-    brief, synth_call = await _structured(STRATEGIST_META_MODEL, _SYNTH_INSTRUCTIONS, json.dumps(synth_input), BrandBriefDraft, effort="medium")
+    async def write() -> tuple[BrandBriefDraft, Any]:
+        return await _structured(STRATEGIST_META_MODEL, _SYNTH_INSTRUCTIONS, json.dumps(synth_input), BrandBriefDraft, effort="medium")
+
+    brief, synth_call = await step("writing_brief", write, lambda result: (
+        f"{_plural(len(result[0].audiences), 'customer group')}, {_plural(len(result[0].pillars), 'content pillar')}"
+        + (f"; {_plural(dropped, 'unconfirmed research item')} dropped" if dropped else "")))
     known = set(evidence)
 
     def refs(ids: list[str]) -> list[str]:
