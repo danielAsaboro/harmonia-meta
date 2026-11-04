@@ -1,0 +1,16 @@
+{
+  "proof": "harmonia-agent-token-authority",
+  "ranAt": "2026-11-04T15:57:53Z",
+  "allowed": [
+    {"method":"GET","route":"/api/jobs","status":200},
+    {"method":"GET","route":"/api/jobs/<job>","status":200},
+    {"method":"POST","route":"/api/a2a","status":200}
+  ],
+  "refused": [
+    {"method":"POST","route":"/api/jobs/<job>/strategy/decision","status":403},
+    {"method":"POST","route":"/api/jobs/<job>/actions/any/decision","status":403},
+    {"method":"POST","route":"/api/proposals/decide","status":403},
+    {"method":"POST","route":"/api/jobs/<job>/retry","status":403},
+    {"method":"POST","route":"/api/settings/agent-tokens","status":403}
+  ]
+}

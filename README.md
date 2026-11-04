@@ -6,7 +6,7 @@ The dashboard and authenticated web chat are active operator surfaces. Telegramâ
 
 The repository also implements governed resident autonomy: an hourly Heartbeat, post-outcome Micro-reflections, a budget-gated nightly Dream Cycle, a morning Wakeup Call with durable agendas, bounded experiments, conservative tuning, and rollback. Its schedules are disabled by default, not deployed, and not authenticated evidence. See [`docs/resident-autonomy.mdx`](./docs/resident-autonomy.mdx).
 
-> **Evidence status:** every model call goes to Meta Model API. Authenticated Meta runs have not been captured yet.
+> **Evidence status:** every model call goes to Meta Model API. Six live end-to-end runs (four from pasted text, two from video, three of them concurrent) are recorded in `evidence/replays/` and shown on `/proof`. They ran against local Firestore and Pub/Sub emulators; a hosted deployment has not been captured yet.
 
 To prove the calls with a key set, run one live request to every model Harmonia uses (Muse Spark, Muse Wonder, Muse Voice Transcribe, SAM 3.1, token counting, `/status`, plus Muse Spark Open when `BASETEN_API_KEY` is set). The report keeps only model ids, request ids, latency and usage:
 
