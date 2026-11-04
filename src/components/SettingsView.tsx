@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { Surface } from "@/components/dashboard/Surface";
 import { AlertBanner, ErrorState, LoadingState } from "@/components/dashboard/SystemState";
 import { BrandLibrariesSettings } from "@/components/settings/BrandLibrariesSettings";
+import { BrandBriefSettings } from "@/components/settings/BrandBriefSettings";
 
 interface HealthInfo {
   ok: boolean;
@@ -418,6 +419,7 @@ export default function SettingsView() {
 
   return (
     <div className="settings-grid">
+      <BrandBriefSettings />
       <GoalsSection />
       <ConnectionsSection />
       <BrandLibrariesSettings />

@@ -26,6 +26,7 @@ from .linkedin_client import LinkedInClient
 from .agent_models import (
     SourceAnalysis,
     AnalystInput,
+    AnalystMemoryFact,
     AnalystPerformanceObservation,
     CampaignContext,
     CompanyContext,
@@ -457,7 +458,7 @@ async def run_understand(job_id: str) -> None:
         operatorInstructions=[str(item.get("instruction"))[:300] for item in (job.get("steeringInstructions") or []) if item.get("instruction")],
         sourceSegments=source_segments,
         performanceObservations=performance,
-        memoryFacts=[],
+        memoryFacts=brand_audience_facts(job),
         researchRequest=(job.get("config") or {}).get("analysisResearchRequest"),
     )
     run_result = await analyze_with_team(analyst_input, invocation=invocation)
@@ -486,6 +487,47 @@ async def run_understand(job_id: str) -> None:
         "searchProvenance": run_result.searchProvenance,
         "sourceScreen": screen.summary(),
     })
+
+
+def _brand_audiences(job: dict[str, Any]) -> list[dict[str, Any]]:
+    context = (job.get("config") or {}).get("strategyContext") or {}
+    return [item for item in (context.get("audiences") or []) if isinstance(item, dict) and item.get("id") and item.get("pains")]
+
+
+def brand_audience_facts(job: dict[str, Any]) -> list[AnalystMemoryFact]:
+    """Give Nimi the brand brief's target customers so it ranks moments by the pain they answer."""
+    facts = []
+    for audience in _brand_audiences(job)[:3]:
+        pains = "; ".join(str(pain) for pain in audience["pains"][:4])
+        facts.append(AnalystMemoryFact(
+            id=f"memory:brief:{str(audience['id'])[:80]}", kind="learning",
+            content=(
+                f"Brand brief target customer \"{audience.get('name') or audience['id']}\" (audience id {audience['id']}) "
+                f"pains: {pains}. Prefer moments and angles that answer one of these pains, and name the "
+                "audience id and the pain in the rationale."
+            )[:1000],
+            firestoreEvidenceRef=f"config/operator/goals/strategyContext/audiences/{audience['id']}"[:500],
+        ))
+    return facts
+
+
+def brand_writing_context(job: dict[str, Any], audience_id: str | None) -> tuple[dict[str, Any], list[str]]:
+    """The brief's positioning, voice and the brief's target customer, for Noni and Dara."""
+    context = (job.get("config") or {}).get("strategyContext") or {}
+    audience = next((item for item in _brand_audiences(job) if item["id"] == audience_id), None)
+    extra: dict[str, Any] = {
+        "positioning": context.get("positioning"),
+        "brandVoice": context.get("brandVoice") or [],
+        "exclusions": context.get("exclusions") or [],
+    }
+    constraints: list[str] = []
+    if audience:
+        extra["targetCustomer"] = {"id": audience["id"], "name": audience.get("name"), "pains": audience["pains"][:4]}
+        constraints.append(
+            f"Write for {audience.get('name') or audience['id']}: speak to one of their pains "
+            f"({'; '.join(str(pain) for pain in audience['pains'][:3])})"[:300]
+        )
+    return extra, constraints
 
 
 def _strategy_input(job: dict[str, Any], insights: dict[str, Any]) -> StrategistInput:
@@ -683,13 +725,14 @@ async def run_draft(job_id: str) -> None:
         required_refs = list(dict.fromkeys(ref for item in requested for ref in (item.get("evidenceRefs") or [])))
         missing = [ref for ref in required_refs if ref not in evidence_by_id]
         if missing: raise AgentProtocolError(f"artifact output plan references unknown normalized evidence: {missing}")
+        brand_extra, brand_constraints = brand_writing_context(job, brief.get("audienceId"))
         production_input = ArtifactProductionInput.model_validate({
             "operatorBrief": (job.get("config") or {}).get("operatorBrief"),
             "outputPlanId": output_plan["id"], "outputPlanDigest": output_plan["digest"],
             "requests": [{"id": item["id"], "outputType": item["outputType"], "evidenceRefs": item["evidenceRefs"]} for item in requested],
             "evidence": [{"id": ref, "text": evidence_by_id[ref]} for ref in required_refs],
-            "brandContext": json.dumps({"strategicThesis": strategy.get("thesis"), "differentiatedNarrative": strategy.get("differentiatedNarrative"), "brandSafety": strategy.get("brandSafety") or []}, sort_keys=True)[:4000],
-            "constraints": [*selected.constraints, *strategy.get("brandSafety", []), *[str(item.get("instruction"))[:300] for item in (job.get("steeringInstructions") or []) if item.get("instruction")]],
+            "brandContext": json.dumps({"strategicThesis": strategy.get("thesis"), "differentiatedNarrative": strategy.get("differentiatedNarrative"), "brandSafety": strategy.get("brandSafety") or [], **brand_extra}, sort_keys=True)[:4000],
+            "constraints": [*brand_constraints, *selected.constraints, *strategy.get("brandSafety", []), *[str(item.get("instruction"))[:300] for item in (job.get("steeringInstructions") or []) if item.get("instruction")]][:30],
             "passType": "original", "priorBatch": None, "priorReview": None,
         })
         claim = web_post("/api/internal/content-artifacts/claim", {

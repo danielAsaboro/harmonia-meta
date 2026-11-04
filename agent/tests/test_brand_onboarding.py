@@ -190,3 +190,32 @@ def test_onboarding_endpoint_maps_failures_to_retryable_dependency_error(monkeyp
         "x-harmonia-internal-token": "test-token-not-a-secret", "x-workspace-id": "w1", "x-brand-id": "b1"})
     assert response.status_code == 502
     assert response.json()["detail"]["code"] == "website_onboarding_failed"
+
+
+def _job_with_brief():
+    return {"config": {"strategyContext": {
+        "positioning": "Five-minute client reports", "brandVoice": ["Numbers first"], "exclusions": ["No competitor bashing"],
+        "audiences": [
+            {"id": "agency-owners", "name": "Agency owners", "pains": ["Reporting eats a day", "Clients ignore dashboards"]},
+            {"id": "freelancers", "name": "Freelancers", "pains": ["No time to build decks"]},
+        ],
+    }}}
+
+
+def test_nimi_receives_brief_customers_as_eligible_memory_facts():
+    from harmonia_agent.stages import brand_audience_facts
+
+    facts = brand_audience_facts(_job_with_brief())
+    assert [fact.id for fact in facts] == ["memory:brief:agency-owners", "memory:brief:freelancers"]
+    assert "Reporting eats a day; Clients ignore dashboards" in facts[0].content
+    assert brand_audience_facts({"config": {}}) == []
+
+
+def test_noni_and_dara_receive_the_briefs_target_customer_voice_and_a_pain_constraint():
+    from harmonia_agent.stages import brand_writing_context
+
+    extra, constraints = brand_writing_context(_job_with_brief(), "agency-owners")
+    assert extra["targetCustomer"] == {"id": "agency-owners", "name": "Agency owners", "pains": ["Reporting eats a day", "Clients ignore dashboards"]}
+    assert extra["brandVoice"] == ["Numbers first"]
+    assert constraints == ["Write for Agency owners: speak to one of their pains (Reporting eats a day; Clients ignore dashboards)"]
+    assert brand_writing_context(_job_with_brief(), "unknown")[1] == []

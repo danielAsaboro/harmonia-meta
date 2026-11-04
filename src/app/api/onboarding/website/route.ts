@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { operatorTenantHandler } from "@/lib/auth";
 import { requireContentOperator } from "@/lib/authority";
-import { requestWebsiteOnboarding, saveBrandBrief } from "@/lib/brandBrief";
+import { briefEditSchema, requestWebsiteOnboarding, saveBrandBrief, updateBrandBrief } from "@/lib/brandBrief";
 import { getGoals } from "@/lib/firestore";
 import { currentTenant } from "@/lib/tenancy";
 
@@ -25,5 +25,18 @@ async function post(req: Request) {
   }
 }
 
+// An operator corrects the brief (positioning, voice, customers and pains); later jobs use the edit.
+async function patch(req: Request) {
+  requireContentOperator(currentTenant());
+  const parsed = briefEditSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return Response.json({ error: "invalid brief edit", detail: parsed.error.flatten() }, { status: 400 });
+  try {
+    return Response.json({ brandBrief: await updateBrandBrief(parsed.data) });
+  } catch (error) {
+    return Response.json({ error: error instanceof Error ? error.message : String(error) }, { status: 409 });
+  }
+}
+
 export const GET = operatorTenantHandler(get);
+export const PATCH = operatorTenantHandler(patch);
 export const POST = operatorTenantHandler(post);

@@ -40,6 +40,7 @@ export type OnboardingResult = z.infer<typeof onboardingResultSchema>;
 export interface StoredBrandBrief extends Omit<OnboardingResult, "strategyContext"> {
   digest: string;
   createdAt: string;
+  editedAt?: string;
 }
 
 export async function requestWebsiteOnboarding(url: string, channels: string[] = ["x", "linkedin"], options: { fetchImpl?: typeof fetch } = {}): Promise<OnboardingResult> {
@@ -66,7 +67,7 @@ export async function requestWebsiteOnboarding(url: string, channels: string[] =
 }
 
 /** One memory fact per pain, competitor, and pillar, each traced to the brief version. */
-export function briefMemoryFacts(result: OnboardingResult, digest: string, tenant: { workspaceId: string; brandId: string }): MemoryFact[] {
+export function briefMemoryFacts(result: Omit<OnboardingResult, "strategyContext">, digest: string, tenant: { workspaceId: string; brandId: string }): MemoryFact[] {
   const cite = (ids: string[]) => {
     const urls = [...new Set(ids.map((id) => result.evidence.find((item) => item.id === id)?.url).filter((url): url is string => Boolean(url)))].slice(0, 2);
     return urls.length ? ` (sources: ${urls.join(", ")})` : "";
@@ -94,6 +95,48 @@ export async function saveBrandBrief(result: OnboardingResult): Promise<StoredBr
   await saveGoals({ ...goals, strategyContext, brandBrief: stored });
   await saveMemoryFacts(tenant.brandId, briefMemoryFacts(result, digest, tenant));
   return stored;
+}
+
+export const briefEditSchema = z.object({
+  positioning: z.string().trim().min(1).max(500).optional(),
+  voiceRules: z.array(z.string().trim().min(1).max(120)).min(1).max(8).optional(),
+  exclusions: z.array(z.string().trim().min(1).max(300)).max(12).optional(),
+  audiences: z.array(z.object({ id: z.string().min(1).max(100), name: z.string().trim().min(1).max(200), pains: z.array(z.string().trim().min(1).max(300)).min(1).max(8) }).strict()).min(1).max(6).optional(),
+}).strict();
+export type BriefEdit = z.infer<typeof briefEditSchema>;
+
+/** Apply an operator's edits to the brief and to the strategy context every job starts from. */
+export function applyBriefEdit(stored: StoredBrandBrief, context: StrategyContext, edit: BriefEdit): { brief: StoredBrandBrief; context: StrategyContext } {
+  const known = new Map(stored.brief.audiences.map((audience) => [audience.id, audience]));
+  const audiences = edit.audiences?.map((audience) => ({ ...(known.get(audience.id) ?? { jobsToBeDone: [], objections: [], evidenceIds: [] }), ...audience }));
+  const brief = {
+    ...stored.brief,
+    ...(edit.positioning ? { positioning: edit.positioning } : {}),
+    ...(edit.voiceRules ? { voiceRules: edit.voiceRules } : {}),
+    ...(edit.exclusions ? { exclusions: edit.exclusions } : {}),
+    ...(audiences ? { audiences } : {}),
+  };
+  const digest = createHash("sha256").update(JSON.stringify(brief)).digest("hex");
+  return {
+    brief: { ...stored, brief, digest, editedAt: new Date().toISOString() },
+    context: {
+      ...context,
+      positioning: brief.positioning,
+      brandVoice: brief.voiceRules.slice(0, 8),
+      exclusions: brief.exclusions.slice(0, 12),
+      audiences: brief.audiences.map(({ id, name, pains }) => ({ id, name, pains })),
+    },
+  };
+}
+
+export async function updateBrandBrief(edit: BriefEdit): Promise<StoredBrandBrief> {
+  const goals = await getGoals();
+  if (!goals.brandBrief || !goals.strategyContext) throw new Error("no brand brief to edit yet");
+  const { brief, context } = applyBriefEdit(goals.brandBrief, goals.strategyContext, edit);
+  await saveGoals({ ...goals, strategyContext: context, brandBrief: brief });
+  const tenant = currentTenant();
+  await saveMemoryFacts(tenant.brandId, briefMemoryFacts(brief, brief.digest, tenant));
+  return brief;
 }
 
 const BRAND_KEYS = ["company", "product", "positioning", "differentiators", "brandVoice", "exclusions", "safetyConstraints", "audiences"] as const;
@@ -136,6 +179,6 @@ export function summarizeBrief(brief: StoredBrandBrief): string {
     ...(b.competitors.length ? [`Competitors: ${b.competitors.map((competitor) => `${competitor.name} (${competitor.howWeDiffer})`).join("; ")}.`] : []),
     `Pillars: ${b.pillars.map((pillar) => pillar.name).join(", ")}.`,
     `Voice: ${b.voiceRules.slice(0, 3).join("; ")}.`,
-    "Send me a YouTube link, a post, or any text and I will write it for these customers. Tell me if anything here is wrong and I will correct it.",
+    "Send me a YouTube link, a post, or any text and I will write it for these customers. You can correct anything here in Settings, under Brand brief.",
   ].join("\n\n");
 }

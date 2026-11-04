@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { briefMemoryFacts, onboardingResultSchema, websiteOnboardingTarget, withBrandContext } from "@/lib/brandBrief";
+import { applyBriefEdit, briefMemoryFacts, onboardingResultSchema, websiteOnboardingTarget, withBrandContext, type StoredBrandBrief } from "@/lib/brandBrief";
 import type { StrategyContext } from "@/lib/types";
 
 const saved: StrategyContext = {
@@ -57,5 +57,29 @@ describe("website onboarding", () => {
     ]);
     expect(facts.every((fact) => fact.kind === "learning" && fact.evidence_ref.job_id === "onboarding")).toBe(true);
     expect(facts[1].evidence_ref.record_id).toBe(`brief:${"a".repeat(24)}:2`);
+  });
+
+  it("applies an operator's edit to the brief and the strategy context jobs start from", () => {
+    const stored = {
+      website: "https://acme.test/", digest: "d".repeat(64), createdAt: "2026-11-04T00:00:00.000Z",
+      brief: {
+        company: "Acme", product: "Reporting", category: "Reporting", positioning: "Old", differentiators: ["Slides"],
+        audiences: [{ id: "agency-owners", name: "Agency owners", pains: ["Reporting eats a day"], jobsToBeDone: ["Ship reports"], objections: [], evidenceIds: ["web:1"] }],
+        competitors: [], pillars: [], voiceRules: ["Numbers first"], exclusions: [], businessObjectives: ["Trials"], campaignObjectives: ["Time saved"],
+        funnelStage: "awareness", intendedConversion: "Trial",
+      },
+      evidence: [], pages: [], unverifiedResearchDropped: 0, modelCalls: [],
+    } satisfies StoredBrandBrief;
+    const { brief, context } = applyBriefEdit(stored, saved, {
+      positioning: "Client reports in five minutes", voiceRules: ["Plain", "Specific"],
+      audiences: [{ id: "agency-owners", name: "Agency founders", pains: ["Clients ignore dashboards"] }],
+    });
+    expect(brief.brief.audiences[0]).toMatchObject({ name: "Agency founders", pains: ["Clients ignore dashboards"], evidenceIds: ["web:1"], jobsToBeDone: ["Ship reports"] });
+    expect(brief.digest).not.toBe(stored.digest);
+    expect(brief.editedAt).toBeDefined();
+    expect(context.positioning).toBe("Client reports in five minutes");
+    expect(context.brandVoice).toEqual(["Plain", "Specific"]);
+    expect(context.audiences).toEqual([{ id: "agency-owners", name: "Agency founders", pains: ["Clients ignore dashboards"] }]);
+    expect(context.campaignObjectives).toEqual(saved.campaignObjectives);
   });
 });
