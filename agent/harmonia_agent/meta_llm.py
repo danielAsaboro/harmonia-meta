@@ -28,9 +28,15 @@ class MetaLlm(LiteLlm):
 
     provider: Provider = "meta"
 
-    def __init__(self, *, model_id: str, provider: Provider, reasoning_effort: str, **kwargs: Any) -> None:
+    def __init__(
+        self, *, model_id: str, provider: Provider, reasoning_effort: str, cache_key: str | None = None, **kwargs: Any,
+    ) -> None:
         if provider not in PROVIDER_ENDPOINTS:
             raise ValueError(f"unknown model provider: {provider}")
+        if cache_key and provider == "meta":
+            # docs/meta/prompt-caching.md: a stable key routes a role's calls,
+            # which share one long instruction prefix, to backends that hold it.
+            kwargs["extra_body"] = {**kwargs.get("extra_body", {}), "prompt_cache_key": cache_key}
         super().__init__(
             model=f"openai/{model_id}",
             provider=provider,

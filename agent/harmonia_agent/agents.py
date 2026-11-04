@@ -364,6 +364,7 @@ def _located_model(config: RoleModelConfig) -> BaseLlm:
         model_id=config.model_id,
         provider=config.provider,
         reasoning_effort=config.generation.reasoning_effort,
+        cache_key=f"harmonia-{config.role}",
     )
 
 
