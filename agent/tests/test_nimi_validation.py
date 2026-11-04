@@ -175,3 +175,23 @@ def test_rejects_non_ascii_semantic_bypass():
     output["angles"][0]["rationale"] = "Publısh automatically."
     with pytest.raises(AgentProtocolError, match="ASCII"):
         validate(output_value=output)
+
+
+def test_host_binds_muse_spark_frames_inside_the_moment_window():
+    supplied = analyst_input()
+    supplied["sourceSegments"] += [
+        {"id": "frame-open", "sourceId": "source-1", "text": "A chart shows activation rising.", "digest": "d" * 64,
+         "locator": {"kind": "frame", "timestampMs": 2000, "frameArtifactId": "art-open"}},
+        {"id": "frame-late", "sourceId": "source-1", "text": "A closing slide.", "digest": "e" * 64,
+         "locator": {"kind": "frame", "timestampMs": 13000, "frameArtifactId": "art-late"}},
+    ]
+    supplied = AnalystInput.model_validate(supplied)
+    proposal = source_analysis()
+    proposal["moments"][0]["visualEvidenceIds"] = ["invented-frame"]
+
+    materialized = _materialize_nimi_analysis(supplied, proposal)
+
+    # Moment 2-8 s: the frames at 2 s and 4 s, never the model's invented id or the 13 s frame.
+    assert materialized.moments[0].visualEvidenceIds == ["frame-open", "frame-1"]
+    assert materialized.moments[0].visualHook == "A chart shows activation rising."
+    assert validate_source_analysis(supplied, materialized).moments[0].visualEvidenceIds == ["frame-open", "frame-1"]

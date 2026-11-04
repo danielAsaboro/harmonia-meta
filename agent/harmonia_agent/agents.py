@@ -1812,6 +1812,10 @@ def _materialize_nimi_analysis(
         (segment for segment in input.sourceSegments if segment.locator.kind == "time_range"),
         key=lambda segment: (segment.locator.startMs, segment.locator.endMs, segment.id),
     )
+    frames = sorted(
+        (segment for segment in input.sourceSegments if segment.locator.kind == "frame"),
+        key=lambda segment: (segment.locator.timestampMs, segment.id),
+    )
     moments = []
     for index, moment in enumerate(value.get("moments") or []):
         start_ms, end_ms = float(moment.get("startSec", 0)) * 1000, float(moment.get("endSec", 0)) * 1000
@@ -1827,8 +1831,14 @@ def _materialize_nimi_analysis(
         cited_text = " ".join(segment.text for segment in cited)
         if moment.get("quote") not in cited_text:
             moment["quote"] = cited[0].text[:2_000]
-        moment["visualEvidenceIds"] = []
-        moment["visualHook"] = None
+        # Visual evidence is bound by the host, never taken from the model: every
+        # Muse Spark frame observation inside the moment's window, in time order.
+        in_window = [
+            segment for segment in frames
+            if start_ms <= segment.locator.timestampMs <= end_ms
+        ][:12]
+        moment["visualEvidenceIds"] = [segment.id for segment in in_window]
+        moment["visualHook"] = in_window[0].text[:300] if in_window else None
         moment["cropSuitability"] = None
         moment["captionSafeRegion"] = None
         moments.append(moment)
