@@ -446,3 +446,34 @@ def test_uploaded_media_is_materialized_for_clip_rendering(monkeypatch, tmp_path
     source = stages._materialize_source_video("job-1", {"sourceSegmentRefs": ["source-1:segment-1"]}, str(tmp_path))
     assert source == Path(tmp_path) / "source.mp4"
     assert source.read_bytes() == b"video"
+
+
+def test_understand_validates_angles_against_memory_recalled_for_the_run(monkeypatch):
+    from harmonia_agent.agent_models import AnalystMemoryFact
+    posts = []
+
+    async def fake_analyze(request, *, invocation):
+        recalled = request.model_copy(update={"memoryFacts": [AnalystMemoryFact(
+            id="memory:learning:brief:abc:8", kind="learning",
+            content="ICP revenue teams pains: demo routing is manual.",
+            firestoreEvidenceRef="jobs/onboarding/learning/brief:abc:8",
+        )]})
+        result = _analysis()
+        result["sourceDigest"] = request.sourceDigest
+        result["moments"] = []
+        result["angles"][0].update({"angleType": "memory_learning", "evidenceKind": "memory", "evidenceRefs": ["memory:learning:brief:abc:8"]})
+        return AnalysisRunResult(analysis=SourceAnalysis.model_validate(result), searchEvidence={}, searchProvenance=None, input=recalled)
+
+    monkeypatch.setattr(stages, "get_job", lambda _job_id: {
+        "id": "job-1", "config": {"sourceManifestId": "manifest-1"},
+        "workspaceId": "workspace-test", "brandId": "brand-test", "createdByUserId": "user-test",
+    })
+    monkeypatch.setattr(stages, "get_source_manifest", lambda _job_id: {"normalizedSources": [{"sourceId": "source-1", "sourceKind": "document", "title": "Routing", "mimeType": "text/plain", "contentDigest": "a" * 64, "segments": [{"id": "page-1", "text": "Route demos by territory", "digest": "b" * 64, "locator": {"kind": "page_range", "startPage": 1, "endPage": 1}}]}]})
+    monkeypatch.setattr(stages, "get_insights", lambda: {})
+    monkeypatch.setattr(stages, "analyze_with_team", fake_analyze)
+    monkeypatch.setattr(stages, "web_post", lambda path, payload: posts.append((path, payload)))
+
+    with operation_scope("job:job-1:stage:understand:generation:7", 1):
+        asyncio.run(stages.run_understand("job-1"))
+
+    assert posts[0][1]["analysis"]["angles"][0]["evidenceRefs"] == ["memory:learning:brief:abc:8"]

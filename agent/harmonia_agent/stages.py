@@ -462,6 +462,7 @@ async def run_understand(job_id: str) -> None:
         researchRequest=(job.get("config") or {}).get("analysisResearchRequest"),
     )
     run_result = await analyze_with_team(analyst_input, invocation=invocation)
+    analyst_input = run_result.input or analyst_input
     result = validate_source_analysis(
         analyst_input, run_result.analysis, research_evidence=run_result.searchEvidence,
     ).model_dump(mode="json", exclude_none=True)

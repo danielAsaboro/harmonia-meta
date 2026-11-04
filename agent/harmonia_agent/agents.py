@@ -280,6 +280,8 @@ class AnalysisRunResult:
     analysis: SourceAnalysis
     searchEvidence: dict[str, tuple[str, ...]]
     searchProvenance: dict[str, Any] | None
+    # The input Nimi actually saw, including memory recalled for this run.
+    input: AnalystInput | None = None
 
 
 @dataclass(frozen=True)
@@ -2804,6 +2806,7 @@ async def analyze_with_team(
         ),
         searchEvidence=research_evidence,
         searchProvenance=provenance if isinstance(provenance, dict) else None,
+        input=input,
     )
 
 
