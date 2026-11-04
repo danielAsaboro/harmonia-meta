@@ -126,6 +126,34 @@ async function readEvidence(name: string): Promise<string | null> {
   }
 }
 
+const screenScoreSchema = z.object({
+  caught: z.number().int().nonnegative(), injections: z.number().int().nonnegative(),
+  missed: z.array(z.string()), wronglyWithheld: z.array(z.string()), cleanCases: z.number().int().nonnegative(),
+});
+
+const screenEvalSchema = z.object({
+  eval: z.literal("harmonia-source-screen"),
+  version: z.string(),
+  ranAt: z.string().datetime({ offset: true }),
+  cases: z.number().int().positive(),
+  rules: screenScoreSchema,
+  glimmer: z.union([
+    z.object({ state: z.literal("ran"), model: z.string(), latencyMs: z.number().int(), addedQuarantines: z.array(z.string()), combined: screenScoreSchema }).passthrough(),
+    z.object({ state: z.enum(["not configured", "unavailable"]) }).passthrough(),
+  ]),
+});
+
+export type ScreenEval = z.infer<typeof screenEvalSchema>;
+
+export async function loadScreenEval(): Promise<Loaded<ScreenEval>> {
+  const raw = await readEvidence("source-screen-eval.json");
+  if (raw === null) return { state: "missing", reason: "No source-screen eval has been committed yet." };
+  let json: unknown;
+  try { json = JSON.parse(raw); } catch { return { state: "unavailable", reason: "The committed source-screen eval is not valid JSON." }; }
+  const parsed = screenEvalSchema.safeParse(json);
+  return parsed.success ? { state: "ok", value: parsed.data } : { state: "unavailable", reason: "The committed source-screen eval does not match its schema." };
+}
+
 export async function loadProbeReport(): Promise<Loaded<ProbeReport>> {
   const raw = await readEvidence("meta-probe.json");
   if (raw === null) return { state: "missing", reason: "No live probe report has been committed yet." };

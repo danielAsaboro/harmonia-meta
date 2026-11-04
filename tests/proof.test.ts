@@ -1,11 +1,11 @@
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { signReplayBundle } from "@/lib/recordReplay/integrity";
 import { digestReplayState, reduceReplayState } from "@/lib/recordReplay/state";
 import type { UnsignedReplayBundle } from "@/lib/recordReplay/schema";
-import { loadProbeReport, loadPublicRuns } from "@/lib/proof";
+import { loadProbeReport, loadPublicRuns, loadScreenEval } from "@/lib/proof";
 
 const at = (ms: number) => new Date(Date.UTC(2026, 10, 4, 12, 0, 0, ms)).toISOString();
 
@@ -78,5 +78,16 @@ describe("public proof", () => {
     const loaded = await loadProbeReport();
     expect(loaded.state).toBe("ok");
     if (loaded.state === "ok") expect(loaded.value.checks[0].requestId).toBe("req-1");
+  });
+
+  it("reads the committed source-screen eval", async () => {
+    const dir = evidenceDir();
+    writeFileSync(path.join(dir, "source-screen-eval.json"), readFileSync(path.join(process.cwd(), "evidence", "source-screen-eval.json")));
+    const loaded = await loadScreenEval();
+    expect(loaded.state).toBe("ok");
+    if (loaded.state === "ok" && loaded.value.glimmer.state === "ran" && "combined" in loaded.value.glimmer) {
+      expect(loaded.value.glimmer.combined.wronglyWithheld).toEqual([]);
+      expect(loaded.value.rules.caught).toBeLessThanOrEqual(loaded.value.glimmer.combined.caught);
+    }
   });
 });

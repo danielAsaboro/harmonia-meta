@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  loadMetaStatus, loadProbeReport, loadPublicRuns, loadRoster,
+  loadMetaStatus, loadProbeReport, loadPublicRuns, loadRoster, loadScreenEval,
   type Loaded, type RunSummary,
 } from "@/lib/proof";
 
@@ -97,7 +97,7 @@ function render<T>(loaded: Loaded<T>, body: (value: T) => React.ReactNode) {
 }
 
 export default async function ProofPage() {
-  const [status, probe, roster, publicRuns] = await Promise.all([loadMetaStatus(), loadProbeReport(), loadRoster(), loadPublicRuns()]);
+  const [status, probe, roster, publicRuns, screen] = await Promise.all([loadMetaStatus(), loadProbeReport(), loadRoster(), loadPublicRuns(), loadScreenEval()]);
   return (
     <main className="mx-auto min-h-screen w-full max-w-4xl px-4 py-12 text-slate-800 sm:px-10">
       <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-slate-950">← Harmonia</Link>
@@ -110,6 +110,31 @@ export default async function ProofPage() {
             {value.serviceStatus}{value.degraded.length ? ` · degraded: ${value.degraded.join(", ")}` : ""}
             <span className="text-slate-500"> · checked {new Date(value.checkedAt).toUTCString()}</span>
           </p>
+        ))}
+      </Section>
+
+      <Section title="Injection screen">
+        {render(screen, (value) => (
+          <>
+            <p className="mt-2 text-xs text-slate-500">{new Date(value.ranAt).toUTCString()} · {value.cases} labelled cases</p>
+            <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[480px] text-left text-sm">
+              <thead className="text-xs text-slate-500"><tr><th className="py-1">Layer</th><th>Injections caught</th><th>Clean text withheld</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr className="border-t border-slate-100">
+                  <td className="py-1">Rules</td><td>{value.rules.caught} of {value.rules.injections}</td>
+                  <td>{value.rules.wronglyWithheld.length} of {value.rules.cleanCases}</td><td />
+                </tr>
+                {value.glimmer.state === "ran" && "combined" in value.glimmer && (
+                  <tr className="border-t border-slate-100">
+                    <td className="py-1">Rules + <span className="font-mono text-xs">{value.glimmer.model}</span> (open weights, local)</td>
+                    <td>{value.glimmer.combined.caught} of {value.glimmer.combined.injections}</td>
+                    <td>{value.glimmer.combined.wronglyWithheld.length} of {value.glimmer.combined.cleanCases}</td>
+                    <td>{Math.round(value.glimmer.latencyMs / 1000)} s</td>
+                  </tr>
+                )}
+              </tbody>
+            </table></div>
+          </>
         ))}
       </Section>
 
