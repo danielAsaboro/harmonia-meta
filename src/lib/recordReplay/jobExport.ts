@@ -49,8 +49,9 @@ export function jobObservations({ job, events, usage, receipts }: JobExportInput
     }
   }
   for (const record of usage) {
-    if (record.unitType !== "tokens") continue;
-    timed.push({ at: record.createdAt, kind: "usage", payload: { jobId, model: record.model, inputTokens: record.inputUnits, outputTokens: record.outputUnits, estimatedCostUsd: Number(record.observedCostUsd ?? record.estimatedCostUsd), traceId: record.traceId } });
+    // Audio seconds and video frames carry their cost with zero token counts.
+    const tokens = record.unitType === "tokens";
+    timed.push({ at: record.createdAt, kind: "usage", payload: { jobId, model: record.model, inputTokens: tokens ? record.inputUnits : 0, outputTokens: tokens ? record.outputUnits : 0, estimatedCostUsd: Number(record.observedCostUsd ?? record.estimatedCostUsd), traceId: record.traceId } });
   }
   const verifications = new Map((job.verifications ?? []).map((item) => [item.receiptId, item]));
   for (const receipt of receipts) {

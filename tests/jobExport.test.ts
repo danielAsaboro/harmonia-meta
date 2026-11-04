@@ -34,7 +34,7 @@ describe("job export", () => {
   it("turns a persisted job into ordered, allowlisted observations a public bundle accepts", () => {
     const observations = jobObservations({ job, events, usage, receipts });
     expect(observations.map((item) => item.kind)).toEqual([
-      "stage_transition", "specialist_handoff", "moment", "stage_transition", "usage", "receipt", "draft", "action", "approval", "verification", "job_snapshot",
+      "stage_transition", "specialist_handoff", "moment", "stage_transition", "usage", "usage", "receipt", "draft", "action", "approval", "verification", "job_snapshot",
     ]);
     expect(observations.every((item, index) => item.sequence === index)).toBe(true);
 
@@ -49,7 +49,10 @@ describe("job export", () => {
 
     expect(run.environment).toBe("local_emulator");
     expect(run.stages).toEqual(["understand", "strategize", "verify"]);
-    expect(run.cost).toEqual([{ model: "muse-wonder-1.0", inputTokens: 5000, outputTokens: 2000, usd: 0.06 }]);
+    expect(run.cost).toEqual([
+      { model: "muse-wonder-1.0", inputTokens: 5000, outputTokens: 2000, usd: 0.06 },
+      { model: "sam-3.1", inputTokens: 0, outputTokens: 0, usd: 0.01 },
+    ]);
     expect(run.receipts).toEqual([{ actionId: "a1", outcome: "applied", verified: true }]);
     expect(run.drafts[0].text).toContain("forty hours");
   });
