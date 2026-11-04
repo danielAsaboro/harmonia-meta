@@ -11,8 +11,8 @@ no reviewer notices it:
 - ``clipped_word_start`` / ``clipped_word_end``: speech-level audio in the first
   or last 120 ms, which usually means the cut lands mid-word
 
-Dead air at the edges has a fix: the window is trimmed to the speech, padded
-by 150 ms, and the clip is rendered once more. Both versions are measured and
+Edge faults have fixes: dead air is trimmed to the speech (padded by 150 ms)
+and a clipped word widens the cut by 400 ms, then the clip is rendered once more. Both versions are measured and
 the better one is kept (fewer major faults, then fewer minor ones, earliest
 version on a tie), so a fix can never make the delivered clip worse. The loop
 stops when nothing is fixable, the fix repeats, or ``MAX_PASSES`` is reached.
@@ -34,6 +34,7 @@ BLACK_SEC = 0.4
 EDGE_PROBE_SEC = 0.12
 EDGE_SPEECH_DB = -28.0
 TRIM_PAD_SEC = 0.15
+WORD_PAD_SEC = 0.4
 MIN_CLIP_SEC = 3.0
 MAX_PASSES = 2
 
@@ -153,13 +154,18 @@ def measure_clip(path: Path) -> Measurement:
 
 
 def trimmed_window(start: float, end: float, measurement: Measurement) -> tuple[float, float] | None:
-    """A tighter source window that drops measured dead air at either edge, or None."""
+    """A source window that drops edge dead air and widens cuts that clip a word, or None."""
     new_start, new_end = start, end
     for fault in measurement.faults:
         if fault.code == "dead_air_start":
             new_start = start + max(fault.endSec - TRIM_PAD_SEC, 0.0)
         elif fault.code == "dead_air_end":
             new_end = start + min(fault.startSec + TRIM_PAD_SEC, measurement.durationSec)
+        elif fault.code == "clipped_word_start":
+            new_start = max(start - WORD_PAD_SEC, 0.0)
+        elif fault.code == "clipped_word_end":
+            # ffmpeg stops at the end of the source if this runs past it.
+            new_end = end + WORD_PAD_SEC
     if (new_start, new_end) == (start, end) or new_end - new_start < MIN_CLIP_SEC:
         return None
     return round(new_start, 3), round(new_end, 3)

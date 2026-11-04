@@ -52,7 +52,7 @@ def test_dead_air_at_both_edges_is_measured_trimmed_and_the_fixed_cut_kept(tmp_p
 
 @ffmpeg
 def test_a_clean_cut_is_rendered_once(tmp_path: Path):
-    source = _source(tmp_path, lead=0.0, tone=5.0, trail=0.0)
+    source = _source(tmp_path, lead=0.3, tone=5.0, trail=0.3)
     renders: list[float] = []
     render = _renderer(source)
 
@@ -60,7 +60,7 @@ def test_a_clean_cut_is_rendered_once(tmp_path: Path):
         renders.append(start)
         return render(out, start, end)
 
-    _path, _notes, result = review.render_reviewed(counted, tmp_path, "clip", 0.0, 5.0)
+    _path, _notes, result = review.render_reviewed(counted, tmp_path, "clip", 0.0, 5.6)
     assert renders == [0.0] and result["kept"] == 1
     assert not any(fault["severity"] == "major" for fault in result["versions"][0]["faults"])
 
@@ -97,3 +97,11 @@ def test_shifted_crop_path_starts_where_the_trimmed_window_starts():
     assert shifted.keyframes == ((0.0, 200), (0.6, 300))
     assert stages._shift_crop(crop, 0.0) is crop
     assert stages._shift_crop(crop, 5.0).keyframes == ((0.0, 300),)
+
+
+def test_clipped_words_widen_the_cut():
+    measurement = review.Measurement(5.0, (
+        review.Fault("clipped_word_start", "minor", 0.0, 0.12), review.Fault("clipped_word_end", "minor", 4.88, 5.0),
+    ))
+    assert review.trimmed_window(10.0, 15.0, measurement) == (9.6, 15.4)
+    assert review.trimmed_window(0.1, 5.1, measurement) == (0.0, 5.5)
