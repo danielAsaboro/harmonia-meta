@@ -39,7 +39,7 @@ export const unsignedReplayBundleSchema = z.object({
   schema: z.literal("harmonia.authenticated-replay"), schemaVersion: z.literal(REPLAY_SCHEMA_VERSION), bundleId: id,
   executionMode: z.literal("recorded_replay"), evidenceClassification: z.literal("historical_replay"), scenario: replayScenarioSchema,
   capturedAt: iso, captureEndedAt: iso, release: z.enum(["private_candidate", "approved_public_bundle"]),
-  provenance: z.object({ sourceRunId: id, sourceJobId: id.optional(), environment: z.literal("authenticated_cloud"), sanitizerVersion: z.literal("1.0.0"), sourceCaptureAuthorized: z.boolean() }).strict(),
+  provenance: z.object({ sourceRunId: id, sourceJobId: id.optional(), environment: z.enum(["authenticated_cloud", "local_emulator"]), sanitizerVersion: z.literal("1.0.0"), sourceCaptureAuthorized: z.boolean() }).strict(),
   events: z.array(replayEventSchema).max(10000), terminalStateDigest: z.string().regex(/^[a-f0-9]{64}$/),
 }).strict().superRefine((bundle, ctx) => {
   bundle.events.forEach((event, index) => { if (event.sequence !== index) ctx.addIssue({ code: "custom", path: ["events", index, "sequence"], message: "event sequence must be contiguous and zero-based" }); });

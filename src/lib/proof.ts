@@ -57,6 +57,7 @@ export interface RunSummary {
   scenario: string;
   capturedAt: string;
   sourceRunId: string;
+  environment: "authenticated_cloud" | "local_emulator";
   integrityDigest: string;
   terminalStateDigest: string;
   eventCount: number;
@@ -76,7 +77,7 @@ export function summarizeRun(bundle: ImportedReplayBundle): RunSummary {
   const cost = new Map<string, { inputTokens: number; outputTokens: number; usd: number }>();
   const summary: RunSummary = {
     bundleId: bundle.bundleId, scenario: bundle.scenario, capturedAt: bundle.capturedAt,
-    sourceRunId: bundle.provenance.sourceRunId, integrityDigest: bundle.integrity.digest,
+    sourceRunId: bundle.provenance.sourceRunId, environment: bundle.provenance.environment, integrityDigest: bundle.integrity.digest,
     terminalStateDigest: bundle.terminalStateDigest, eventCount: bundle.events.length,
     durationMs: bundle.events.at(-1)?.offsetMs ?? 0,
     stages, handoffs: [], moments: [], drafts: [], approvals: [], receipts: [], cost: [], totalUsd: 0,

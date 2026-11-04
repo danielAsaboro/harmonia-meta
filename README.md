@@ -16,6 +16,8 @@ cd agent && .venv/bin/python -m harmonia_agent.meta_probe --out ../evidence/meta
 
 The public, read-only [`/proof`](./src/app/proof/page.tsx) page (and `/api/proof` as JSON) shows Meta's live `/status`, that committed probe report, the running agent roster with a digest of each agent's definition, and every recorded run in `evidence/replays/` released as `approved_public_bundle`. Each request re-verifies each bundle's integrity and terminal-state digest, and anything missing is shown as missing.
 
+`./scripts/key-day.sh` runs that probe and the source-screen eval as soon as `.env.local` holds `MODEL_API_KEY`, then starts the local stack for one real job. When the job is done, `scripts/export-job-run.ts` signs it as a private candidate (labelled `local_emulator` when Firestore is the emulator), and `scripts/approve-replay.ts` is the explicit release step that publishes it to `evidence/replays/` for `/proof`.
+
 ## Why Harmonia is an agent—and where it deliberately is not
 
 Harmonia is agentic where the problem is ambiguous: Muse Spark specialists, organized with Google ADK, interpret multimodal source material, identify grounded moments and angles, produce and review typed content artifacts, and propose bounded actions. It is deliberately deterministic where mistakes have consequences: Firestore/Pub/Sub progression, schema validation, cost reservation, policy, approval, idempotent execution, receipts, and independent verification. Humans retain final publishing authority. This is bounded agency inside a durable workflow, not an unrestricted model loop; the full stage/authority and KPI contract is in [`docs/operational-model.mdx`](./docs/operational-model.mdx).

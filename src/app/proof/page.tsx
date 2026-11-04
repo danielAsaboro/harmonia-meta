@@ -39,7 +39,7 @@ function Run({ run }: { run: RunSummary }) {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="font-semibold text-slate-950">{run.scenario.replaceAll("_", " ")}</h3>
         <span className="text-xs text-slate-500">
-          {new Date(run.capturedAt).toUTCString()} · {(run.durationMs / 1000).toFixed(0)} s · {run.eventCount} events
+          {run.environment === "local_emulator" ? "Local run (Firestore and Pub/Sub emulators)" : "Cloud run"} · {new Date(run.capturedAt).toUTCString()} · {(run.durationMs / 1000).toFixed(0)} s · {run.eventCount} events
         </span>
       </div>
       <p className="mt-1 text-xs text-slate-500">
