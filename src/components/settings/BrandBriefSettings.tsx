@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BriefSummary } from "@/components/onboarding/BriefSummary";
+import { ShareBriefButton } from "@/components/onboarding/ShareBriefButton";
 import { OnboardingStepper } from "@/components/onboarding/OnboardingStepper";
 import { useWebsiteOnboarding } from "@/hooks/useWebsiteOnboarding";
 import { apiFetch } from "@/lib/clientApi";
@@ -71,7 +72,7 @@ export function BrandBriefSettings() {
       {brief && !editing && !building ? (
         <div className="mt-4 space-y-4">
           <BriefSummary brief={brief} />
-          <Button onClick={startEdit}>Edit brief</Button>
+          <div className="flex flex-wrap items-center gap-2"><Button onClick={startEdit}>Edit brief</Button><ShareBriefButton className="dash-button dash-button--secondary" /></div>
         </div>
       ) : null}
 

@@ -1,4 +1,5 @@
 import asyncio
+from decimal import Decimal
 
 import httpx
 import pytest
@@ -177,6 +178,10 @@ def test_onboard_website_runs_read_research_synthesize_with_meta_models(monkeypa
     assert [item["name"] for item in result["brief"]["competitors"]] == ["Rival"]
     assert result["unverifiedResearchDropped"] == 3
     assert [call["step"] for call in result["modelCalls"]] == ["read_site", "research_competitors", "research_customer_pain", "synthesize_brief"]
+    # Every call is priced at Meta list price; the run total is their sum.
+    assert result["cost"]["pricingVersion"] == "2026-11-03"
+    assert Decimal(result["cost"]["totalUsd"]) == sum(Decimal(call["costUsd"]) for call in result["modelCalls"])
+    assert all(Decimal(call["costUsd"]) > 0 for call in result["modelCalls"])
 
 
 def _app():

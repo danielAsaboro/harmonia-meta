@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { BriefSummary, type StoredBrief } from "@/components/onboarding/BriefSummary";
 import { OnboardingStepper } from "@/components/onboarding/OnboardingStepper";
+import { ShareBriefButton } from "@/components/onboarding/ShareBriefButton";
 import type { OnboardingRun } from "@/lib/onboardingSteps";
 
 interface WelcomeOnboardingProps {
@@ -31,7 +32,10 @@ export function WelcomeOnboarding({ run, brief, error, onStart, onContinue }: We
       <div className="w-full max-w-[680px] rounded-[18px] border border-[#11110f] bg-[#f4f1ea] p-6 shadow-[4px_4px_0_#11110f] sm:p-8">
         {phase === "done" && brief ? (
           <>
-            <h1 className="text-2xl font-semibold tracking-tight">Here&apos;s who you&apos;re writing for</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-2xl font-semibold tracking-tight">Here&apos;s who you&apos;re writing for</h1>
+              <ShareBriefButton />
+            </div>
             <div className="mt-5 max-h-[52vh] overflow-y-auto rounded-[12px] border border-black/10 bg-white p-4"><BriefSummary brief={brief} /></div>
             <button type="button" onClick={onContinue} className="mt-6 w-full rounded-full bg-[#11110f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">
               Now send a YouTube link, a post or an idea

@@ -33,7 +33,7 @@ import { brandBriefContext, BRAND_CONTEXT_MAX_CHARS } from "@/lib/brandBriefCont
 import { handleChat } from "@/lib/chatHandler";
 
 const stored = {
-  website: "https://acme.test/", digest: "d", createdAt: "2026-11-01T00:00:00.000Z", evidence: [], pages: [], unverifiedResearchDropped: 0, modelCalls: [],
+  website: "https://acme.test/", digest: "d", createdAt: "2026-11-01T00:00:00.000Z", evidence: [], pages: [], unverifiedResearchDropped: 0, modelCalls: [], cost: { totalUsd: "0", pricingVersion: "2026-11-03", durationMs: 0 },
   brief: {
     company: "Acme", product: "Client reporting", category: "Reporting", positioning: "Five-minute client reports", differentiators: [],
     audiences: [{ id: "agency-owners", name: "Agency owners", pains: ["Reporting eats a day", "Clients ignore dashboards", "Slides break", "Fourth pain"], jobsToBeDone: [], objections: [], evidenceIds: [] }],

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 // a shared link cannot start jobs or spend model budget on someone's behalf.
 const PUBLIC_PATHS = [
   /^\/$/, /^\/proof$/, /^\/api\/proof$/, /^\/api\/health$/, /^\/api\/agent-card$/, /^\/\.well-known\/agent-card\.json$/, /^\/docs(\/.*)?$/,
-  /^\/privacy$/, /^\/terms$/, /^\/data-deletion$/,
+  /^\/privacy$/, /^\/terms$/, /^\/data-deletion$/, /^\/b\/[A-Za-z0-9_-]{32}$/,
   /^\/_next\//, /^\/(favicon\.ico|icon\.png|apple-icon\.png|og\.png|brand\/.*|architecture\/.*)$/,
 ];
 

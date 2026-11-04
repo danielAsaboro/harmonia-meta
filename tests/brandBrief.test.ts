@@ -46,7 +46,7 @@ describe("website onboarding", () => {
         { id: "web:2", kind: "competitor", text: "Rival", url: "https://g2.example/rival", title: "t" },
       ],
       pages: [{ pageId: "p1", role: "home", url: "https://acme.test/", title: "Acme" }],
-      unverifiedResearchDropped: 0, modelCalls: [],
+      unverifiedResearchDropped: 0, modelCalls: [], cost: { totalUsd: "0", pricingVersion: "2026-11-03", durationMs: 0 },
     });
     const facts = briefMemoryFacts(result, "a".repeat(64), { workspaceId: "w1", brandId: "b1" });
     expect(facts.map((fact) => fact.fact)).toEqual([
@@ -68,7 +68,7 @@ describe("website onboarding", () => {
         competitors: [], pillars: [], voiceRules: ["Numbers first"], exclusions: [], businessObjectives: ["Trials"], campaignObjectives: ["Time saved"],
         funnelStage: "awareness", intendedConversion: "Trial",
       },
-      evidence: [], pages: [], unverifiedResearchDropped: 0, modelCalls: [],
+      evidence: [], pages: [], unverifiedResearchDropped: 0, modelCalls: [], cost: { totalUsd: "0", pricingVersion: "2026-11-03", durationMs: 0 },
     } satisfies StoredBrandBrief;
     const { brief, context } = applyBriefEdit(stored, saved, {
       positioning: "Client reports in five minutes", voiceRules: ["Plain", "Specific"],

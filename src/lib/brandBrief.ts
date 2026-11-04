@@ -35,7 +35,9 @@ export const onboardingResultSchema = z.object({
   evidence: z.array(evidenceSchema),
   pages: z.array(z.object({ pageId: z.string(), role: z.string(), url: z.string(), title: z.string() })),
   unverifiedResearchDropped: z.number().int(),
-  modelCalls: z.array(z.object({ step: z.string(), model: z.string(), responseId: z.string(), inputTokens: z.number(), outputTokens: z.number(), searchCalls: z.number() })),
+  modelCalls: z.array(z.object({ step: z.string(), model: z.string(), responseId: z.string(), inputTokens: z.number(), outputTokens: z.number(), searchCalls: z.number(), costUsd: z.string().regex(/^\d+(\.\d+)?$/) })),
+  /** Meta list price for the run, not an invoice. */
+  cost: z.object({ totalUsd: z.string().regex(/^\d+(\.\d+)?$/), pricingVersion: z.string(), durationMs: z.number().int().nonnegative() }),
 });
 export type OnboardingResult = z.infer<typeof onboardingResultSchema>;
 
@@ -195,9 +197,9 @@ export function summarizeBrief(brief: StoredBrandBrief): string {
   const b = brief.brief;
   const sources = brief.evidence.filter((item) => item.kind !== "site").length;
   return [
-    `I read ${brief.pages.length} page${brief.pages.length === 1 ? "" : "s"} of ${brief.website} and checked ${sources} outside source${sources === 1 ? "" : "s"} with Meta web search. Here is the brand brief every new job will now start from.`,
+    `I read ${brief.pages.length} page${brief.pages.length === 1 ? "" : "s"} of ${brief.website} and checked ${sources} outside source${sources === 1 ? "" : "s"} with Meta web search in ${Math.round(brief.cost.durationMs / 1000)}s, for $${Number(brief.cost.totalUsd).toFixed(2)} at Meta list price. Here is the brand brief every new job will now start from.`,
     `${b.company}: ${b.positioning}`,
-    ...b.audiences.map((audience) => `Customer: ${audience.name}. Pains: ${audience.pains.slice(0, 3).join("; ")}.`),
+    ...b.audiences.map((audience) => `Customer: ${audience.name}. Pains: ${audience.pains.slice(0, 3).map((pain) => pain.replace(/[.\s]+$/, "")).join("; ")}.`),
     ...(b.competitors.length ? [`Competitors: ${b.competitors.map((competitor) => `${competitor.name} (${competitor.howWeDiffer})`).join("; ")}.`] : []),
     `Pillars: ${b.pillars.map((pillar) => pillar.name).join(", ")}.`,
     `Voice: ${b.voiceRules.slice(0, 3).join("; ")}.`,

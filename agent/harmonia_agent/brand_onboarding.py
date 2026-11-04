@@ -22,6 +22,8 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import time
+from decimal import Decimal
 from typing import Any, Awaitable, Callable, Literal
 from urllib.parse import urldefrag, urljoin, urlparse
 
@@ -31,6 +33,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .extraction.security import assert_public_url
 from .extraction.web import WebExtractionError, extract_html
+from .model_catalog import PRICING_VERSION, estimate_text_cost, estimate_web_search_cost
 from .meta_search import (
     WebSearchProvenance,
     _endpoint,
@@ -282,6 +285,7 @@ class ModelCall(_Strict):
     inputTokens: int
     outputTokens: int
     searchCalls: int = 0
+    costUsd: str
 
 
 async def _structured(
@@ -446,9 +450,11 @@ def strategy_context_from_brief(brief: BrandBriefDraft, channels: list[str]) -> 
 
 
 def _call(step: str, provenance: WebSearchProvenance) -> ModelCall:
+    """One model call at Meta list price: tokens at the catalog rate plus each web search query."""
+    cost = estimate_text_cost(provenance.model, provenance.inputTokens, provenance.outputTokens) + estimate_web_search_cost(provenance.searchCalls)
     return ModelCall(step=step, model=provenance.model, responseId=provenance.responseId,
                      inputTokens=provenance.inputTokens, outputTokens=provenance.outputTokens,
-                     searchCalls=provenance.searchCalls)
+                     searchCalls=provenance.searchCalls, costUsd=str(cost))
 
 
 Progress = Callable[[str, str, str | None], Awaitable[None]]
@@ -465,6 +471,7 @@ def _plural(count: int, word: str) -> str:
 async def onboard_website(url: str, *, channels: list[str] | None = None, progress: Progress | None = None) -> dict[str, Any]:
     channels = channels or ["x", "linkedin"]
     report = progress or _no_progress
+    started = time.monotonic()
 
     async def step(name: str, work: Callable[[], Awaitable[Any]], detail: Callable[[Any], str]) -> Any:
         await report(name, "running", None)
@@ -543,6 +550,8 @@ async def onboard_website(url: str, *, channels: list[str] | None = None, progre
         "pillars": [p.model_copy(update={"evidenceIds": refs(p.evidenceIds)}) for p in brief.pillars],
     })
 
+    calls = [_call("read_site", read_call), _call("research_competitors", rivals_call),
+             _call("research_customer_pain", pains_call), _call("synthesize_brief", synth_call)]
     return {
         "website": pages[0].url,
         "brief": brief.model_dump(mode="json"),
@@ -553,8 +562,12 @@ async def onboard_website(url: str, *, channels: list[str] | None = None, progre
         "pages": [{"pageId": p.pageId, "role": p.role, "url": p.url, "title": p.title} for p in pages],
         "sourceScreen": screen,
         "unverifiedResearchDropped": dropped,
-        "modelCalls": [_call("read_site", read_call).model_dump(), _call("research_competitors", rivals_call).model_dump(),
-                       _call("research_customer_pain", pains_call).model_dump(), _call("synthesize_brief", synth_call).model_dump()],
+        "modelCalls": [call.model_dump() for call in calls],
+        "cost": {
+            "totalUsd": str(sum((Decimal(call.costUsd) for call in calls), Decimal("0"))),
+            "pricingVersion": PRICING_VERSION,
+            "durationMs": int((time.monotonic() - started) * 1000),
+        },
     }
 
 

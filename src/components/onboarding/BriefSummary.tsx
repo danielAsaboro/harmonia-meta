@@ -4,13 +4,44 @@ export interface StoredBrief {
   website: string; digest: string; createdAt: string; editedAt?: string;
   pages: Array<{ pageId: string; role: string; url: string; title: string }>;
   evidence: BriefEvidence[]; unverifiedResearchDropped: number;
-  modelCalls: Array<{ step: string; model: string; searchCalls: number; inputTokens?: number; outputTokens?: number }>;
+  modelCalls: Array<{ step: string; model: string; searchCalls: number; inputTokens: number; outputTokens: number; costUsd: string }>;
+  cost: { totalUsd: string; pricingVersion: string; durationMs: number };
   brief: {
     company: string; category: string; positioning: string; audiences: BriefAudience[];
     competitors: Array<{ name: string; howWeDiffer: string; evidenceIds: string[] }>;
     pillars: Array<{ name: string; purpose: string; evidenceIds: string[] }>;
     voiceRules: string[]; exclusions: string[];
   };
+}
+
+const STEP_NAMES: Record<string, string> = {
+  read_site: "Read the site", research_competitors: "Competitor search", research_customer_pain: "Customer pain search", synthesize_brief: "Write the brief",
+};
+
+const usd = (value: string | number) => "$" + Number(value).toFixed(Number(value) < 0.01 ? 4 : 2);
+
+/** What building the brief cost at Meta list price, call by call. */
+function CostReceipt({ brief }: { brief: StoredBrief }) {
+  const searches = brief.modelCalls.reduce((sum, call) => sum + call.searchCalls, 0);
+  return (
+    <details className="mt-1 text-[11px] text-zinc-500" data-cost-receipt>
+      <summary className="cursor-pointer list-none">
+        Built in {Math.round(brief.cost.durationMs / 1000)}s · {brief.modelCalls.length} model calls · {searches} web searches · <b className="font-medium text-zinc-700 dark:text-zinc-300">{usd(brief.cost.totalUsd)}</b> at Meta list price
+      </summary>
+      <table className="mt-2 w-full font-mono text-[10px]">
+        <tbody>{brief.modelCalls.map((call) => (
+          <tr key={call.step} className="border-t border-zinc-200 dark:border-zinc-800">
+            <td className="py-1 pr-2">{STEP_NAMES[call.step] ?? call.step}</td>
+            <td className="pr-2">{call.model}</td>
+            <td className="pr-2 text-right">{call.inputTokens.toLocaleString()} in / {call.outputTokens.toLocaleString()} out</td>
+            <td className="pr-2 text-right">{call.searchCalls ? `${call.searchCalls} search` : ""}</td>
+            <td className="text-right">{usd(call.costUsd)}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+      <p className="mt-1">Pricing {brief.cost.pricingVersion}. A list-price reconstruction, not an invoice.</p>
+    </details>
+  );
 }
 
 function Sources({ ids, evidence }: { ids: string[]; evidence: BriefEvidence[] }) {
@@ -28,13 +59,13 @@ function Sources({ ids, evidence }: { ids: string[]; evidence: BriefEvidence[] }
 export function BriefSummary({ brief }: { brief: StoredBrief }) {
   const b = brief.brief;
   const outside = brief.evidence.filter((item) => item.kind !== "site").length;
-  const models = brief.modelCalls.map((call) => call.model).filter((model, index, all) => all.indexOf(model) === index).join(" + ");
   return (
     <div className="space-y-4 text-xs leading-5">
       <div>
         <p className="text-sm font-medium">{b.company} <span className="font-normal text-zinc-500">· {b.category}</span></p>
         <p className="mt-1 text-zinc-700 dark:text-zinc-300">{b.positioning}</p>
-        <p className="mt-1 text-[11px] text-zinc-500">From {brief.pages.length} pages of {brief.website} and {outside} outside sources · {models} · {brief.unverifiedResearchDropped} unconfirmed research items dropped</p>
+        <p className="mt-1 text-[11px] text-zinc-500">From {brief.pages.length} pages of {brief.website} and {outside} outside sources · {brief.unverifiedResearchDropped} unconfirmed research items dropped</p>
+        <CostReceipt brief={brief} />
       </div>
       <div>
         <h4 className="font-medium">Target customers</h4>
