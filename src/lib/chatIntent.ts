@@ -81,3 +81,20 @@ export async function parseIntent(message: string, attachmentCount = 0, recentCo
   if (["establish_strategy", "revise_strategy", "advance_plan", "manage_calendar"].includes(route.intent)) return { intent: route.intent as ChatIntent, ...common };
   return { intent: "unknown", ...common };
 }
+
+/**
+ * Pasted sources are evidence, so they must be the operator's own words. Keep a
+ * router-extracted pasted_text only when it appears verbatim in the message;
+ * otherwise, or when the router found no source at all, the whole message is
+ * the source. A model's paraphrase never becomes evidence.
+ */
+export function groundPastedSources(sources: ChatSourceDescriptor[], message: string, hasAttachments: boolean): ChatSourceDescriptor[] {
+  const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
+  const verbatim = normalize(message);
+  const grounded = sources.filter((source) => source.kind !== "pasted_text" || verbatim.includes(normalize(source.text)));
+  const droppedPaste = grounded.length < sources.length;
+  if ((grounded.length === 0 && !hasAttachments) || droppedPaste) {
+    return [...grounded.filter((source) => source.kind !== "pasted_text"), { kind: "pasted_text", title: "Operator message", text: message.trim() }];
+  }
+  return grounded;
+}

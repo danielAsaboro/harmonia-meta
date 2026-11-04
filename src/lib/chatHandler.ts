@@ -11,7 +11,7 @@ import {
   saveChatMessage,
 } from "@/lib/firestore";
 import { currentTenant } from "@/lib/tenancy";
-import { parseIntent } from "@/lib/chatIntent";
+import { groundPastedSources, parseIntent } from "@/lib/chatIntent";
 import { queueStageTrigger } from "@/lib/stageTrigger";
 import type { Job, PlannedAction, SourceInput, Stage } from "@/lib/types";
 import type { ContentArtifact } from "@/lib/contentArtifacts/contracts";
@@ -347,10 +347,7 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
 
   switch (intent.intent) {
     case "create_job": {
-      const descriptors = [...(intent.sources ?? [])];
-      if (descriptors.length === 0 && effectiveAttachments.length === 0) {
-        descriptors.push({ kind: "pasted_text", title: "Operator brief", text: intent.userOutcome ?? effectiveMessage });
-      }
+      const descriptors = groundPastedSources(intent.sources ?? [], effectiveMessage, effectiveAttachments.length > 0);
       const needsRightsAttestation = intent.requiresRightsAttestation || effectiveAttachments.length > 0 || descriptors.some((source) => source.kind === "youtube");
       if (needsRightsAttestation && !rightsAttested) return { payload: { intent: intent.intent, reply: `Before processing uploaded or YouTube media, send the request again with: “${RIGHTS_ATTESTATION_PHRASE}”.` } satisfies ChatResponse };
       const directSources: SourceInput[] = [];
