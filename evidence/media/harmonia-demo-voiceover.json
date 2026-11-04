@@ -1,0 +1,38 @@
+{
+  "planDigest": "d405023a71be80646d5b9185fbf56d7ec1716c0caacff9db5f97935938c7425d",
+  "scenes": 5,
+  "durationSec": 43.54,
+  "voiceModel": "facebook/mms-tts-eng",
+  "bytes": 781320,
+  "plan": {
+    "title": "Your best post is already recorded",
+    "centralArgument": "Founders already say their best ideas out loud; Harmonia turns one recording into a week of grounded content without losing what they meant.",
+    "scenes": [
+      {
+        "narration": "Every week you explain your product brilliantly. On sales calls, in demos, on podcasts. Then the recording disappears into a folder nobody opens.",
+        "caption": "Your best ideas, lost in recordings",
+        "visualPrompt": "A dim home office at night, a single desk lamp lighting a stack of unlabeled audio cassettes and a closed laptop, cinematic shallow depth of field, moody blue and amber tones"
+      },
+      {
+        "narration": "So you sit down to write a post from scratch. An hour later you have three sentences, and none of them sound like you.",
+        "caption": "Starting from a blank page",
+        "visualPrompt": "Close-up of a blank notebook page under harsh morning light, a pen resting across it, a cold cup of coffee beside it, muted grey palette, editorial photography"
+      },
+      {
+        "narration": "Harmonia listens to the recording instead. It finds the moments where you made your point, and keeps your exact words attached to every claim.",
+        "caption": "It listens, then keeps your words",
+        "visualPrompt": "Abstract visualization of a glowing audio waveform unfurling into ribbons of light that settle into neat cards, deep navy background, warm gold highlights, elegant and calm"
+      },
+      {
+        "narration": "One conversation becomes a clip, a thread, a LinkedIn post, and a newsletter. An editor checks each one before anything goes out.",
+        "caption": "One recording, a week of content",
+        "visualPrompt": "A single ribbon of light branching into four floating panels of different shapes, tall vertical, square, wide, and folded paper, soft studio lighting, minimalist composition"
+      },
+      {
+        "narration": "You approve what ships. Harmonia does the rest. Record once, and let your ideas keep working all week.",
+        "caption": "Record once. Approve. Ship.",
+        "visualPrompt": "Sunrise over a city skyline seen through a tall window, a microphone on a stand silhouetted in the foreground, optimistic warm orange light, wide open sky"
+      }
+    ]
+  }
+}
