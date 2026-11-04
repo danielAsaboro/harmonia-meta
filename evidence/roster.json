@@ -1,0 +1,230 @@
+{
+  "coordinator": "harmonia_coordinator",
+  "authority": "Returns one typed proposal per call. Cannot publish, approve, schedule, spend, or change workflow state; deterministic code validates every output first.",
+  "agents": [
+    {
+      "name": "harmonia_intent_router",
+      "description": "Routes ordinary operator language against durable workspace content context.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "low",
+      "maxOutputTokens": 4096,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 8954,
+      "definitionDigest": "1a93262ff6829cb2e73028f9c038beb86686ac77abe00d7dbac83390841ee9c4"
+    },
+    {
+      "name": "harmonia_context_assembler",
+      "description": "Assembles bounded startup strategy context from exact operator language.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "low",
+      "maxOutputTokens": 4096,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 6130,
+      "definitionDigest": "2bc5ed8059d229cf55e379f33c3a393db96fbf55fb7ce9a2d17f773763baf7db"
+    },
+    {
+      "name": "ryan_strategist",
+      "description": "Turns bounded startup context and Nimi evidence into a grounded strategy proposal.",
+      "model": "muse-wonder-1.0",
+      "provider": "meta",
+      "reasoningEffort": "high",
+      "maxOutputTokens": 32768,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 27409,
+      "definitionDigest": "af445b10833ffe6f8674ec574d90cfcdcf37f4c9105ceffbc8d435e130269230"
+    },
+    {
+      "name": "ryan_research_strategist",
+      "description": "Proposes source-grounded strategy with one host-authorized research request.",
+      "model": "muse-wonder-1.0",
+      "provider": "meta",
+      "reasoningEffort": "high",
+      "maxOutputTokens": 32768,
+      "tools": [
+        "ryan_web_search"
+      ],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 27409,
+      "definitionDigest": "b1c637f761e2f60e483330d016c4eacb4b1c2d278c89c88c23e683ca0622ace0"
+    },
+    {
+      "name": "nimi_analyst",
+      "description": "Finds grounded insights and, when timed media exists, clip-worthy moments across a source manifest.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 16384,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 17412,
+      "definitionDigest": "86c987bd81ef756709a51037909ec666e957d0ae7629e75411b7b125435b84b9"
+    },
+    {
+      "name": "nimi_research_analyst",
+      "description": "Finds grounded insights with explicitly authorized bounded research.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 16384,
+      "tools": [
+        "nimi_web_search"
+      ],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 17412,
+      "definitionDigest": "67131cc3e4ecdd764dd5202df762575e5ee3c65017bc1e3493466de2830a9c7f"
+    },
+    {
+      "name": "temi_editorial_planner",
+      "description": "Operationalizes one approved Ryan strategy as a bounded editorial plan.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 16384,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 14010,
+      "definitionDigest": "d04e6383c5d91c005b17665d87fcc437c73d55be5c928f338f1ef4df710cea4a"
+    },
+    {
+      "name": "noni_copywriter",
+      "description": "Writes one platform-native X draft grounded in supplied moments and angles.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 8192,
+      "tools": [
+        "load_skill",
+        "noni_web_search"
+      ],
+      "skills": [
+        "noni-writing-skills"
+      ],
+      "typedOutput": true,
+      "instructionChars": 9018,
+      "definitionDigest": "4fcbf1637bc815b3bace438c078bbcee93b7eb10effadac442ea8329c8a45df9"
+    },
+    {
+      "name": "dara_editor",
+      "description": "Returns a structured review of one exact Noni draft without rewriting it.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 8192,
+      "tools": [
+        "load_skill"
+      ],
+      "skills": [
+        "dara-editing-skills"
+      ],
+      "typedOutput": true,
+      "instructionChars": 7128,
+      "definitionDigest": "a87d1b7179b224358239299c98dcc17b422c4d55eb3709ea3c5a65b1f5d798e5"
+    },
+    {
+      "name": "noni_artifact_producer",
+      "description": "Produces one evidence-grounded semantic artifact without authority metadata.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 16384,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 10153,
+      "definitionDigest": "dcb33787af42e22edd20ac4a682941f3bbc2f6006402b208a7c9f13e31a39c9f"
+    },
+    {
+      "name": "dara_artifact_editor",
+      "description": "Reviews one exact host-identified artifact without rewriting it.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "medium",
+      "maxOutputTokens": 8192,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 10409,
+      "definitionDigest": "da656bc5c995261ce5e9c8cf02a2f9ed1fbd18bd82f1c890c0d9106b960c6312"
+    },
+    {
+      "name": "maya_presenter",
+      "description": "Composes trustworthy Harmonia A2UI workspaces from bounded entity references.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "low",
+      "maxOutputTokens": 8192,
+      "tools": [],
+      "skills": [],
+      "typedOutput": true,
+      "instructionChars": 7245,
+      "definitionDigest": "aece61cbfe6274e4270d25b6c5ce60bacd22de2245070f6c5d4d8bd8c1dd5a92"
+    },
+    {
+      "name": "nova_liaison",
+      "description": "Answers operator questions about jobs, engagement, trends, and posting windows using its loaded Harmonia skills and read-only live tools.",
+      "model": "muse-spark-1.3",
+      "provider": "meta",
+      "reasoningEffort": "low",
+      "maxOutputTokens": 8192,
+      "tools": [
+        "load_skill"
+      ],
+      "skills": [
+        "engagement-insights",
+        "job-status",
+        "posting-schedule",
+        "signal-watch",
+        "trend-scan"
+      ],
+      "typedOutput": false,
+      "instructionChars": 5912,
+      "definitionDigest": "488280d18b6b7b143ae7b22dda7f4fcaed6e8881743faadaeceda70b45622234"
+    }
+  ],
+  "media": [
+    {
+      "name": "transcriber",
+      "model": "muse-voice-transcribe-1.0",
+      "job": "timed speech segments from audio and video"
+    },
+    {
+      "name": "video_observer",
+      "model": "muse-spark-1.3",
+      "job": "timed visual observations anchored to frame stills"
+    },
+    {
+      "name": "image_reader",
+      "model": "muse-spark-1.3",
+      "job": "visible text and observations from uploaded images"
+    },
+    {
+      "name": "subject_tracker",
+      "model": "sam-3.1",
+      "job": "speaker-following crop for vertical and square clips"
+    },
+    {
+      "name": "image_generator",
+      "model": "muse-image-1.0",
+      "job": "approved campaign images"
+    },
+    {
+      "name": "source_screen",
+      "model": "rules only",
+      "job": "quarantine instructions hidden in untrusted sources (source-guard-2026-11-03)"
+    }
+  ],
+  "rosterDigest": "d98471471dd5838d01c34a0b6ce18552f5ce2b0a329b8ff51889e4dc6c4b71ec",
+  "snapshotAt": "2026-11-04T18:35:43.789316+00:00"
+}

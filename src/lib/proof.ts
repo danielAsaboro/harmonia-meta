@@ -46,6 +46,7 @@ const rosterSchema = z.object({
   })),
   media: z.array(z.object({ name: z.string(), model: z.string(), job: z.string() })),
   rosterDigest: z.string().regex(/^[0-9a-f]{64}$/),
+  snapshotAt: z.string().optional(),
 });
 
 export type AgentRoster = z.infer<typeof rosterSchema>;
@@ -196,7 +197,14 @@ async function fetchJson(url: string, timeoutMs: number): Promise<unknown> {
 
 export async function loadRoster(): Promise<Loaded<AgentRoster>> {
   const base = process.env.AGENT_SERVICE_URL;
-  if (!base) return { state: "unavailable", reason: "AGENT_SERVICE_URL is not configured." };
+  if (!base) {
+    // A read-only deployment has no worker: show the committed roster snapshot, labelled as one.
+    const raw = await readEvidence("roster.json");
+    const parsed = raw ? rosterSchema.safeParse(JSON.parse(raw)) : null;
+    return parsed?.success
+      ? { state: "ok", value: parsed.data }
+      : { state: "unavailable", reason: "No agent service on this deployment and no committed roster snapshot." };
+  }
   try {
     const parsed = rosterSchema.safeParse(await fetchJson(`${base.replace(/\/$/, "")}/roster`, 8000));
     return parsed.success ? { state: "ok", value: parsed.data } : { state: "unavailable", reason: "The agent service returned an unexpected roster." };

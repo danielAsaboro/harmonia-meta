@@ -1,0 +1,6 @@
+agent/
+infra/
+.notes/
+.env
+.env.local
+node_modules

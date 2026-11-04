@@ -164,7 +164,7 @@ export default async function ProofPage() {
       <Section title="Agent team">
         {render(roster, (value) => (
           <>
-            <p className="mt-2 text-sm text-slate-600">{value.authority} Roster {short(value.rosterDigest)}</p>
+            <p className="mt-2 text-sm text-slate-600">{value.authority} Roster {short(value.rosterDigest)}{value.snapshotAt ? ` · snapshot ${new Date(value.snapshotAt).toUTCString()}` : ""}</p>
             <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[560px] text-left text-sm">
               <thead className="text-xs text-slate-500"><tr><th className="py-1">Agent</th><th>Model</th><th>Effort</th><th>Tools</th><th>Definition</th></tr></thead>
               <tbody>
