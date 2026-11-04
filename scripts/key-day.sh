@@ -33,4 +33,6 @@ want to show is done, export and publish it:
   npx tsx scripts/approve-replay.ts --input ../harmonia-private/run.json
 
 NEXT
+export INTERNAL_API_TOKEN="${INTERNAL_API_TOKEN:-local-dev-token}"
+export AGENT_SERVICE_URL="${AGENT_SERVICE_URL:-http://localhost:8080}"
 HARMONIA_DEV_AUTH_BYPASS=1 exec ./scripts/dev.sh
