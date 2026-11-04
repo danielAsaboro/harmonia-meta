@@ -20,6 +20,14 @@ export type Principal =
       callbackQueryIdDigest: string;
     }
   | {
+      /** An MCP client acting with a token the workspace owner minted. Never approves effects. */
+      kind: "agent_token";
+      subjectId: string;
+      workspaceRole: "member";
+      authenticationId: string;
+      tokenId: string;
+    }
+  | {
       kind: "service";
       subjectId: "harmonia-worker";
       workspaceRole: "service";
@@ -58,6 +66,28 @@ export function telegramPrincipal(input: {
   callbackQueryIdDigest: string;
 }): Extract<Principal, { kind: "telegram_user" }> {
   return { kind: "telegram_user", workspaceRole: "member", ...input };
+}
+
+export function agentTokenPrincipal(input: {
+  ownerSubjectId: string;
+  tokenId: string;
+}): Extract<Principal, { kind: "agent_token" }> {
+  return {
+    kind: "agent_token",
+    subjectId: input.ownerSubjectId,
+    workspaceRole: "member",
+    authenticationId: `agent_token_${input.tokenId}`,
+    tokenId: input.tokenId,
+  };
+}
+
+/** A human operator, or an MCP client the operator delegated to, asserting source rights. */
+export function requireSourceRequester(
+  context: TenantContext,
+): Extract<Principal, { kind: "firebase_user" | "telegram_user" | "agent_token" }> {
+  const { principal } = context;
+  if (principal.kind === "agent_token") return principal;
+  return requireContentOperator(context);
 }
 
 export function servicePrincipal(authenticationId: string): Extract<Principal, { kind: "service" }> {

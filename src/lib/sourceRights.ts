@@ -1,4 +1,4 @@
-import { requireContentOperator } from "./authority";
+import { requireSourceRequester } from "./authority";
 import { createHash } from "node:crypto";
 import type { TenantContext } from "./tenancy";
 
@@ -9,7 +9,7 @@ export interface SourceRightsAuthorization {
   sourceKind: "youtube" | "web" | "upload" | "pasted_text";
   attestedBySubjectId: string;
   authenticationId: string;
-  channel: "dashboard" | "telegram";
+  channel: "dashboard" | "telegram" | "mcp";
   attestedAt: string;
 }
 
@@ -26,13 +26,13 @@ export function sourceRightsAuthorization(
   sourceKind: SourceRightsAuthorization["sourceKind"],
   now = new Date().toISOString(),
 ): SourceRightsAuthorization {
-  const actor = requireContentOperator(context);
+  const actor = requireSourceRequester(context);
   return {
     version: "source-rights-v1",
     sourceKind,
     attestedBySubjectId: actor.subjectId,
     authenticationId: actor.authenticationId,
-    channel: actor.kind === "telegram_user" ? "telegram" : "dashboard",
+    channel: actor.kind === "telegram_user" ? "telegram" : actor.kind === "agent_token" ? "mcp" : "dashboard",
     attestedAt: now,
   };
 }

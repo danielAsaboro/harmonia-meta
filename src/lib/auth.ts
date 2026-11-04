@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { adminAuth } from "./firebaseAdmin";
 import { db } from "./firestore";
 import { currentTenant, requireWorkspaceRole, runWithTenant, type TenantContext } from "./tenancy";
-import { AuthorityError, firebasePrincipal, requireWorkspaceAdministrator } from "./authority";
+import { AuthorityError, agentTokenPrincipal, firebasePrincipal, requireWorkspaceAdministrator } from "./authority";
+import { AGENT_TOKEN_PREFIX, agentTokenRouteAllowed, resolveAgentToken } from "./agentTokens";
 import { withTraceContext } from "./telemetry";
 
 export const SESSION_COOKIE = "harmonia_session";
@@ -88,7 +89,22 @@ async function ensurePersonalWorkspace(uid: string, email?: string): Promise<Use
   return resolved.data() as UserDoc;
 }
 
+async function agentTokenContext(req: Request, token: string): Promise<TenantContext> {
+  if (!agentTokenRouteAllowed(req.method, new URL(req.url).pathname)) {
+    throw new AuthError("agent tokens cannot call this route", 403);
+  }
+  const record = await resolveAgentToken(token);
+  if (!record) throw new AuthError("invalid agent token", 401);
+  return {
+    workspaceId: record.workspaceId,
+    brandId: record.brandId,
+    principal: agentTokenPrincipal({ ownerSubjectId: record.ownerSubjectId, tokenId: record.id }),
+  };
+}
+
 export async function requireTenantContext(req: Request): Promise<TenantContext> {
+  const bearer = req.headers.get("authorization")?.match(/^Bearer\s+(\S+)$/i)?.[1];
+  if (bearer?.startsWith(AGENT_TOKEN_PREFIX)) return agentTokenContext(req, bearer);
   const session = cookieValue(req, SESSION_COOKIE);
   if (!session) throw new AuthError("authentication required", 401);
   if (isDevAuthBypassEnabled() && session === DEV_SESSION_VALUE) {
