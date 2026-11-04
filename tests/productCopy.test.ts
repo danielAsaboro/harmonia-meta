@@ -18,7 +18,7 @@ vi.mock("@/lib/firestore", () => ({
   listJobs: firestore.listJobs,
   saveChatMessage: firestore.saveChatMessage,
 }));
-vi.mock("@/lib/chatIntent", () => ({ parseIntent: chatIntent.parseIntent }));
+vi.mock("@/lib/chatIntent", async (importOriginal) => ({ ...(await importOriginal<typeof import("@/lib/chatIntent")>()), parseIntent: chatIntent.parseIntent }));
 vi.mock("@/lib/sourceManifest", () => ({ createSourceJob: sourceManifest.createSourceJob }));
 vi.mock("@/lib/stageTrigger", () => ({ queueStageTrigger: vi.fn() }));
 vi.mock("@/lib/tenancy", () => ({ currentTenant: () => ({ workspaceId: "workspace-local", brandId: "brand-local", principal: { subjectId: "user-local" } }) }));
