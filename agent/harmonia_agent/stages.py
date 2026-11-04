@@ -1309,8 +1309,10 @@ async def dispatch(job_id: str, stage: str, *, attempt: int = 0, operation_id: s
             }))
             span.set_status(Status(StatusCode.ERROR, envelope.code))
             logger.error(
-                "stage %s failed for %s (%s/%s retryable=%s)",
+                "stage %s failed for %s (%s/%s retryable=%s): %s: %s",
                 stage, job_id, envelope.category.value, envelope.code, envelope.retryable,
+                # Protocol errors name the broken contract, never prompt or output text.
+                type(exc).__name__, str(exc)[:300] if isinstance(exc, AgentProtocolError) else "",
             )
             try:
                 web_post("/api/internal/failure", _failure_payload(job_id, envelope))

@@ -39,15 +39,50 @@ function tokens(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/[a-z0-9]{3,}/g) ?? []);
 }
 
-/** Rank by shared words with the query, newest first on ties; facts with no overlap are dropped. */
+/** Operator-taught preferences that every retrieval returns first, newest first. */
+export const MAX_STANDING_PREFERENCES = 2;
+
+/**
+ * Operator preferences come first whatever the query says: an operator taught
+ * them on purpose. The remaining slots rank other facts by shared words with
+ * the query, newest first on ties; facts with no overlap are dropped.
+ */
 export function rankMemoryFacts(facts: StoredMemoryFact[], query: string, topK: number): MemoryFact[] {
   const wanted = tokens(query);
-  return facts
+  const newest = (left: StoredMemoryFact, right: StoredMemoryFact) => right.createdAt.localeCompare(left.createdAt);
+  const standing = facts.filter((fact) => fact.kind === "preference").sort(newest).slice(0, Math.min(MAX_STANDING_PREFERENCES, topK));
+  const ranked = facts
+    .filter((fact) => fact.kind !== "preference")
     .map((fact) => ({ fact, score: [...tokens(fact.fact)].filter((token) => wanted.has(token)).length }))
     .filter(({ score }) => score > 0)
-    .sort((left, right) => right.score - left.score || right.fact.createdAt.localeCompare(left.fact.createdAt))
+    .sort((left, right) => right.score - left.score || newest(left.fact, right.fact))
+    .map(({ fact }) => fact);
+  return [...standing, ...ranked]
     .slice(0, topK)
-    .map(({ fact: { createdAt: _createdAt, ...fact } }) => fact);
+    .map(({ createdAt: _createdAt, ...fact }) => fact);
+}
+
+/** Store one preference an operator taught ("never use hashtags"), traced to that operator. */
+export async function saveOperatorPreference(text: string, operatorSubjectId: string): Promise<MemoryFact> {
+  const { workspaceId, brandId } = currentTenant();
+  const recordId = `preference:${createHash("sha256").update(`${operatorSubjectId}|${text}`).digest("hex").slice(0, 24)}`;
+  const fact: MemoryFact = {
+    kind: "preference",
+    fact: `Operator preference: ${text.trim()}`,
+    evidence_ref: { workspace_id: workspaceId, brand_id: brandId, job_id: "operator", kind: "decision", record_id: recordId },
+  };
+  await saveMemoryFacts(brandId, [fact]);
+  return fact;
+}
+
+export async function listOperatorPreferences(): Promise<MemoryFact[]> {
+  const { brandId } = currentTenant();
+  const snapshot = await memoryCollection().where("evidence_ref.brand_id", "==", brandId).get();
+  return snapshot.docs
+    .map((doc) => doc.data() as StoredMemoryFact)
+    .filter((fact) => fact.kind === "preference")
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+    .map(({ createdAt: _createdAt, ...fact }) => fact);
 }
 
 function memoryCollection() {
