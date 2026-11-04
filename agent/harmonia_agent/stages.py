@@ -21,7 +21,7 @@ import httpx
 from opentelemetry.trace import Status, StatusCode
 from pydantic import ValidationError
 
-from . import clip_review, clipper, content, segmentation, x_client, youtube
+from . import clip_critic, clip_review, clipper, content, segmentation, x_client, youtube
 from .linkedin_client import LinkedInClient
 from .agent_models import (
     SourceAnalysis,
@@ -228,6 +228,12 @@ def _tracking_record(moment_id: str, source: Any, crop: "segmentation.SubjectCro
         "sourceWidth": width, "sourceHeight": height, "cropWidth": crop.width, "cropHeight": crop.height,
         "keyframes": [[round(t, 2), x] for t, x in crop.keyframes[::step]],
     }
+
+
+def _measured_for_critic(reviews: list[dict[str, Any]], out: Any) -> dict[str, Any]:
+    """The measured faults of the delivered version(s), for the blind critic's prompt."""
+    faults = [fault for review in reviews for fault in review["versions"][review["kept"] - 1]["faults"]]
+    return {"durationSec": clipper.probe_duration(out), "faults": faults if len(reviews) == 1 else []}
 
 
 def _clip_renderer(
@@ -892,6 +898,15 @@ async def run_publish(job_id: str) -> None:
                                 parts.append(part)
                             out = Path(td) / "reel.mp4"
                             clipper.render_reel(parts, out)
+                        critique = clip_critic.critique_clip(
+                            out, title=str(action.get("title") or action["type"]),
+                            measured=_measured_for_critic(reviews, out),
+                            invocation=InvocationContext(
+                                job_id=job["id"], workspace_id=job["workspaceId"], brand_id=job["brandId"],
+                                user_id=job["createdByUserId"], stage="publish",
+                                operation_id=f"{job['id']}:publish:{action['id']}:critic",
+                            ),
+                        )
                         video_bytes = out.read_bytes()
 
                     digest = hashlib.sha256(video_bytes).hexdigest()
@@ -909,6 +924,7 @@ async def run_publish(job_id: str) -> None:
                         **({"notes": render_notes} if render_notes else {}),
                         **({"tracking": tracking} if tracking else {}),
                         **({"review": reviews} if reviews else {}),
+                        **({"critique": critique} if critique else {}),
                     })
         except (x_client.XError, content.ImageGenError, ClipRenderError) as exc:
             outcome, detail["error"] = "failed", str(exc)

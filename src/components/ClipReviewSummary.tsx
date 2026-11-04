@@ -27,3 +27,26 @@ export function ClipReviewSummary({ review }: { review: ClipReview }) {
     </ol>
   );
 }
+
+export interface ClipCritique { model: string; score: number; issues: { tSec: number; criterion: string; severity: string; note: string }[] }
+
+export function clipCritique(detail: Record<string, unknown> | undefined): ClipCritique | null {
+  const critique = detail?.critique as ClipCritique | undefined;
+  return critique && typeof critique.score === "number" && Array.isArray(critique.issues) ? critique : null;
+}
+
+/** Muse Spark's blind score of the delivered clip; advice beside the measured gate. */
+export function ClipCritiqueSummary({ critique }: { critique: ClipCritique }) {
+  return (
+    <div className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+      <p><span className="font-medium text-zinc-900 dark:text-zinc-100">{critique.score}/100</span> · {critique.model}, blind review</p>
+      {critique.issues.length > 0 && (
+        <ul className="mt-1 space-y-0.5">
+          {critique.issues.map((issue, index) => (
+            <li key={index}>{issue.tSec.toFixed(1)} s · {issue.criterion}{issue.severity === "major" ? " (major)" : ""}: {issue.note}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
