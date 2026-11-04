@@ -1,5 +1,7 @@
 google-adk>=2.7,<3
 litellm==1.106.6
+# litellm imports mcp whenever a request carries tools (load_skill, web_search).
+mcp>=2.3,<3
 fastapi>=0.115
 uvicorn[standard]>=0.30
 httpx>=0.27

@@ -45,6 +45,8 @@ describe("Meta chat completions", () => {
         { role: "system", content: expect.stringContaining("ONE Harmonia record") },
         { role: "user", content: expect.stringContaining("Question: Is it done?") },
       ],
+      reasoning_effort: "low",
+      prompt_cache_key: "harmonia-web-contextual-answer",
     });
     expect(body).not.toHaveProperty("signal");
   });
@@ -117,5 +119,30 @@ describe("Meta chat completions", () => {
       Object.values(schema).forEach(visit);
     };
     visit(body.response_format.json_schema.schema);
+  });
+
+  it("retries 429/500/503 honouring Retry-After, then returns the answer", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response("busy", { status: 429, headers: { "retry-after": "2" } }))
+      .mockResolvedValueOnce(new Response("down", { status: 503 }))
+      .mockResolvedValueOnce(completion("ok"));
+    vi.stubGlobal("fetch", fetchMock);
+    const sleeps: number[] = [];
+    const { createChatCompletion } = await import("@/lib/metaChatCompletion");
+
+    await expect(createChatCompletion({
+      purpose: "test", messages: [{ role: "user", content: "q" }], timeoutMs: 1000,
+      sleep: async (ms) => { sleeps.push(ms); },
+    })).resolves.toBe("ok");
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(sleeps).toEqual([2000, 1000]);
+  });
+
+  it("does not retry a 400", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("bad schema", { status: 400 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { createChatCompletion } = await import("@/lib/metaChatCompletion");
+    await expect(createChatCompletion({ purpose: "test", messages: [], timeoutMs: 1000, sleep: async () => {} })).rejects.toThrow("(400)");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
