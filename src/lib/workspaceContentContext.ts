@@ -19,7 +19,9 @@ export function projectWorkspaceContentContext(input: { goals: OperatorGoals; jo
     ...(strategyJob?.contentStrategy?.channelRoles ?? []).map((role) => role.channel),
     ...input.items.flatMap((item) => item.platforms),
   ])].slice(0, 12);
+  const brief = input.goals.brandBrief?.brief;
   const goals = [
+    ...(brief ? [bounded(`Brand brief (onboarded from ${input.goals.brandBrief!.website}): ${brief.company}, ${brief.positioning}`, 300), bounded(`Customers: ${brief.audiences.map((audience) => audience.name).join("; ")}`, 300)] : []),
     ...(input.goals.audience ? [`Audience: ${input.goals.audience}`] : []),
     ...(input.goals.voice ? [`Voice: ${input.goals.voice}`] : []),
     ...(input.goals.weeklyPostTarget ? [`Weekly target: ${input.goals.weeklyPostTarget}`] : []),

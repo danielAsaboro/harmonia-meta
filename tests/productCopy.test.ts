@@ -12,6 +12,7 @@ const chatAttachments = vi.hoisted(() => ({ requireReadyAttachments: vi.fn() }))
 
 vi.mock("@/lib/firestore", () => ({
   appendEvent: vi.fn(),
+  getGoals: vi.fn().mockResolvedValue({}),
   getJob: vi.fn(),
   listAssets: vi.fn(),
   listChatMessages: firestore.listChatMessages,

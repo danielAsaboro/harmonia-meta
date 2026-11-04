@@ -916,6 +916,8 @@ export interface OperatorGoals {
   voice?: string;
   topics: string[];
   strategyContext?: import("./types").StrategyContext;
+  /** Cited brand brief from website onboarding; its company fields override routed guesses. */
+  brandBrief?: import("./brandBrief").StoredBrandBrief;
 }
 
 export async function getGoals(): Promise<OperatorGoals> {

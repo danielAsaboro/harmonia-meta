@@ -1,0 +1,604 @@
+{
+  "website": "https://cal.com/",
+  "brief": {
+    "company": "Cal.com",
+    "product": "Cal.com scheduling platform with booking pages, team scheduling, routing, workflows, embeds and Platform API, plus Cal Video, Events, Cal.ai and integrations.",
+    "category": "Scheduling Software for Online Bookings",
+    "positioning": "Cal.com is scheduling software that replaces email back-and-forth with one booking link, offering one calendar for every way people meet for individuals, teams and enterprises.",
+    "differentiators": [
+      "Open source and customizable scheduling infrastructure",
+      "Built-in Cal Video with browser guest join, recording and transcription on a team plan",
+      "100+ app integrations including Slack and Salesforce",
+      "Free for individuals with unlimited links and no usage limits"
+    ],
+    "audiences": [
+      {
+        "id": "solo-professionals-and-small-businesses",
+        "name": "Solo professionals and small-business owners sharing booking links",
+        "pains": [
+          "Finding a time took a week of emails. Now it's one link.",
+          "Whenever I share a Calendly link over email, the conversation tends to die down."
+        ],
+        "jobsToBeDone": [
+          "Share one link instead of trading availability by email",
+          "Start scheduling free without usage limits"
+        ],
+        "objections": [
+          "A link may feel too impersonal for a client relationship",
+          "Scheduling tools can get expensive or complicated as usage grows"
+        ],
+        "evidenceIds": [
+          "site:p1-seg-38",
+          "web:6",
+          "site:p2-seg-17"
+        ]
+      },
+      {
+        "id": "enterprise-recruiting-and-operations-teams",
+        "name": "Enterprise recruiting coordinators and operations teams",
+        "pains": [
+          "Calendly works fine for first-round screens. But once you hit panel interviews or custom workflows, it breaks."
+        ],
+        "jobsToBeDone": [
+          "Coordinate complex team and panel scheduling without manual follow-up",
+          "Have bookings show up in Slack, Salesforce, and tools the team already uses"
+        ],
+        "objections": [
+          "A basic scheduler may not hold up beyond simple one-to-one meetings",
+          "Efficiency claims need proof from a comparable company, not general promises"
+        ],
+        "evidenceIds": [
+          "web:7",
+          "site:p1-seg-82",
+          "site:p5-seg-49"
+        ]
+      },
+      {
+        "id": "service-businesses-with-staff-and-paid-bookings",
+        "name": "Service businesses with staff, services, and paid bookings",
+        "pains": [
+          "The bill scaling per seat, reminders being metered or gated, booking pages that are 'functional but visually rigid' and hard to change."
+        ],
+        "jobsToBeDone": [
+          "Let customers book staff and services online without rigid pages or surprise limits",
+          "Start free and move to a collaborative plan only when the company size requires it"
+        ],
+        "objections": [
+          "Per-seat pricing can punish growth",
+          "Key no-show and page-customisation features may be gated or hard to adapt"
+        ],
+        "evidenceIds": [
+          "web:8",
+          "site:p2-seg-17",
+          "site:p1-seg-154"
+        ]
+      }
+    ],
+    "competitors": [
+      {
+        "name": "Calendly",
+        "howWeDiffer": "Calendly is the polished mainstream benchmark with routing forms and a large integration ecosystem. Cal.com differs on evidence as an open-source scheduling platform that is free for individuals with no usage limits; do not claim Cal.com has a larger ecosystem than Calendly.",
+        "evidenceIds": [
+          "web:1",
+          "web:4",
+          "site:p2-seg-17"
+        ]
+      },
+      {
+        "name": "SavvyCal",
+        "howWeDiffer": "SavvyCal is positioned around invitee-first booking UX with calendar overlay for busy calendars and teams. Cal.com's evidenced contrast is breadth of meeting format: one calendar for every way people meet, including built-in Cal Video where guests join from the browser without an account.",
+        "evidenceIds": [
+          "web:1",
+          "site:p1-seg-62",
+          "site:p3-seg-17"
+        ]
+      },
+      {
+        "name": "TidyCal",
+        "howWeDiffer": "TidyCal is positioned as the budget-friendly lifetime-deal option for individuals and solos. Cal.com is honestly not a lifetime deal: individuals are free forever with no usage limits, while collaborative features are paid per-user plans, so the difference is a free unlimited start plus a team upgrade path.",
+        "evidenceIds": [
+          "web:5",
+          "site:p2-seg-17"
+        ]
+      },
+      {
+        "name": "YouCanBookMe",
+        "howWeDiffer": "YouCanBookMe is positioned on customizable booking pages, intake forms, and tailored booking communications integrated with Google Calendar. Cal.com's evidenced difference is open-source scheduling infrastructure and bookings surfacing in Slack, Salesforce, and 100+ other tools; do not claim its pages are more customizable without proof.",
+        "evidenceIds": [
+          "web:2",
+          "web:4",
+          "site:p1-seg-82"
+        ]
+      },
+      {
+        "name": "Acuity Scheduling",
+        "howWeDiffer": "Acuity Scheduling is positioned for appointment-based service businesses managing appointments online. Cal.com's evidenced difference is a broader one-calendar proposition for individuals, teams, and enterprises, with Cal Video built into each booking; do not claim deeper appointment-service specialisation than Acuity.",
+        "evidenceIds": [
+          "web:3",
+          "site:p1-seg-62",
+          "site:p3-seg-17"
+        ]
+      }
+    ],
+    "pillars": [
+      {
+        "name": "One link, not a week of emails",
+        "purpose": "Connect the pain of email back-and-forth and conversations dying after a link is shared to Cal.com's one-link booking outcome.",
+        "evidenceIds": [
+          "site:p1-seg-38",
+          "web:6"
+        ]
+      },
+      {
+        "name": "One calendar for every way people meet",
+        "purpose": "Connect varied meeting formats and video friction to one calendar plus built-in Cal Video rooms that guests join from the browser without an account.",
+        "evidenceIds": [
+          "site:p1-seg-62",
+          "site:p3-seg-17"
+        ]
+      },
+      {
+        "name": "Bookings where your team already works",
+        "purpose": "Connect complex team and panel workflows breaking in basic schedulers to bookings showing up in Slack, Salesforce, and 100+ connected tools.",
+        "evidenceIds": [
+          "site:p1-seg-82",
+          "web:7"
+        ]
+      },
+      {
+        "name": "Start free, pay only to collaborate",
+        "purpose": "Connect per-seat cost anxiety and gated features to a free start with no usage limits, with premium plans chosen to fit company size.",
+        "evidenceIds": [
+          "site:p2-seg-17",
+          "web:8"
+        ]
+      },
+      {
+        "name": "Proof time goes back to real work",
+        "purpose": "Connect time lost to scheduling to Deel's cited 35% reduction in scheduling time and 20% improvement in meeting attendance, framed as one customer's result.",
+        "evidenceIds": [
+          "site:p5-seg-49",
+          "site:p1-seg-17"
+        ]
+      }
+    ],
+    "voiceRules": [
+      "Lead with the pain, then the fix in one short sentence.",
+      "Use plain, everyday words; avoid enterprise jargon.",
+      "Keep each line to one clear benefit or outcome.",
+      "Write for absolutely everyone, not just big teams.",
+      "Be warm and human; never cold, hyped, or pushy.",
+      "Use ambitious mission language only as aspiration."
+    ],
+    "exclusions": [
+      "Do not present Deel's 35% scheduling-time reduction or 20% attendance improvement as a guaranteed or typical result for every customer.",
+      "Do not claim Cal.com is #1, best, or better-rated than any competitor; the evidence lists alternatives and ratings but proves no superiority.",
+      "Do not claim unproven security, compliance, uptime, or enterprise procurement credentials; no such evidence is supplied.",
+      "Do not claim unlimited collaborative or team features for free; the site says collaborative features require a premium plan.",
+      "Do not claim recording and transcription are available on every plan; the site ties them to a team plan.",
+      "Do not disparage competitors as broken for all users; the panel-interview pain is one cited enterprise recruiting view.",
+      "Do not use hyped, salesy, or exclusionary language that conflicts with 'Scheduling for absolutely everyone.'"
+    ],
+    "businessObjectives": [
+      "Grow free individual sign-ups as the entry point to team adoption",
+      "Move collaborative teams to paid Teams or Organizations plans",
+      "Prove scheduling time savings with named customer outcomes such as Deel"
+    ],
+    "campaignObjectives": [
+      "Make the cost of email back-and-forth immediately relatable",
+      "Demonstrate one link, one calendar, and built-in video in plain language",
+      "Convert social attention into a free start with no usage limits"
+    ],
+    "funnelStage": "awareness",
+    "intendedConversion": "Start scheduling for free with no credit card and no usage limits"
+  },
+  "strategyContext": {
+    "company": "Cal.com",
+    "product": "Cal.com scheduling platform with booking pages, team scheduling, routing, workflows, embeds and Platform API, plus Cal Video, Events, Cal.ai and integrations.",
+    "positioning": "Cal.com is scheduling software that replaces email back-and-forth with one booking link, offering one calendar for every way people meet for individuals, teams and enterprises.",
+    "differentiators": [
+      "Open source and customizable scheduling infrastructure",
+      "Built-in Cal Video with browser guest join, recording and transcription on a team plan",
+      "100+ app integrations including Slack and Salesforce",
+      "Free for individuals with unlimited links and no usage limits"
+    ],
+    "brandVoice": [
+      "Lead with the pain, then the fix in one short sentence.",
+      "Use plain, everyday words; avoid enterprise jargon.",
+      "Keep each line to one clear benefit or outcome.",
+      "Write for absolutely everyone, not just big teams.",
+      "Be warm and human; never cold, hyped, or pushy.",
+      "Use ambitious mission language only as aspiration."
+    ],
+    "exclusions": [
+      "Do not present Deel's 35% scheduling-time reduction or 20% attendance improvement as a guaranteed or typical result for every customer.",
+      "Do not claim Cal.com is #1, best, or better-rated than any competitor; the evidence lists alternatives and ratings but proves no superiority.",
+      "Do not claim unproven security, compliance, uptime, or enterprise procurement credentials; no such evidence is supplied.",
+      "Do not claim unlimited collaborative or team features for free; the site says collaborative features require a premium plan.",
+      "Do not claim recording and transcription are available on every plan; the site ties them to a team plan.",
+      "Do not disparage competitors as broken for all users; the panel-interview pain is one cited enterprise recruiting view.",
+      "Do not use hyped, salesy, or exclusionary language that conflicts with 'Scheduling for absolutely everyone.'"
+    ],
+    "safetyConstraints": [],
+    "businessObjectives": [
+      "Grow free individual sign-ups as the entry point to team adoption",
+      "Move collaborative teams to paid Teams or Organizations plans",
+      "Prove scheduling time savings with named customer outcomes such as Deel"
+    ],
+    "campaignObjectives": [
+      "Make the cost of email back-and-forth immediately relatable",
+      "Demonstrate one link, one calendar, and built-in video in plain language",
+      "Convert social attention into a free start with no usage limits"
+    ],
+    "audiences": [
+      {
+        "id": "solo-professionals-and-small-businesses",
+        "name": "Solo professionals and small-business owners sharing booking links",
+        "pains": [
+          "Finding a time took a week of emails. Now it's one link.",
+          "Whenever I share a Calendly link over email, the conversation tends to die down."
+        ]
+      },
+      {
+        "id": "enterprise-recruiting-and-operations-teams",
+        "name": "Enterprise recruiting coordinators and operations teams",
+        "pains": [
+          "Calendly works fine for first-round screens. But once you hit panel interviews or custom workflows, it breaks."
+        ]
+      },
+      {
+        "id": "service-businesses-with-staff-and-paid-bookings",
+        "name": "Service businesses with staff, services, and paid bookings",
+        "pains": [
+          "The bill scaling per seat, reminders being metered or gated, booking pages that are 'functional but visually rigid' and hard to change."
+        ]
+      }
+    ],
+    "funnelStage": "awareness",
+    "intendedConversion": "Start scheduling for free with no credit card and no usage limits",
+    "requestedChannels": [
+      "x",
+      "linkedin"
+    ],
+    "supportedChannels": [
+      "x",
+      "linkedin"
+    ],
+    "horizonWeeks": 4
+  },
+  "siteReading": {
+    "company": "Cal.com",
+    "product": "Cal.com scheduling platform with booking pages, team scheduling, routing, workflows, embeds and Platform API, plus Cal Video, Events, Cal.ai and integrations.",
+    "category": "Scheduling Software for Online Bookings",
+    "positioning": "Cal.com is scheduling software that replaces email back-and-forth with one booking link, offering one calendar for every way people meet for individuals, teams and enterprises.",
+    "differentiators": [
+      "Open source and customizable scheduling infrastructure",
+      "Built-in Cal Video with browser guest join, recording and transcription",
+      "100+ app integrations including Slack, Salesforce, Zoom, HubSpot and Stripe",
+      "Team features like round-robin, routing forms, workflows and managed links",
+      "Platform API, embeds and MCP support for AI voice and chat agents",
+      "Free for individuals with unlimited links and no usage limits"
+    ],
+    "statedCustomers": [
+      "Deel",
+      "Retell AI",
+      "Storyblok",
+      "Kiaora"
+    ],
+    "pricingModel": "Individuals Free forever with no credit card and no usage limits. Teams $12 per user/month, Organizations $28 per user/month with 14 day free trial, Enterprise Custom annual pricing.",
+    "claims": [
+      {
+        "text": "Making time for millions of people every month.",
+        "segmentId": "p1-seg-17"
+      },
+      {
+        "text": "Finding a time took a week of emails. Now it's one link.",
+        "segmentId": "p1-seg-38"
+      },
+      {
+        "text": "Connects to Slack, Salesforce, and 100+ more. Bookings show up where your team already works.",
+        "segmentId": "p1-seg-82"
+      },
+      {
+        "text": "Start scheduling for free, with no usage limits. For collaborative features, choose one of our premium plans that fits your company size.",
+        "segmentId": "p2-seg-17"
+      },
+      {
+        "text": "Cal Video is the video calling built into Cal.com. Each booking gets a room at its own link, guests join from the browser without an account, and on a team plan the call can be recorded and transcribed.",
+        "segmentId": "p3-seg-17"
+      },
+      {
+        "text": "Deel has seen a 35% reduction in the time spent on scheduling meetings since they started using Cal.com . In addition to that, they have also seen a 20% improvement in overall meeting attendance rates. These efficiency gains mean that Deel now has more time to focus on other value-added tasks, like maintaining market leadership in their industry and fostering innovation.",
+        "segmentId": "p5-seg-49"
+      }
+    ],
+    "voiceSamples": [
+      {
+        "text": "Finding a time took a week of emails. Now it's one link.",
+        "segmentId": "p1-seg-38"
+      },
+      {
+        "text": "One calendar for every way people meet.",
+        "segmentId": "p1-seg-62"
+      },
+      {
+        "text": "Scheduling for absolutely everyone.",
+        "segmentId": "p1-seg-154"
+      },
+      {
+        "text": "Our mission is to connect a billion people by 2031 through calendar scheduling.",
+        "segmentId": "p1-seg-159"
+      }
+    ]
+  },
+  "research": {
+    "competitors": [
+      {
+        "url": "https://www.producthunt.com/products/cal/alternatives",
+        "title": "Cal.com Competitors & Alternatives (2026) | Product Hunt",
+        "supportedText": "The best Cal.com alternatives are Calendly, SavvyCal, TidyCal, Morgen, and Google Calendar.",
+        "name": "Calendly",
+        "positioning": "Polished mainstream meeting scheduling benchmark with routing forms and large integration ecosystem"
+      },
+      {
+        "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+        "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+        "supportedText": "YouCanBookMe is booking software that integrates with your Google Calendar. Get a personalized scheduling page so your customers can book you online.",
+        "name": "YouCanBookMe",
+        "positioning": "Customizable booking pages with intake forms and tailored booking communications"
+      },
+      {
+        "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+        "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+        "supportedText": "Acuity Scheduling lets businesses easily book and manage appointments online.",
+        "name": "Acuity Scheduling",
+        "positioning": "Appointment-based services scheduling for service businesses managing appointments online"
+      },
+      {
+        "url": "https://webcatalog.io/en/apps/cal-com/alternatives?page=2",
+        "title": "Top Cal.com alternatives",
+        "supportedText": "Cal.com is an open source scheduling platform that simplifies appointment booking and calendar management for businesses and individuals.",
+        "name": "SavvyCal",
+        "positioning": "Invitee-first booking UX with calendar overlay for busy calendars and teams"
+      },
+      {
+        "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+        "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+        "supportedText": "A: The best alternatives to Cal.com are Calendly (4.7/5 stars, 2643 reviews), TidyCal (4.7/5 stars, 24 reviews), zcal (4.5/5 stars, 18 reviews), and",
+        "name": "TidyCal",
+        "positioning": "Budget-friendly lifetime-deal booking links for individuals and solos"
+      }
+    ],
+    "painSignals": [
+      {
+        "url": "https://fluentive.app/en/blogs/comparisons/scheduling-software-too-complicated-small-business-complaints.html",
+        "title": "\"Too Complicated\": What Real Users Say | Fluentive Blog",
+        "supportedText": "Whenever I share a Calendly link over email, the conversation tends to die down.",
+        "audience": "Freelancers and small business owners sharing booking links",
+        "pain": "Booking links feel impersonal and kill client conversation",
+        "platform": "blog"
+      },
+      {
+        "url": "https://candidate.fyi/post/calendly-enterprise-interview-scheduling",
+        "title": "Is Calendly Good for Enterprise Interview Scheduling? No.",
+        "supportedText": "\u201cCalendly works fine for first-round screens. But once you hit panel interviews or custom workflows, it breaks.\u201d",
+        "audience": "Enterprise recruiting coordinators doing panel interviews",
+        "pain": "Basic scheduler breaks for panels and custom workflows",
+        "platform": "blog"
+      },
+      {
+        "url": "https://journal.theflowops.com/calendly-alternatives-for-wellness/",
+        "title": "7 Best Calendly Alternatives for Service Businesses (2026)",
+        "supportedText": "the bill scaling per seat, reminders (the feature that kills no-shows) being metered or gated, booking pages that are \u201cfunctional but visually rigid\u201d and hard",
+        "audience": "Service businesses with staff, services and paid bookings",
+        "pain": "Per-seat pricing, gated reminders, and rigid booking pages",
+        "platform": "blog"
+      }
+    ],
+    "trends": []
+  },
+  "evidence": [
+    {
+      "id": "site:p1-seg-17",
+      "kind": "site",
+      "text": "Making time for millions of people every month.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "site:p1-seg-38",
+      "kind": "site",
+      "text": "Finding a time took a week of emails. Now it's one link.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "site:p1-seg-82",
+      "kind": "site",
+      "text": "Connects to Slack, Salesforce, and 100+ more. Bookings show up where your team already works.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "site:p2-seg-17",
+      "kind": "site",
+      "text": "Start scheduling for free, with no usage limits. For collaborative features, choose one of our premium plans that fits your company size.",
+      "url": "https://cal.com/pricing",
+      "title": ""
+    },
+    {
+      "id": "site:p3-seg-17",
+      "kind": "site",
+      "text": "Cal Video is the video calling built into Cal.com. Each booking gets a room at its own link, guests join from the browser without an account, and on a team plan the call can be recorded and transcribed.",
+      "url": "https://cal.com/features/cal-video",
+      "title": ""
+    },
+    {
+      "id": "site:p5-seg-49",
+      "kind": "site",
+      "text": "Deel has seen a 35% reduction in the time spent on scheduling meetings since they started using Cal.com . In addition to that, they have also seen a 20% improvement in overall meeting attendance rates. These efficiency gains mean that Deel now has more time to focus on other value-added tasks, like maintaining market leadership in their industry and fostering innovation.",
+      "url": "https://cal.com/customers/deel",
+      "title": ""
+    },
+    {
+      "id": "site:p1-seg-62",
+      "kind": "site",
+      "text": "One calendar for every way people meet.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "site:p1-seg-154",
+      "kind": "site",
+      "text": "Scheduling for absolutely everyone.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "site:p1-seg-159",
+      "kind": "site",
+      "text": "Our mission is to connect a billion people by 2031 through calendar scheduling.",
+      "url": "https://cal.com/",
+      "title": ""
+    },
+    {
+      "id": "web:1",
+      "kind": "competitor",
+      "text": "The best Cal.com alternatives are Calendly, SavvyCal, TidyCal, Morgen, and Google Calendar.",
+      "url": "https://www.producthunt.com/products/cal/alternatives",
+      "title": "Cal.com Competitors & Alternatives (2026) | Product Hunt",
+      "check": "source"
+    },
+    {
+      "id": "web:2",
+      "kind": "competitor",
+      "text": "YouCanBookMe is booking software that integrates with your Google Calendar. Get a personalized scheduling page so your customers can book you online.",
+      "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+      "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+      "check": "source"
+    },
+    {
+      "id": "web:3",
+      "kind": "competitor",
+      "text": "Acuity Scheduling lets businesses easily book and manage appointments online.",
+      "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+      "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+      "check": "source"
+    },
+    {
+      "id": "web:4",
+      "kind": "competitor",
+      "text": "Cal.com is an open source scheduling platform that simplifies appointment booking and calendar management for businesses and individuals.",
+      "url": "https://webcatalog.io/en/apps/cal-com/alternatives?page=2",
+      "title": "Top Cal.com alternatives",
+      "check": "source"
+    },
+    {
+      "id": "web:5",
+      "kind": "competitor",
+      "text": "A: The best alternatives to Cal.com are Calendly (4.7/5 stars, 2643 reviews), TidyCal (4.7/5 stars, 24 reviews), zcal (4.5/5 stars, 18 reviews), and",
+      "url": "https://www.g2.com/products/cal-com/competitors/alternatives?open_modal_url=%2Fit%2Fproducts%2Ftidycal%2Fwishlists%3Fhost_path%3D%252Fproducts%252Fcal-com%252Fcompetitors%252Falternatives%26source%3Dalternatives_card_pin",
+      "title": "Top 10 Cal.com Alternatives & Competitors in 2026 | G2",
+      "check": "source"
+    },
+    {
+      "id": "web:6",
+      "kind": "pain",
+      "text": "Whenever I share a Calendly link over email, the conversation tends to die down.",
+      "url": "https://fluentive.app/en/blogs/comparisons/scheduling-software-too-complicated-small-business-complaints.html",
+      "title": "\"Too Complicated\": What Real Users Say | Fluentive Blog",
+      "check": "source"
+    },
+    {
+      "id": "web:7",
+      "kind": "pain",
+      "text": "\u201cCalendly works fine for first-round screens. But once you hit panel interviews or custom workflows, it breaks.\u201d",
+      "url": "https://candidate.fyi/post/calendly-enterprise-interview-scheduling",
+      "title": "Is Calendly Good for Enterprise Interview Scheduling? No.",
+      "check": "source"
+    },
+    {
+      "id": "web:8",
+      "kind": "pain",
+      "text": "the bill scaling per seat, reminders (the feature that kills no-shows) being metered or gated, booking pages that are \u201cfunctional but visually rigid\u201d and hard",
+      "url": "https://journal.theflowops.com/calendly-alternatives-for-wellness/",
+      "title": "7 Best Calendly Alternatives for Service Businesses (2026)",
+      "check": "source"
+    }
+  ],
+  "pages": [
+    {
+      "pageId": "p1",
+      "role": "home",
+      "url": "https://cal.com/",
+      "title": "Cal.com | Scheduling Software for Online Bookings"
+    },
+    {
+      "pageId": "p2",
+      "role": "pricing",
+      "url": "https://cal.com/pricing",
+      "title": "Pricing | Cal.com"
+    },
+    {
+      "pageId": "p3",
+      "role": "product",
+      "url": "https://cal.com/features/cal-video",
+      "title": "Cal Video | Cal.com"
+    },
+    {
+      "pageId": "p4",
+      "role": "about",
+      "url": "https://cal.com/customers/storyblok",
+      "title": "How Storyblok Solved Scheduling Challenges with Cal.com | Cal.com"
+    },
+    {
+      "pageId": "p5",
+      "role": "customers",
+      "url": "https://cal.com/customers/deel",
+      "title": "How Deel Reduced Scheduling Time by 35% with Cal.com | Cal.com"
+    }
+  ],
+  "sourceScreen": {
+    "version": "source-guard-2026-11-03",
+    "screenedSegments": 904,
+    "quarantined": [],
+    "strippedCharacters": 0,
+    "modelScreen": "off"
+  },
+  "unverifiedResearchDropped": 6,
+  "modelCalls": [
+    {
+      "step": "read_site",
+      "model": "muse-spark-1.3",
+      "responseId": "resp_6aeb84487ae8e633ef414af2",
+      "inputTokens": 21507,
+      "outputTokens": 1435,
+      "searchCalls": 0
+    },
+    {
+      "step": "research_competitors",
+      "model": "muse-spark-1.3",
+      "responseId": "resp_6aeb84480228a54c789641b1",
+      "inputTokens": 9977,
+      "outputTokens": 3016,
+      "searchCalls": 3
+    },
+    {
+      "step": "research_customer_pain",
+      "model": "muse-spark-1.3",
+      "responseId": "resp_6aeb8449fbf737efffb44c18",
+      "inputTokens": 8503,
+      "outputTokens": 2470,
+      "searchCalls": 3
+    },
+    {
+      "step": "synthesize_brief",
+      "model": "muse-wonder-1.0",
+      "responseId": "resp_6aeb8481bf1b1b8e4c5c4212",
+      "inputTokens": 3280,
+      "outputTokens": 3522,
+      "searchCalls": 0
+    }
+  ],
+  "elapsedSeconds": 71.4
+}

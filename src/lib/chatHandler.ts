@@ -4,6 +4,7 @@ import { requestAgentAnswer } from "@/lib/agentAskClient";
 import { answerFromContext, fetchContextRecord, isValidContext } from "@/lib/contextAnswer";
 import {
   appendEvent,
+  getGoals,
   getJob,
   listAssets,
   listChatMessages,
@@ -20,6 +21,8 @@ import { actionPayloadDigest } from "@/lib/idempotency";
 import { createPendingOperation, type PendingOperation } from "@/lib/pendingOperations";
 import { hasRightsAttestation, RIGHTS_ATTESTATION_PHRASE, sourceRightsAuthorization, sourceRightsAuthorizationId } from "@/lib/sourceRights";
 import { createSourceJob } from "@/lib/sourceManifest";
+import { requestWebsiteOnboarding, saveBrandBrief, summarizeBrief, websiteOnboardingTarget, withBrandContext } from "@/lib/brandBrief";
+import { requireContentOperator } from "@/lib/authority";
 import { latestHealthySnapshot, listLibraryConnections } from "@/lib/brandLibraries/repository";
 import { outputKindSchema } from "@/lib/contracts";
 
@@ -292,6 +295,22 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
     } satisfies ChatResponse as ChatResponse };
   }
 
+  // "Here's our website": build the cited brand brief every later job starts from.
+  const website = attachments.length === 0 ? websiteOnboardingTarget(message) : null;
+  if (website) {
+    try {
+      requireContentOperator(currentTenant());
+    } catch {
+      return { payload: { intent: "website_onboarding", reply: "Only a signed-in content operator can set the brand brief." } satisfies ChatResponse };
+    }
+    try {
+      const brief = await saveBrandBrief(await requestWebsiteOnboarding(website));
+      return { payload: { intent: "website_onboarding", reply: summarizeBrief(brief) } satisfies ChatResponse };
+    } catch (e) {
+      return { payload: { intent: "website_onboarding", reply: `I could not build the brand brief from ${website}: ${e instanceof Error ? e.message : String(e)}` } satisfies ChatResponse };
+    }
+  }
+
   let intent;
   let history: Awaited<ReturnType<typeof listChatMessages>> = [];
   let effectiveMessage = message;
@@ -373,8 +392,10 @@ async function buildResponse(req: Request, message: string, surface: "dashboard"
       if (directSources.length || librarySnapshotId) {
         const desiredOutputs = (intent.desiredOutputs ?? []).map((item) => outputKindSchema.safeParse(item)).filter((item) => item.success).map((item) => item.data);
         if (!desiredOutputs.length) desiredOutputs.push(intent.workspaceContext?.channels.includes("linkedin") ? "linkedin_post" : "x_post");
-        const platforms = Array.from(new Set(intent.strategyContext?.supportedChannels ?? intent.platformRecommendations ?? ["x"]));
-        const job = await createSourceJob({ operatorBrief: effectiveMessage, librarySnapshotId, directSources, desiredOutputs, allowedOutputs: desiredOutputs, platforms, strategyContext: intent.strategyContext });
+        const goals = await getGoals();
+        const strategyContext = withBrandContext(intent.strategyContext, goals.strategyContext, Boolean(goals.brandBrief));
+        const platforms = Array.from(new Set(strategyContext?.supportedChannels ?? intent.platformRecommendations ?? ["x"]));
+        const job = await createSourceJob({ operatorBrief: effectiveMessage, librarySnapshotId, directSources, desiredOutputs, allowedOutputs: desiredOutputs, platforms, strategyContext });
         await appendEvent(job.id, "collect_sources", `source manifest created via ${surface} chat`, "operator");
         await queueStageTrigger(job.id, "collect_sources");
         const inherited = intent.workspaceContext?.strategyReady ? " It is using your approved workspace strategy as context." : " Harmonia will state its assumptions before strategy approval.";

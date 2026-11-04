@@ -59,7 +59,7 @@ function safeValidationSummary(body: unknown): string {
   return items.length ? `: ${items.slice(0, 4).join(", ")}` : "";
 }
 
-async function authorizedFetch(url: string, init: RequestInit, custom?: typeof fetch): Promise<Response> {
+export async function authorizedAgentFetch(url: string, init: RequestInit, custom?: typeof fetch): Promise<Response> {
   if (custom) return custom(url, init);
   const host = new URL(url).hostname;
   if (["localhost", "127.0.0.1", "::1"].includes(host)) return fetch(url, init);
@@ -77,7 +77,7 @@ export async function requestIntentRoute(input: IntentRouteRequest, options: Opt
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 180_000);
   try {
-    const response = await authorizedFetch(`${baseUrl}/internal/agent/route`, {
+    const response = await authorizedAgentFetch(`${baseUrl}/internal/agent/route`, {
       method: "POST", signal: controller.signal,
       headers: { "content-type": "application/json", "x-harmonia-internal-token": options.token ?? config?.INTERNAL_API_TOKEN ?? "", "x-workspace-id": tenant.workspaceId, "x-brand-id": tenant.brandId, "x-user-id": tenant.userId },
       body: JSON.stringify(input),

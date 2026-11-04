@@ -27,6 +27,7 @@ from .a2ui_api import router as a2ui_router
 from .ask_api import router as ask_router
 from .intent_api import router as intent_router
 from .extraction_api import router as extraction_router
+from .onboarding_api import router as onboarding_router
 from .stages import HANDLERS, dispatch
 from .telemetry import configure_telemetry, extract_context
 from .tenant_context import tenant_scope
@@ -44,6 +45,7 @@ app.include_router(a2ui_router)
 app.include_router(ask_router)
 app.include_router(intent_router)
 app.include_router(extraction_router)
+app.include_router(onboarding_router)
 
 if settings().telemetry_enabled:
     from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor

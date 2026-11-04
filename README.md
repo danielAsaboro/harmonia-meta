@@ -22,6 +22,12 @@ The public, read-only [`/proof`](./src/app/proof/page.tsx) page (and `/api/proof
 
 Harmonia is agentic where the problem is ambiguous: Muse Spark specialists, organized with Google ADK, interpret multimodal source material, identify grounded moments and angles, produce and review typed content artifacts, and propose bounded actions. It is deliberately deterministic where mistakes have consequences: Firestore/Pub/Sub progression, schema validation, cost reservation, policy, approval, idempotent execution, receipts, and independent verification. Humans retain final publishing authority. This is bounded agency inside a durable workflow, not an unrestricted model loop; the full stage/authority and KPI contract is in [`docs/operational-model.mdx`](./docs/operational-model.mdx).
 
+## Start from a website
+
+Tell Harmonia "here's our website: acme.com" (or `POST /api/onboarding/website`) and it builds a cited brand brief before any content job runs. It reads the homepage plus up to four same-site pages chosen by role (pricing, product, about, customers, blog) through the SSRF-guarded fetcher and the source guard. Muse Spark reads what the site says, quoting page segments verbatim. Two Muse Spark calls with Meta's `web_search` find competitors and customer pain in the customer's own words (Reddit, Hacker News, X, review sites), and an item is kept only if Meta's search returned its source. Muse Wonder then writes ICP segments, a competitor wedge, messaging pillars and voice rules that may cite only that evidence.
+
+The brief becomes the workspace strategy context and a set of memory facts. From then on, company facts and ICPs in every job come from the brief, not from a model's reading of one chat message, and the router only sets that job's campaign fields. A live run on cal.com (`evidence/onboarding/cal.com-2026-11-04.json`) took 71 seconds and about $0.18: 5 pages, 5 competitors, 3 ICP segments with outside pain quotes, 6 unconfirmed research items dropped.
+
 ## The pipeline
 
 Harmonia runs as an asynchronous, event-driven workflow on Pub/Sub. A single job travels across two services with durable state in Firestore at every step:
