@@ -14,7 +14,9 @@ describe("agent image dependency contract", () => {
   it("builds the worker from exact resolved versions", () => {
     expect(dockerfile).toContain("COPY requirements.lock .");
     expect(dockerfile).toContain("pip install --no-cache-dir -r requirements.lock");
-    expect(lock).toContain("google-adk==2.7.1");
+    expect(lock).toContain("google-adk==2.13.0");
+    // litellm imports mcp on every tool-carrying request.
+    expect(lock).toMatch(/^mcp==/m);
   });
 
   it("excludes workstation dependencies from the Cloud Build source archive", () => {
