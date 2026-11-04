@@ -115,6 +115,7 @@ class AdkTeamRuntime:
         session_id = f"harmonia-{sha256(f'{user_id}|{session_key}'.encode()).hexdigest()[:40]}"
         state: dict[str, Any] = {}
         response_texts: list[str] = []
+        observed_usage: dict[str, dict[str, int]] = {}
         prompt = json.dumps(_specialist_prompt_payload(payload), separators=(",", ":"), ensure_ascii=False)
         try:
             await runner.session_service.create_session(
@@ -129,6 +130,7 @@ class AdkTeamRuntime:
                 new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
             ):
                 state.update(_state_delta(event))
+                _observe_usage(observed_usage, event)
                 content = getattr(event, "content", None)
                 for part in getattr(content, "parts", []) or []:
                     if isinstance(getattr(part, "text", None), str):
@@ -194,7 +196,26 @@ class AdkTeamRuntime:
             ) from exc
         if not state:
             raise TeamRuntimeProtocolError("ADK returned no state delta")
+        if observed_usage:
+            state[OBSERVED_USAGE_KEY] = observed_usage
         return state
+
+
+OBSERVED_USAGE_KEY = "_harmonia_observed_usage"
+
+
+def _observe_usage(totals: dict[str, dict[str, int]], event: Any) -> None:
+    """Sum the provider-reported tokens of every model response, per agent."""
+    metadata = getattr(event, "usage_metadata", None)
+    author = getattr(event, "author", None)
+    if metadata is None or not isinstance(author, str):
+        return
+    row = totals.setdefault(author, {"input": 0, "output": 0, "cached": 0, "responses": 0})
+    row["input"] += int(getattr(metadata, "prompt_token_count", 0) or 0)
+    row["output"] += int(getattr(metadata, "candidates_token_count", 0) or 0)
+    row["output"] += int(getattr(metadata, "thoughts_token_count", 0) or 0)
+    row["cached"] += int(getattr(metadata, "cached_content_token_count", 0) or 0)
+    row["responses"] += 1
 
 
 def _state_delta(event: Any) -> dict[str, Any]:

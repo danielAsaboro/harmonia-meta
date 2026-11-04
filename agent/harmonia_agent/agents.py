@@ -143,7 +143,7 @@ from .dara_skills import (
 from .telemetry import current_trace_id, safe_attributes, tracer
 from .activity_models import AgentActivityRecord
 from .activity_projection import invocation_activity, tool_activity
-from .team_runtime import AdkTeamRuntime, TeamRuntime, TeamRuntimeProviderError
+from .team_runtime import OBSERVED_USAGE_KEY, AdkTeamRuntime, TeamRuntime, TeamRuntimeProviderError
 from .handoff_protocol import (
     MAX_HANDOFF_REPAIR_ATTEMPTS,
     build_handoff,
@@ -2450,6 +2450,8 @@ async def _run_coordinator(
     inference_calls = 0
     tool_calls = 0
     accounting_invocations: list[InvocationContext] = [invocation] if invocation else []
+    # Provider-reported usage per attempt, in the same order as accounting_invocations.
+    observed_attempts: list[dict[str, dict[str, int]]] = []
     reporter = activity_reporter
     if reporter is None and team_runtime is None:
         reporter = record_agent_activity
@@ -2556,6 +2558,7 @@ async def _run_coordinator(
             final_state = await invoke_with_timeout(
                 runtime_payload, base_session_key,
             )
+            observed_attempts.append(final_state.get(OBSERVED_USAGE_KEY) or {})
             managed_trace_id = current_trace_id()
             span_context = invoke_span.get_span_context()
             if span_context.is_valid:
@@ -2600,6 +2603,7 @@ async def _run_coordinator(
                         repair_payload,
                         f"{base_session_key}:repair:{repair_attempt}",
                     )
+                    observed_attempts.append(final_state.get(OBSERVED_USAGE_KEY) or {})
                     try:
                         _validate_run_output(specialist, payload, final_state)
                     except AgentContractError as repair_error:
@@ -2650,8 +2654,20 @@ async def _run_coordinator(
                     model=model_id,
                     model_policy=config.policy_snapshot(),
                 )
-                accumulator.input_tokens = estimated_input
-                accumulator.output_tokens = estimated_output
+                attempt_index = accounting_invocations.index(accounted_invocation)
+                observed = (
+                    observed_attempts[attempt_index].get(role)
+                    if attempt_index < len(observed_attempts) else None
+                )
+                if observed and observed.get("responses"):
+                    # Bill what Meta reported for this attempt; an attempt with
+                    # no reported usage keeps its reserved estimate.
+                    accumulator.input_tokens = observed["input"]
+                    accumulator.output_tokens = observed["output"]
+                    accumulator.cached_input_tokens = min(observed["cached"], observed["input"])
+                else:
+                    accumulator.input_tokens = estimated_input
+                    accumulator.output_tokens = estimated_output
                 record = accumulator.finalize(trace_id=trace_id)
                 # Web search bills tokens plus $2.50 per 1,000 queries. The final
                 # invocation's searches are observed; earlier repaired ones are not.
@@ -3360,9 +3376,10 @@ async def route_intent_with_team(
     suggestions = [platform for platform in recommendations if not connected.get(platform, False)]
 
     strategy_context = None
+    # Every job these intents start runs Ryan's strategize stage, which needs a
+    # typed context even when the workspace already has an approved strategy.
     needs_context = (
         classification.intent in {"establish_strategy", "revise_strategy", "repurpose_source", "one_off_content"}
-        and not value.workspaceContext.strategyReady
         and not classification.needsClarification
     )
     if needs_context:
