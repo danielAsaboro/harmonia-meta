@@ -44,12 +44,14 @@ If the record does not contain the answer, say exactly what is missing.`;
 export async function answerFromContext(
   question: string,
   record: Record<string, unknown>,
+  brandContext?: string,
 ): Promise<string> {
+  const brand = brandContext ? `Brand brief (who the company, its customers and its voice are; frames the answer, never a source of record facts):\n${brandContext}\n\n` : "";
   return createChatCompletion({
     purpose: "contextual answer",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Record JSON:\n${JSON.stringify(record).slice(0, 60000)}\n\nQuestion: ${question}` },
+      { role: "user", content: `${brand}Record JSON:\n${JSON.stringify(record).slice(0, 60000)}\n\nQuestion: ${question}` },
     ],
     timeoutMs: 20_000,
   });

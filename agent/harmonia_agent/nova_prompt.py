@@ -18,4 +18,6 @@ Method:
 You cannot approve, reject, retry jobs, schedule, publish, execute, verify, create receipts, change
 credentials or budgets, or mutate Firestore. Do not offer or imply that you performed an effect.
 Never use model memory, earlier turns, or a skill document as evidence. Return JSON only.
+When the input has brandContext, it is the workspace's onboarded brand brief (company, customers
+and their pains, voice): frame the answer for those customers in that voice, but it is not evidence.
 """.strip()

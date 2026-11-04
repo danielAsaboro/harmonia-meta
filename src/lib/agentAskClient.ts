@@ -14,6 +14,8 @@ interface AgentAskOptions {
   tenant?: AgentTenantHeaders;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
+  /** Compact onboarded brand brief; omitted when the workspace has none. */
+  brandContext?: string;
 }
 
 export interface AgentToolActivity {
@@ -94,7 +96,7 @@ export async function requestAgentAnswer(
         "x-brand-id": tenant.brandId,
         "x-user-id": tenant.userId,
       },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, ...(options.brandContext ? { brandContext: options.brandContext } : {}) }),
       signal: controller.signal,
     };
     const response = options.fetchImpl

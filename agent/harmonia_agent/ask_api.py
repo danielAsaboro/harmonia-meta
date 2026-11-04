@@ -26,6 +26,7 @@ class OperatorQuestion(BaseModel):
     model_config = {"extra": "forbid"}
 
     question: str = Field(min_length=1, max_length=2000)
+    brandContext: str | None = Field(default=None, min_length=1, max_length=1500)
 
 
 class OperatorAnswer(BaseModel):
@@ -70,7 +71,7 @@ async def operator_ask(payload: OperatorQuestion, request: Request) -> OperatorA
     try:
         with tenant_scope(workspace_id, brand_id):
             answer, activity = await ask_with_team_detailed(
-                payload.question, invocation=invocation,
+                payload.question, brand_context=payload.brandContext, invocation=invocation,
             )
     except AgentContractError as exc:
         raise HTTPException(status_code=502, detail={

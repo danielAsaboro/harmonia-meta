@@ -8,7 +8,7 @@ from typing import Annotated, Any, Callable, Literal
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator, model_serializer, model_validator
 
 
 class StrictModel(BaseModel):
@@ -1128,6 +1128,15 @@ class LiaisonInput(StrictModel):
     """Operator question routed to the skill-enabled insight liaison."""
 
     question: StrictStr = Field(min_length=1, max_length=2000)
+    brandContext: StrictStr | None = Field(default=None, min_length=1, max_length=1500)
+
+    @model_serializer(mode="wrap")
+    def _omit_absent_brand(self, handler: Callable[["LiaisonInput"], dict[str, Any]]) -> dict[str, Any]:
+        # A workspace without a brief sends Nova exactly the question, as before.
+        data = handler(self)
+        if data.get("brandContext") is None:
+            data.pop("brandContext", None)
+        return data
 
 
 class LiaisonClaim(StrictModel):

@@ -3432,10 +3432,10 @@ async def ask_with_team(
 
 
 async def ask_with_team_detailed(
-    question: str, *, invocation: InvocationContext | None = None,
+    question: str, *, brand_context: str | None = None, invocation: InvocationContext | None = None,
 ) -> tuple[str, list[dict[str, Any]]]:
     """Return Nova's answer plus content-free activity derived from its validated trace."""
-    input = LiaisonInput(question=question)
+    input = LiaisonInput(question=question, brandContext=brand_context)
     state = await _run_coordinator("nova_liaison", input, invocation=invocation)
     answer = _validated_liaison_state(state)
     trace = state.get(LIAISON_TRACE_KEY) or []
