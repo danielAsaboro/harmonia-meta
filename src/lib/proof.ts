@@ -64,6 +64,7 @@ export interface RunSummary {
   durationMs: number;
   stages: string[];
   handoffs: { from: string; to: string; summary: string }[];
+  reviews: string[];
   moments: { title: string; startSec: number; endSec: number }[];
   drafts: { platform: string; valid: boolean; text: string }[];
   approvals: { actionId: string; decision: string }[];
@@ -80,7 +81,7 @@ export function summarizeRun(bundle: ImportedReplayBundle): RunSummary {
     sourceRunId: bundle.provenance.sourceRunId, environment: bundle.provenance.environment, integrityDigest: bundle.integrity.digest,
     terminalStateDigest: bundle.terminalStateDigest, eventCount: bundle.events.length,
     durationMs: bundle.events.at(-1)?.offsetMs ?? 0,
-    stages, handoffs: [], moments: [], drafts: [], approvals: [], receipts: [], cost: [], totalUsd: 0,
+    stages, handoffs: [], reviews: [], moments: [], drafts: [], approvals: [], receipts: [], cost: [], totalUsd: 0,
   };
   for (const event of bundle.events) {
     const p = event.payload as Record<string, unknown>;
@@ -91,6 +92,9 @@ export function summarizeRun(bundle: ImportedReplayBundle): RunSummary {
         break;
       case "specialist_handoff":
         summary.handoffs.push({ from: String(p.from), to: String(p.to), summary: String(p.summary) });
+        break;
+      case "activity_summary":
+        if (p.specialist === "clip_critic") summary.reviews.push(String(p.summary));
         break;
       case "moment":
         summary.moments.push({ title: String(p.title), startSec: Number(p.startSec), endSec: Number(p.endSec) });

@@ -53,6 +53,7 @@ function Run({ run }: { run: RunSummary }) {
           ))}
         </ol>
       )}
+      {run.reviews.map((line, index) => <p key={`v${index}`} className="mt-3 text-sm font-medium text-slate-800">{line}</p>)}
       {run.moments.length > 0 && (
         <ul className="mt-4 space-y-1 text-sm text-slate-700">
           {run.moments.map((moment, index) => (

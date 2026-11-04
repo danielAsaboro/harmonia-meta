@@ -57,6 +57,13 @@ export function jobObservations({ job, events, usage, receipts }: JobExportInput
   for (const receipt of receipts) {
     const verification = verifications.get(receipt.id);
     timed.push({ at: receipt.performedAt, kind: "receipt", payload: { jobId, receiptId: receipt.id, actionId: receipt.actionId, outcome: receipt.outcome, verified: verification?.verified === true, traceId: receipt.traceId } });
+    const critique = (receipt.detail ?? {}).critique as { score?: number; previousScore?: number; model?: string } | undefined;
+    if (critique && typeof critique.score === "number") {
+      const summary = typeof critique.previousScore === "number"
+        ? `${critique.model ?? "Muse Spark"} blind score ${critique.previousScore}/100, re-cut, then ${critique.score}/100`
+        : `${critique.model ?? "Muse Spark"} blind score ${critique.score}/100`;
+      timed.push({ at: receipt.performedAt, kind: "activity_summary", payload: { jobId, specialist: "clip_critic", summary, status: "succeeded", traceId: receipt.traceId } });
+    }
     if (verification) {
       timed.push({ at: verification.checkedAt, kind: "verification", payload: { jobId, receiptId: receipt.id, verified: verification.verified, method: verification.method, traceId: verification.traceId } });
     }

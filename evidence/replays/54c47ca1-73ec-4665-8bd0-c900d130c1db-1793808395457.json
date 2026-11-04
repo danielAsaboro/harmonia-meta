@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.authenticated-replay",
   "schemaVersion": "1.0.0",
-  "bundleId": "54c47ca1-73ec-4665-8bd0-c900d130c1db-1793807567689",
+  "bundleId": "54c47ca1-73ec-4665-8bd0-c900d130c1db-1793808395457",
   "executionMode": "recorded_replay",
   "evidenceClassification": "historical_replay",
   "scenario": "success",
@@ -332,6 +332,19 @@
     },
     {
       "sequence": 24,
+      "capturedAt": "2026-11-04T15:51:10.539Z",
+      "offsetMs": 236382,
+      "kind": "activity_summary",
+      "payload": {
+        "jobId": "54c47ca1-73ec-4665-8bd0-c900d130c1db",
+        "traceId": "492545b33db948116a5a8623bb847ad3",
+        "specialist": "clip_critic",
+        "summary": "muse-spark-1.3 blind score 38/100",
+        "status": "succeeded"
+      }
+    },
+    {
+      "sequence": 25,
       "capturedAt": "2026-11-04T15:51:10.557Z",
       "offsetMs": 236400,
       "kind": "stage_transition",
@@ -343,7 +356,7 @@
       }
     },
     {
-      "sequence": 25,
+      "sequence": 26,
       "capturedAt": "2026-11-04T15:51:10.757Z",
       "offsetMs": 236600,
       "kind": "receipt",
@@ -357,7 +370,7 @@
       }
     },
     {
-      "sequence": 26,
+      "sequence": 27,
       "capturedAt": "2026-11-04T15:51:11.125Z",
       "offsetMs": 236968,
       "kind": "verification",
@@ -370,7 +383,7 @@
       }
     },
     {
-      "sequence": 27,
+      "sequence": 28,
       "capturedAt": "2026-11-04T15:51:11.125Z",
       "offsetMs": 236968,
       "kind": "verification",
@@ -383,7 +396,7 @@
       }
     },
     {
-      "sequence": 28,
+      "sequence": 29,
       "capturedAt": "2026-11-04T15:51:11.143Z",
       "offsetMs": 236986,
       "kind": "stage_transition",
@@ -395,7 +408,7 @@
       }
     },
     {
-      "sequence": 29,
+      "sequence": 30,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "draft",
@@ -408,7 +421,7 @@
       }
     },
     {
-      "sequence": 30,
+      "sequence": 31,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "action",
@@ -420,7 +433,7 @@
       }
     },
     {
-      "sequence": 31,
+      "sequence": 32,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "action",
@@ -432,7 +445,7 @@
       }
     },
     {
-      "sequence": 32,
+      "sequence": 33,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "approval",
@@ -443,7 +456,7 @@
       }
     },
     {
-      "sequence": 33,
+      "sequence": 34,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "action",
@@ -455,7 +468,7 @@
       }
     },
     {
-      "sequence": 34,
+      "sequence": 35,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "approval",
@@ -466,7 +479,7 @@
       }
     },
     {
-      "sequence": 35,
+      "sequence": 36,
       "capturedAt": "2026-11-04T15:51:11.372Z",
       "offsetMs": 237215,
       "kind": "job_snapshot",
@@ -477,7 +490,7 @@
       }
     },
     {
-      "sequence": 36,
+      "sequence": 37,
       "capturedAt": "2026-11-04T15:51:11.376Z",
       "offsetMs": 237219,
       "kind": "stage_transition",
@@ -489,9 +502,9 @@
       }
     }
   ],
-  "terminalStateDigest": "a168f70fb679b158fcef7ed32bede860af74f9bf1b47be7a06962dd72633bc9b",
+  "terminalStateDigest": "97eb73fe239e2d3a744712202059acdb456a153498edd7985e4571f10e8a83a2",
   "integrity": {
     "algorithm": "sha256-canonical-json",
-    "digest": "4c458bc57bdebf58d1cedabbf5b0f9311d0e93da917ad393204e9b161a149b00"
+    "digest": "5912f49bbe5aba4e074a01f5ce485113fda2bf47996a97357a9c785234ee6041"
   }
 }
