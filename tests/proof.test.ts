@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { signReplayBundle } from "@/lib/recordReplay/integrity";
 import { digestReplayState, reduceReplayState } from "@/lib/recordReplay/state";
 import type { UnsignedReplayBundle } from "@/lib/recordReplay/schema";
-import { concurrentGroups, loadBrandBrief, loadGroundingEval, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadScreenEval, type RunSummary } from "@/lib/proof";
+import { concurrentGroups, loadBrandBrief, loadGroundingEval, loadNarratedVideo, loadPublicRun, loadProbeReport, loadPublicRuns, loadScreenEval, type RunSummary } from "@/lib/proof";
 
 const at = (ms: number) => new Date(Date.UTC(2026, 10, 4, 12, 0, 0, ms)).toISOString();
 
@@ -148,5 +148,24 @@ describe("public proof", () => {
     const loaded = await loadGroundingEval();
     expect(loaded.state).toBe("ok");
     if (loaded.state === "ok") expect(loaded.value.harmonia.verified).toBeGreaterThan(loaded.value.baseline.verified);
+  });
+
+  it("replays one approved run by id and refuses private, tampered or unknown ones", async () => {
+    const dir = evidenceDir();
+    writeFileSync(path.join(dir, "replays", "public-1.json"), JSON.stringify(bundle("approved_public_bundle", "public-1")));
+    writeFileSync(path.join(dir, "replays", "private-1.json"), JSON.stringify(bundle("private_candidate", "private-1")));
+    const loaded = await loadPublicRun("public-1");
+    expect(loaded?.run.bundleId).toBe("public-1");
+    expect(loaded?.steps.map((step) => step.kind)).toEqual(["stage_transition", "specialist_handoff", "moment", "usage", "usage", "usage", "draft", "approval", "stage_transition"]);
+    expect(loaded?.steps.every((step, index, all) => index === 0 || step.offsetMs >= all[index - 1].offsetMs)).toBe(true);
+    expect(await loadPublicRun("private-1")).toBeNull();
+    expect(await loadPublicRun("missing")).toBeNull();
+    expect(await loadPublicRun("../meta-probe")).toBeNull();
+  });
+
+  it("replays every committed public run", async () => {
+    const { runs } = await loadPublicRuns();
+    expect(runs.length).toBeGreaterThan(0);
+    for (const run of runs) expect((await loadPublicRun(run.bundleId))?.steps.length).toBeGreaterThan(0);
   });
 });

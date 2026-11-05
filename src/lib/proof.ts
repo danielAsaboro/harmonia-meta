@@ -315,6 +315,33 @@ export async function loadPublicRuns(): Promise<{ runs: RunSummary[]; rejected: 
   return { runs, rejected };
 }
 
+export interface ReplayStep { offsetMs: number; kind: string; payload: Record<string, unknown> }
+
+/** One approved public run, integrity re-verified, as the steps a visitor can replay. */
+export async function loadPublicRun(bundleId: string): Promise<{ run: RunSummary; steps: ReplayStep[] } | null> {
+  if (!/^[A-Za-z0-9-]{1,120}$/.test(bundleId)) return null;
+  let files: string[] = [];
+  try {
+    files = (await readdir(path.join(evidenceDir(), "replays"))).filter((file) => file.endsWith(".json"));
+  } catch {
+    return null;
+  }
+  for (const file of files.filter((name) => name.startsWith(bundleId.slice(0, 36)))) {
+    const raw = await readEvidence(path.join("replays", file));
+    try {
+      const bundle = importReplayBundle(raw ?? "", { destination: "public" });
+      if (bundle.bundleId !== bundleId) continue;
+      const steps = bundle.events
+        .filter((event) => event.kind !== "job_snapshot" && event.kind !== "trace_correlation")
+        .map((event) => ({ offsetMs: event.offsetMs, kind: event.kind, payload: { ...(event.payload as Record<string, unknown>) } }));
+      return { run: summarizeRun(bundle), steps };
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 async function fetchJson(url: string, timeoutMs: number): Promise<unknown> {
   const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(timeoutMs) });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);

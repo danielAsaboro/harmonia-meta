@@ -136,7 +136,7 @@ function Run({ run, concurrent }: { run: RunSummary; concurrent?: number }) {
   return (
     <article className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-semibold text-slate-950">{run.scenario.replaceAll("_", " ")}</h3>
+        <h3 className="font-semibold text-slate-950">{run.scenario.replaceAll("_", " ")} <Link href={`/proof/runs/${run.bundleId}`} className="ml-2 text-sm font-normal text-slate-600 underline">Replay this run ▸</Link></h3>
         <span className="text-xs text-slate-500">
           {concurrent ? `One of ${concurrent} runs in parallel · ` : ""}{run.environment === "local_emulator" ? "Live Meta Model API calls, job state on a local machine" : "Cloud run"} · {new Date(run.capturedAt).toUTCString()} · {(run.durationMs / 1000).toFixed(0)} s · {run.eventCount} events
         </span>
