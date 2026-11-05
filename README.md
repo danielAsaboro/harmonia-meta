@@ -22,7 +22,7 @@ Entry to the **Meta Global AI Developer Hackathon** (Cerebral Valley), Startups 
 | MMS-TTS (`facebook/mms-tts-eng`, open weights) | Speaks the narration on CPU | `harmonia-demo.json` |
 | Muse Glimmer (open weights, local via Ollama) | Screens untrusted sources for injected instructions; can only quarantine | [`source-screen-eval.json`](./evidence/source-screen-eval.json): 7/12 rules only, 12/12 with Glimmer, 0/10 clean texts withheld |
 
-[![Verify](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml/badge.svg)](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml)
+[![Verify](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml/badge.svg)](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml) CI runs 973 web tests (`npm test`), 1,108 agent tests (`npm run test:agent`), the Firestore integration suite, lint, typecheck and a production build on every pull request and every push to main.
 
 **Harmonia is an asynchronous social media content agent for startups.** An operator can begin with ordinary language rather than internal product vocabulary. Harmonia reads the durable workspace context, identifies the intended outcome, checks connected platforms, asks only for genuinely blocking information, and creates the appropriate durable content job. Nimi extracts evidence, Ryan proposes a four-week strategy for human approval, Temi operationalizes approved briefs, Noni and Dara produce reviewed typed artifacts, and deterministic code authorizes and verifies exact effects.
 
