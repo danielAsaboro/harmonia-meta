@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  concurrentGroups, loadBrandBrief, loadMetaStatus, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadRoster, loadScreenEval,
-  type BrandBriefEvidence, type Loaded, type NarratedVideoEvidence, type RunSummary,
+  concurrentGroups, loadBrandBrief, loadGroundingEval, loadMetaStatus, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadRoster, loadScreenEval,
+  type BrandBriefEvidence, type GroundingEval, type Loaded, type NarratedVideoEvidence, type RunSummary,
 } from "@/lib/proof";
 
 const REPO_URL = "https://github.com/danielAsaboro/harmonia-meta";
@@ -73,6 +73,40 @@ function BrandBrief({ value }: { value: BrandBriefEvidence }) {
         </tbody>
       </table></div>
       <p className="mt-2 text-xs text-slate-500">Full record: <a className="underline" href={`${REPO_URL}/blob/main/evidence/onboarding/cal.com-2026-11-04.json`}>evidence/onboarding/cal.com-2026-11-04.json</a>{value.receipt ? <> · cost is a list-price reconstruction (pricing {value.receipt.pricingVersion}), not an invoice</> : null}</p>
+    </>
+  );
+}
+
+function pct(value: number | null) {
+  return value === null ? "–" : `${Math.round(value * 100)}%`;
+}
+
+function Grounding({ value }: { value: GroundingEval }) {
+  const arms = [["Plain Muse Spark, no checks", value.baseline], ["Harmonia onboarding", value.harmonia]] as const;
+  const dropped = value.perSite.reduce((total, site) => total + (site.harmonia.droppedBeforeShipping ?? 0), 0);
+  const failed = value.perSite.flatMap((site) => [
+    ...(site.baseline.error ? [`${site.site} (baseline)`] : []), ...(site.harmonia.error ? [`${site.site} (Harmonia)`] : []),
+  ]);
+  return (
+    <>
+      <p className="mt-2 text-sm text-slate-600">
+        Both arms researched competitors and customer complaints for the same {value.sites.length} startup websites with <span className="font-mono text-xs">{value.model}</span> and
+        Meta&apos;s web search. Afterwards, every cited URL was fetched and searched for its quote, the same way for both. Harmonia also dropped {dropped} items before shipping because Meta&apos;s search had not returned them.
+      </p>
+      <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm">
+        <thead className="text-xs text-slate-500"><tr><th className="py-1">Arm</th><th>Quote found on the cited page</th><th>Quote not on page</th><th>Dead link</th><th>Site blocked the check</th><th className="text-right">Cost</th></tr></thead>
+        <tbody>
+          {arms.map(([label, arm]) => (
+            <tr key={label} className="border-t border-slate-100">
+              <td className="py-1 font-medium">{label}</td>
+              <td>{arm.verified} of {arm.checkable} ({pct(arm.verifiedRate)})</td>
+              <td>{arm.not_on_page}</td><td>{arm.broken}</td><td>{arm.unreachable}</td>
+              <td className="text-right">{usd(Number(arm.costUsd))}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table></div>
+      <p className="mt-2 text-xs text-slate-500">{new Date(value.ranAt).toUTCString()} · {value.sites.join(", ")}{failed.length ? ` · did not complete: ${failed.join(", ")}` : ""} · <a className="underline" href={`${REPO_URL}/blob/main/evidence/grounding-eval.json`}>evidence/grounding-eval.json</a></p>
     </>
   );
 }
@@ -163,8 +197,8 @@ function render<T>(loaded: Loaded<T>, body: (value: T) => React.ReactNode) {
 }
 
 export default async function ProofPage() {
-  const [status, probe, roster, publicRuns, screen, brief, video] = await Promise.all([
-    loadMetaStatus(), loadProbeReport(), loadRoster(), loadPublicRuns(), loadScreenEval(), loadBrandBrief(), loadNarratedVideo(),
+  const [status, probe, roster, publicRuns, screen, brief, video, grounding] = await Promise.all([
+    loadMetaStatus(), loadProbeReport(), loadRoster(), loadPublicRuns(), loadScreenEval(), loadBrandBrief(), loadNarratedVideo(), loadGroundingEval(),
   ]);
   const groupSize = new Map<string, number>();
   for (const group of concurrentGroups(publicRuns.runs)) for (const id of group) groupSize.set(id, group.length);
@@ -189,6 +223,12 @@ export default async function ProofPage() {
       <Section id="brief" title="Brand brief from a website">
         {render(brief, (value) => <BrandBrief value={value} />)}
       </Section>
+
+      {grounding.state === "ok" && (
+        <Section id="grounding" title="Are the cited quotes real? Harmonia vs plain Muse Spark">
+          <Grounding value={grounding.value} />
+        </Section>
+      )}
 
       <Section id="video" title="Narrated video with no footage">
         {render(video, (value) => <NarratedVideo value={value} />)}
@@ -269,7 +309,7 @@ export default async function ProofPage() {
                 {value.media.map((item) => (
                   <tr key={item.name} className="border-t border-slate-100 align-top">
                     <td className="py-1"><span className="font-medium">{item.name}</span><span className="block text-xs text-slate-500">{item.job}</span></td>
-                    <td className="font-mono text-xs">{item.model}</td><td /><td /><td />
+                    <td className="font-mono text-xs">{item.model === "rules only" ? <>rules, plus <a className="underline" href="#screen">muse-glimmer</a> (open weights) when run locally</> : item.model}</td><td /><td /><td />
                   </tr>
                 ))}
               </tbody>

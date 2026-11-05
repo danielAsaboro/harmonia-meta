@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { createHash } from "node:crypto";
 import { requestAgentAnswer } from "@/lib/agentAskClient";
 import { answerFromContext, fetchContextRecord, isValidContext } from "@/lib/contextAnswer";
 import {
@@ -271,7 +270,7 @@ function connectionGuidance(platforms: string[] | undefined): string {
   return ` ${labels.join(" and ")} ${labels.length === 1 ? "is" : "are"} a good fit but not connected yet. Connect ${labels.length === 1 ? "it" : "them"} in Settings before publishing; Harmonia can still prepare the strategy and drafts now.`;
 }
 
-async function buildResponse(req: Request, message: string, surface: "dashboard" | "telegram", conversationId: string, context?: { kind: "job" | "content_item" | "proposal"; id: string }, attachments: ChatAttachment[] = [], requestId?: string): Promise<HandlerResult> {
+async function buildResponse(req: Request, message: string, surface: "dashboard" | "telegram", conversationId: string, context?: { kind: "job" | "content_item" | "proposal"; id: string }, attachments: ChatAttachment[] = [], _requestId?: string): Promise<HandlerResult> {
 
   // Grounded Q&A about a specific record ("chat with any item").
   if (context && isValidContext(context)) {

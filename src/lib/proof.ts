@@ -226,6 +226,38 @@ export async function loadNarratedVideo(): Promise<Loaded<NarratedVideoEvidence>
     : { state: "unavailable", reason: "The committed narrated video record does not match its schema." };
 }
 
+// Grounding baseline: plain Muse Spark vs Harmonia, every cited quote checked on its page.
+const groundingArmSchema = z.object({
+  items: z.number().int(), verified: z.number().int(), not_on_page: z.number().int(), broken: z.number().int(),
+  unreachable: z.number().int(), checkable: z.number().int(), verifiedRate: z.number().nullable(), costUsd: z.string(),
+});
+
+const groundingEvalSchema = z.object({
+  eval: z.literal("harmonia-grounding-baseline"),
+  ranAt: z.string().datetime({ offset: true }),
+  model: z.string(),
+  method: z.string(),
+  sites: z.array(z.string()),
+  baseline: groundingArmSchema,
+  harmonia: groundingArmSchema,
+  perSite: z.array(z.object({
+    site: z.string(),
+    baseline: z.object({ droppedBeforeShipping: z.number().optional(), error: z.string().optional() }).passthrough(),
+    harmonia: z.object({ droppedBeforeShipping: z.number().optional(), error: z.string().optional() }).passthrough(),
+  }).passthrough()),
+});
+
+export type GroundingEval = z.infer<typeof groundingEvalSchema>;
+
+export async function loadGroundingEval(): Promise<Loaded<GroundingEval>> {
+  const raw = await readEvidence("grounding-eval.json");
+  if (raw === null) return { state: "missing", reason: "The grounding baseline has not been run yet." };
+  let json: unknown;
+  try { json = JSON.parse(raw); } catch { return { state: "unavailable", reason: "The committed grounding baseline is not valid JSON." }; }
+  const parsed = groundingEvalSchema.safeParse(json);
+  return parsed.success ? { state: "ok", value: parsed.data } : { state: "unavailable", reason: "The committed grounding baseline does not match its schema." };
+}
+
 /** Runs whose captures overlap in time ran at the same time; group them so /proof can say so. */
 export function concurrentGroups(runs: RunSummary[]): string[][] {
   const spans = runs.map((run) => {

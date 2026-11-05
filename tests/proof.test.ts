@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { signReplayBundle } from "@/lib/recordReplay/integrity";
 import { digestReplayState, reduceReplayState } from "@/lib/recordReplay/state";
 import type { UnsignedReplayBundle } from "@/lib/recordReplay/schema";
-import { concurrentGroups, loadBrandBrief, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadScreenEval, type RunSummary } from "@/lib/proof";
+import { concurrentGroups, loadBrandBrief, loadGroundingEval, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadScreenEval, type RunSummary } from "@/lib/proof";
 
 const at = (ms: number) => new Date(Date.UTC(2026, 10, 4, 12, 0, 0, ms)).toISOString();
 
@@ -134,5 +134,19 @@ describe("public proof", () => {
       run("a", "2026-11-04T15:02:41Z", 1_340_000), run("b", "2026-11-04T15:02:43Z", 1_340_000), run("c", "2026-11-04T15:02:46Z", 1_336_000),
       run("d", "2026-11-04T15:38:17Z", 407_000), run("e", "2026-11-04T14:51:17Z", 150_000),
     ])).toEqual([["a", "b", "c"]]);
+  });
+
+  it("reads a grounding baseline report and reports it missing until one is committed", async () => {
+    const dir = evidenceDir();
+    expect((await loadGroundingEval()).state).toBe("missing");
+    const arm = (verified: number) => ({ items: 10, verified, not_on_page: 8 - verified, broken: 1, unreachable: 1, checkable: 9, verifiedRate: verified / 9, costUsd: "0.30" });
+    writeFileSync(path.join(dir, "grounding-eval.json"), JSON.stringify({
+      eval: "harmonia-grounding-baseline", version: "2026-11-05", ranAt: "2026-11-05T03:20:00+00:00", model: "muse-spark-1.3",
+      method: "same model, independent check", sites: ["cal.com"], baseline: arm(3), harmonia: arm(7),
+      perSite: [{ site: "cal.com", baseline: { summary: {}, items: [] }, harmonia: { droppedBeforeShipping: 4, items: [] } }],
+    }));
+    const loaded = await loadGroundingEval();
+    expect(loaded.state).toBe("ok");
+    if (loaded.state === "ok") expect(loaded.value.harmonia.verified).toBeGreaterThan(loaded.value.baseline.verified);
   });
 });
