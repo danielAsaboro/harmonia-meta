@@ -1,8 +1,24 @@
 # Harmonia
 
-[![Verify](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml/badge.svg)](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml)
+## For judges: start here
 
-**Live proof:** [harmonia-meta.vercel.app/proof](https://harmonia-meta.vercel.app/proof) (no login): seven recorded campaign runs with per-model cost, the cal.com brand brief with Meta response ids, the narrated video and its listen-back check, the injection-screen eval, and the agent roster. JSON at [`/api/proof`](https://harmonia-meta.vercel.app/api/proof).
+Entry to the **Meta Global AI Developer Hackathon** (Cerebral Valley), Startups track, theme "Build for Your World".
+
+- **Live proof, no login:** [harmonia-meta.vercel.app/proof](https://harmonia-meta.vercel.app/proof): seven recorded campaign runs with per-model cost ($0.13 to $0.28 each), the cal.com brand brief with its Meta response ids, the narrated video and its listen-back check, the injection-screen eval, and the agent roster. Same data as JSON at [`/api/proof`](https://harmonia-meta.vercel.app/api/proof).
+- **Evidence files:** [`evidence/`](./evidence): replay bundles, the live model probe, the brand brief, the narrated video, the injection-screen eval and the agent-token authority check.
+
+| Meta model | Its job in Harmonia | Evidence |
+|---|---|---|
+| Muse Spark 1.3 | Routes chat, runs 12 of 13 agents with strict structured output, reads websites, watches uploaded video, plans narrated scenes, grades every clip blind | [`evidence/replays/`](./evidence/replays), [`meta-probe.json`](./evidence/meta-probe.json) |
+| Meta `web_search` | Finds competitors and customer complaints for the brand brief; an item is kept only if Meta's search returned its source | [`cal.com-2026-11-04.json`](./evidence/onboarding/cal.com-2026-11-04.json) |
+| Muse Wonder 1.0 | Writes the cited brand brief and Ryan's four-week strategy | brand brief, replays |
+| Muse Image 1.0 | Draws one vertical frame per scene for narrated videos | [`harmonia-demo.json`](./evidence/media/harmonia-demo.json) |
+| Muse Voice Transcribe 1.0 | Timed speech segments from talks, and listens back to every narration (under 60% word match fails the render) | video replays, `harmonia-demo.json` (0.982) |
+| SAM 3.1 | Tracks the speaker so vertical clips follow them | video replays, probe |
+| MMS-TTS (`facebook/mms-tts-eng`, open weights) | Speaks the narration on CPU | `harmonia-demo.json` |
+| Muse Glimmer (open weights, local via Ollama) | Screens untrusted sources for injected instructions; can only quarantine | [`source-screen-eval.json`](./evidence/source-screen-eval.json): 7/12 rules only, 12/12 with Glimmer, 0/10 clean texts withheld |
+
+[![Verify](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml/badge.svg)](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml)
 
 **Harmonia is an asynchronous social media content agent for startups.** An operator can begin with ordinary language rather than internal product vocabulary. Harmonia reads the durable workspace context, identifies the intended outcome, checks connected platforms, asks only for genuinely blocking information, and creates the appropriate durable content job. Nimi extracts evidence, Ryan proposes a four-week strategy for human approval, Temi operationalizes approved briefs, Noni and Dara produce reviewed typed artifacts, and deterministic code authorizes and verifies exact effects.
 
