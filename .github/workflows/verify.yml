@@ -37,7 +37,10 @@ jobs:
           install_components: beta,cloud-firestore-emulator
 
       - run: npm ci
-      - run: python -m pip install --disable-pip-version-check -r agent/requirements.lock
+      # npm run test:agent runs agent/.venv/bin/python, the same venv used locally.
+      - run: |
+          python -m venv agent/.venv
+          agent/.venv/bin/python -m pip install --disable-pip-version-check -r agent/requirements.lock
       - run: npm test
       - run: npm run test:integration
       - run: npm run test:agent
