@@ -8,6 +8,9 @@ import { SignalWorld } from "@/components/landing/SignalWorld";
 import { WorkflowMorph } from "@/components/landing/WorkflowMorph";
 
 export default function LandingPage() {
+  // A public read-only deployment has no studio to open: send visitors to the evidence instead.
+  const locked = process.env.HARMONIA_PUBLIC_LOCK === "1";
+  const studioHref = locked ? "/proof" : "/dashboard";
   return (
     <main className="landing-shell">
       <section className="hero-section">
@@ -22,10 +25,10 @@ export default function LandingPage() {
           <nav className="nav-island" aria-label="Primary navigation">
             <a href="#workflow">Workflow</a>
             <a href="#outputs">Outputs</a>
-            <a href="#proof">Proof</a>
+            <Link href="/proof">Proof</Link>
           </nav>
-          <Link href="/dashboard" className="nav-cta">
-            Open studio <span>↗</span>
+          <Link href={studioHref} className="nav-cta">
+            {locked ? "See live proof" : "Open studio"} <span>↗</span>
           </Link>
         </header>
 
@@ -42,8 +45,8 @@ export default function LandingPage() {
             content, waits for your approval, then publishes and proves what happened.
           </p>
           <div className="hero-actions">
-            <Link href="/dashboard" className="primary-button">
-              Start a content run <span>↗</span>
+            <Link href={studioHref} className="primary-button">
+              {locked ? "See real runs" : "Start a content run"} <span>↗</span>
             </Link>
             <a href="#workflow" className="ghost-button">
               Watch it transform <span>↓</span>
@@ -200,14 +203,14 @@ export default function LandingPage() {
             Published results flow back into structured memory. The next content cycle begins with
             evidence—not an empty prompt.
           </p>
-          <Link href="/dashboard" className="primary-button">Open the content studio <span>↗</span></Link>
+          <Link href={studioHref} className="primary-button">{locked ? "See every recorded run" : "Open the content studio"} <span>↗</span></Link>
         </div>
       </section>
 
       <footer className="landing-footer">
         <Link href="/" className="footer-brand"><BrandMark className="brand-mark" decorative /> Harmonia</Link>
         <p>From source to signal to proof.</p>
-        <div><a href="#workflow">Workflow</a><a href="#outputs">Outputs</a><Link href="/dashboard">Studio ↗</Link></div>
+        <div><a href="#workflow">Workflow</a><a href="#outputs">Outputs</a><Link href="/proof">Proof ↗</Link>{locked ? null : <Link href="/dashboard">Studio ↗</Link>}</div>
       </footer>
     </main>
   );

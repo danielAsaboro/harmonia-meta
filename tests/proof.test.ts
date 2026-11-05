@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { signReplayBundle } from "@/lib/recordReplay/integrity";
 import { digestReplayState, reduceReplayState } from "@/lib/recordReplay/state";
 import type { UnsignedReplayBundle } from "@/lib/recordReplay/schema";
-import { loadProbeReport, loadPublicRuns, loadScreenEval } from "@/lib/proof";
+import { concurrentGroups, loadBrandBrief, loadNarratedVideo, loadProbeReport, loadPublicRuns, loadScreenEval, type RunSummary } from "@/lib/proof";
 
 const at = (ms: number) => new Date(Date.UTC(2026, 10, 4, 12, 0, 0, ms)).toISOString();
 
@@ -89,5 +89,50 @@ describe("public proof", () => {
       expect(loaded.value.glimmer.combined.wronglyWithheld).toEqual([]);
       expect(loaded.value.rules.caught).toBeLessThanOrEqual(loaded.value.glimmer.combined.caught);
     }
+  });
+
+  it("shows the committed website brand brief with its Meta response ids and list-price receipt", async () => {
+    const dir = evidenceDir();
+    mkdirSync(path.join(dir, "onboarding"));
+    for (const name of ["cal.com-2026-11-04.json", "cal.com-2026-11-04.receipt.json"]) {
+      writeFileSync(path.join(dir, "onboarding", name), readFileSync(path.join(process.cwd(), "evidence", "onboarding", name)));
+    }
+    const loaded = await loadBrandBrief();
+    expect(loaded.state).toBe("ok");
+    if (loaded.state !== "ok") return;
+    expect(loaded.value.modelCalls.map((call) => call.model)).toContain("muse-wonder-1.0");
+    expect(loaded.value.modelCalls.every((call) => call.responseId.startsWith("resp_"))).toBe(true);
+    expect(loaded.value.receipt?.calls.map((call) => call.step)).toEqual(loaded.value.modelCalls.map((call) => call.step));
+    const sum = loaded.value.receipt?.calls.reduce((total, call) => total + call.costUsd, 0) ?? 0;
+    expect(loaded.value.receipt?.totalUsd).toBeCloseTo(sum, 6);
+    expect(loaded.value.research.painSignals.every((signal) => signal.url.startsWith("https://"))).toBe(true);
+  });
+
+  it("shows the committed narrated video and its listen-back check", async () => {
+    const dir = evidenceDir();
+    mkdirSync(path.join(dir, "media"));
+    writeFileSync(path.join(dir, "media", "harmonia-demo.json"), readFileSync(path.join(process.cwd(), "evidence", "media", "harmonia-demo.json")));
+    const loaded = await loadNarratedVideo();
+    expect(loaded.state).toBe("ok");
+    if (loaded.state !== "ok") return;
+    expect(loaded.value.narrationCheck.passed).toBe(true);
+    expect(loaded.value.imageModel).toBe("muse-image-1.0");
+    expect(loaded.value.videoUrl).toBe("/media/harmonia-narrated-demo.mp4");
+    // The served copy must be the committed evidence file, byte for byte.
+    expect(readFileSync(path.join(process.cwd(), "public", "media", "harmonia-narrated-demo.mp4")).equals(readFileSync(path.join(process.cwd(), "evidence", "media", "harmonia-demo.mp4")))).toBe(true);
+  });
+
+  it("reports a missing brief and video as missing", async () => {
+    evidenceDir();
+    expect((await loadBrandBrief()).state).toBe("missing");
+    expect((await loadNarratedVideo()).state).toBe("missing");
+  });
+
+  it("groups runs whose captures overlap in time", () => {
+    const run = (bundleId: string, capturedAt: string, durationMs: number) => ({ bundleId, capturedAt, durationMs }) as RunSummary;
+    expect(concurrentGroups([
+      run("a", "2026-11-04T15:02:41Z", 1_340_000), run("b", "2026-11-04T15:02:43Z", 1_340_000), run("c", "2026-11-04T15:02:46Z", 1_336_000),
+      run("d", "2026-11-04T15:38:17Z", 407_000), run("e", "2026-11-04T14:51:17Z", 150_000),
+    ])).toEqual([["a", "b", "c"]]);
   });
 });

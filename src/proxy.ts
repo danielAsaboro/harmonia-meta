@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 const PUBLIC_PATHS = [
   /^\/$/, /^\/proof$/, /^\/api\/proof$/, /^\/api\/health$/, /^\/api\/agent-card$/, /^\/\.well-known\/agent-card\.json$/, /^\/docs(\/.*)?$/,
   /^\/privacy$/, /^\/terms$/, /^\/data-deletion$/, /^\/b\/[A-Za-z0-9_-]{32}$/,
-  /^\/_next\//, /^\/(favicon\.ico|icon\.png|apple-icon\.png|og\.png|brand\/.*|architecture\/.*)$/,
+  /^\/_next\//, /^\/(favicon\.ico|icon\.png|apple-icon\.png|og\.png|brand\/.*|architecture\/.*|media\/.*)$/,
 ];
 
 export function publicPathAllowed(method: string, pathname: string): boolean {
@@ -15,6 +15,12 @@ export function publicPathAllowed(method: string, pathname: string): boolean {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (process.env.HARMONIA_PUBLIC_LOCK === "1" && !publicPathAllowed(request.method, pathname)) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "This public deployment is read-only. See /proof for recorded runs." }, { status: 403 });
+    }
+    if (pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname === "/login") {
+      return NextResponse.redirect(new URL("/proof", request.url));
+    }
     return new NextResponse("Not published on this deployment.", { status: 404 });
   }
   if (pathname.startsWith("/dashboard") && !request.cookies.get("harmonia_session")) {
