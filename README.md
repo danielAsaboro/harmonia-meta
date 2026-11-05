@@ -4,6 +4,9 @@
 
 Entry to the **Meta Global AI Developer Hackathon** (Cerebral Valley), Startups track, theme "Build for Your World".
 
+- **3-minute demo video:** [youtube.com/watch?v=Mfrmh9ZC62I](https://www.youtube.com/watch?v=Mfrmh9ZC62I)
+
+  [![Harmonia demo video](https://i.ytimg.com/vi/Mfrmh9ZC62I/hqdefault.jpg)](https://www.youtube.com/watch?v=Mfrmh9ZC62I)
 - **Live proof, no login:** [harmonia-meta.vercel.app/proof](https://harmonia-meta.vercel.app/proof): seven recorded campaign runs with per-model cost ($0.13 to $0.28 each), the cal.com brand brief with its Meta response ids, the narrated video and its listen-back check, the injection-screen eval, and the agent roster. Same data as JSON at [`/api/proof`](https://harmonia-meta.vercel.app/api/proof).
 - **Evidence files:** [`evidence/`](./evidence): replay bundles, the live model probe, the brand brief, the narrated video, the injection-screen eval and the agent-token authority check.
 

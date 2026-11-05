@@ -6,6 +6,7 @@ import {
 } from "@/lib/proof";
 
 const REPO_URL = "https://github.com/danielAsaboro/harmonia-meta";
+const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=Mfrmh9ZC62I";
 
 export const dynamic = "force-dynamic";
 
@@ -172,7 +173,7 @@ export default async function ProofPage() {
     <main className="mx-auto min-h-screen w-full max-w-4xl px-4 py-12 text-slate-800 sm:px-10">
       <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-slate-950">← Harmonia</Link>
       <h1 className="mt-8 text-3xl font-semibold tracking-tight text-slate-950">Proof</h1>
-      <p className="mt-2 text-sm text-slate-500">Read-only. Everything below is read from committed evidence or fetched live on this request. <a className="underline" href="/api/proof">JSON</a> · <a className="underline" href={REPO_URL}>Source</a></p>
+      <p className="mt-2 text-sm text-slate-500">Read-only. Everything below is read from committed evidence or fetched live on this request. <a className="underline" href="/api/proof">JSON</a> · <a className="underline" href={REPO_URL}>Source</a> · <a className="underline" href={DEMO_VIDEO_URL}>3-minute demo video</a></p>
       {publicRuns.runs.length > 0 && (
         <ul className="mt-6 grid gap-3 text-sm sm:grid-cols-3">
           <li className="rounded-lg border border-slate-200 bg-white p-4"><span className="block text-2xl font-semibold text-slate-950">{publicRuns.runs.length}</span>end-to-end campaign runs on Meta Model API</li>
