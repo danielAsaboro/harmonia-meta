@@ -1,0 +1,1338 @@
+{
+  "eval": "harmonia-grounding-baseline",
+  "version": "2026-11-05",
+  "ranAt": "2026-11-05T03:13:34.754107+00:00",
+  "model": "muse-spark-1.3",
+  "pricingVersion": "2026-11-03",
+  "method": "Same model and Meta web_search in both arms; every cited URL fetched independently and searched for its quote.",
+  "sites": [
+    "cal.com",
+    "linear.app",
+    "posthog.com",
+    "resend.com",
+    "supabase.com",
+    "plausible.io",
+    "tally.so",
+    "raycast.com",
+    "loops.so",
+    "dub.co"
+  ],
+  "baseline": {
+    "items": 110,
+    "verified": 33,
+    "not_on_page": 7,
+    "broken": 18,
+    "unreachable": 52,
+    "checkable": 58,
+    "verifiedRate": 0.569,
+    "costUsd": "1.627346"
+  },
+  "harmonia": {
+    "items": 85,
+    "verified": 55,
+    "not_on_page": 3,
+    "broken": 1,
+    "unreachable": 26,
+    "checkable": 59,
+    "verifiedRate": 0.932,
+    "costUsd": "2.550134"
+  },
+  "perSite": [
+    {
+      "site": "cal.com",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 8,
+          "not_on_page": 1,
+          "broken": 0,
+          "unreachable": 2,
+          "checkable": 9,
+          "verifiedRate": 0.889
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://saascompared.com/blog/calendly-vs-savvycal-vs-cal-com-2026",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "pain",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://prospeo.io/s/calcom-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://saascompared.com/blog/calendly-vs-savvycal-vs-cal-com-2026",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/calendly/reviews?filters%5Bsentiment_snippet%5D=1873982&page=3&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/calendly/reviews?filters%5Bsentiment_snippet%5D=1873982&page=3&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          }
+        ],
+        "costUsd": "0.104438"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 8,
+          "verified": 5,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 3,
+          "checkable": 5,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/cal/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/cal/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/cal/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://lunacal.ai/compare/calendly-alternative",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://lunacal.ai/compare/calendly-alternative",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.klassconcepts.com/klassroom-notes/operations-efficiency/stop-scheduling-back-and-forth.html",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://bsimbframes.com/es/blogs/bsimb-blogs/stop-calendar-tag-right-scheduling-tool-transform-workday",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.usecarly.com/blog/how-to-avoid-scheduling-back-and-forth/",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.309117",
+        "droppedBeforeShipping": 6
+      }
+    },
+    {
+      "site": "linear.app",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 3,
+          "not_on_page": 1,
+          "broken": 3,
+          "unreachable": 4,
+          "checkable": 7,
+          "verifiedRate": 0.429
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://clickup.com/blog/linear-vs-jira/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://asana.com/resources/best-project-management-tools",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://clickup.com/blog/best-linear-alternatives/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://clickup.com/blog/best-linear-alternatives/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/linear/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/linear/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/linear/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://clickup.com/blog/linear-vs-jira/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://clickup.com/blog/linear-vs-jira/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.producthunt.com/products/linear/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.appbrain.com/app/linear/com.linear",
+            "verdict": "not_on_page"
+          }
+        ],
+        "costUsd": "0.161365"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 7,
+          "verified": 4,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 3,
+          "checkable": 4,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/linear/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://blog.apps.deals/linear-alternatives-mac",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://clickup.com/blog/linear-alternatives/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.capterra.ie/alternatives/1072683/Linear",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=36380308",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "http://dovetail.com/outlier/customer-feedback-pile-needs-makeover",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://theaterfi.re/post/8349",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.351722",
+        "droppedBeforeShipping": 3
+      }
+    },
+    {
+      "site": "posthog.com",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 0,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 11,
+          "checkable": 0,
+          "verifiedRate": null
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/posthog/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/posthog/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/posthog/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/posthog/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/posthog/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=43525695",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=37747343",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/posthog/reviews?filters%5Bsentiment_snippet%5D=1352772&page=4&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/posthog/reviews?filters%5Bsentiment_snippet%5D=1352772&page=4&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/posthog/reviews?filters%5Bsentiment_snippet%5D=1352772&page=4&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=40571237",
+            "verdict": "unreachable"
+          }
+        ],
+        "costUsd": "0.139778"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 10,
+          "verified": 6,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 4,
+          "checkable": 6,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "http://www.producthunt.com/products/posthog/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.techjockey.com/alternatives/posthog",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.owler.com/company/posthog/competitors",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.cbinsights.com/company/posthog/alternatives-competitors",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://webcatalog.io/en/apps/posthog/alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.producthunt.com/discussions/85279-what-web-analytics-events-user-flows-tool-do-you-recommend-for-early-stage-startups?comment=1192783",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://userpilot.com/blog/mixpanel-vs-amplitude/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://userpilot.com/blog/mixpanel-vs-amplitude/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://travis.media/blog/rybbit-best-google-analytics-alternative/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://travis.media/blog/rybbit-best-google-analytics-alternative/",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.238059",
+        "droppedBeforeShipping": 3
+      }
+    },
+    {
+      "site": "resend.com",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 2,
+          "not_on_page": 1,
+          "broken": 5,
+          "unreachable": 3,
+          "checkable": 8,
+          "verifiedRate": 0.25
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://futurepicker.com/resend-vs-postmark-vs-sendgrid-vs-mailgun",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://ventureharbour.com/best-transactional-email-services/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://courier.com/guides/transactional-email-services/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://emailbroadcastservices.com/best-email-api-for-developers",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://courier.com/guides/transactional-email-services/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=14202068",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=14202068",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=14202068",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://repost.aws/it/questions/QUl1TP2B3cSFSLXnPtXHnG-w/been-denied-production-access-for-transactional-emails-and-have-no-idea-what-else-to-do",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://repost.aws/it/questions/QUl1TP2B3cSFSLXnPtXHnG-w/been-denied-production-access-for-transactional-emails-and-have-no-idea-what-else-to-do",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "pain",
+            "url": "https://iprodan.dev/aws-ses-denied-prod-access",
+            "verdict": "broken"
+          }
+        ],
+        "costUsd": "0.140970"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 7,
+          "verified": 7,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 0,
+          "checkable": 7,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://rankite.com/blog/resend-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://mailtrap.io/blog/best-email-api/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://sourceforge.net/software/product/Resend/alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://rankite.com/blog/resend-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://mailtrap.io/blog/transactional-email-services/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.mailercloud.com/blog/sendgrid-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.mailercloud.com/blog/sendgrid-alternatives",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.246358",
+        "droppedBeforeShipping": 5
+      }
+    },
+    {
+      "site": "supabase.com",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 2,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 9,
+          "checkable": 2,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=38935323",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=38935323",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.back4app.com/firebase-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://dev.to/mujib77/i-spent-a-week-researching-why-devs-hate-supabase-langchain-posthog-neon-and-what-i-found-6f7",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/supabase-supabase/reviews?page=9&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/supabase-supabase/reviews?page=9&qs=pros-and-cons#reviews",
+            "verdict": "unreachable"
+          }
+        ],
+        "costUsd": "0.260702"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 9,
+          "verified": 4,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 5,
+          "checkable": 4,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/supabase/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://seliseblocks.com/blog/8-supabase-alternatives-in-2026-open-source-and-managed",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://seliseblocks.com/blog/8-supabase-alternatives-in-2026-open-source-and-managed",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://seliseblocks.com/blog/8-supabase-alternatives-in-2026-open-source-and-managed",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://seliseblocks.com/blog/8-supabase-alternatives-in-2026-open-source-and-managed",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=22056536",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=22059002",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=22059002",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=33449229",
+            "verdict": "unreachable"
+          }
+        ],
+        "costUsd": "0.331867",
+        "droppedBeforeShipping": 4
+      }
+    },
+    {
+      "site": "plausible.io",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 5,
+          "not_on_page": 0,
+          "broken": 4,
+          "unreachable": 2,
+          "checkable": 9,
+          "verifiedRate": 0.556
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://plausible.io/blog/google-analytics-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://plausible.io/blog/google-analytics-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://plausible.io/blog/google-analytics-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://plausible.io/blog/google-analytics-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://plausible.io/blog/google-analytics-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/google-analytics/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/google-analytics/pros-and-cons",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://travis.media/best-google-analytics-alternative/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://simpleai.co.in/website-analytics-platform-different-perspectives",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://community.latenode.com/what-analytics-tools-do-you-prefer-for-tracking-website-performance",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://community.latenode.com/looking-for-modern-web-analytics-tools-instead-of-google-analytics",
+            "verdict": "broken"
+          }
+        ],
+        "costUsd": "0.125222"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 10,
+          "verified": 6,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 4,
+          "checkable": 6,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://kitbase.dev/blog/plausible-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://pagelens.io/blog/plausible-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/plausible-analytics/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/plausible-analytics/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://kitbase.dev/blog/plausible-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/google-analytics/reviews/google-analytics-review-12087306",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://dev.to/techresolve/solved-is-it-me-or-does-ga4-kind-of-suck-what-are-some-alternatives-296m",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.elvisduru.com/blog/how-i-switched-from-google-to-plausible-analytics",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://affiliatesuccessbuilder.com/why-i-stopped-using-google-analytics-and-what-i-use-instead/",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.indiehackers.com/post/why-i-stopped-using-google-analytics-and-what-i-built-instead-3bb3719937",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.218537",
+        "droppedBeforeShipping": 2
+      }
+    },
+    {
+      "site": "tally.so",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 4,
+          "not_on_page": 0,
+          "broken": 4,
+          "unreachable": 3,
+          "checkable": 8,
+          "verifiedRate": 0.5
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.jotform.com/blog/tally-vs-typeform/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.jotform.com/blog/tally-vs-typeform/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://softr.io/blog/google-forms-vs-tally",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://formester.com/blog/best-no-code-form-builders/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.pickfu.com/blog/typeform-alternatives/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/typeform/pros-and-cons",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.capterra.ae/software/162027/typeform",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://dev.to/devtoolpicks/best-typeform-alternatives-for-indie-hackers-in-2026-honest-picks-4a72",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.capterra.com.au/software/129382/jotform",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://forum.bubble.io/t/anyform-customizable-google-forms-in-your-bubble-app/348022",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://formnx.com/blog/jotform-vs-google-forms/",
+            "verdict": "broken"
+          }
+        ],
+        "costUsd": "0.166716"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 10,
+          "verified": 8,
+          "not_on_page": 1,
+          "broken": 1,
+          "unreachable": 0,
+          "checkable": 10,
+          "verifiedRate": 0.8
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "http://umatechnology.org/12-best-online-form-builders-for-2026-expert-picks-by-use-case/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.builder.io/blog/the-best-google-forms-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://zapier.com/blog/best-online-form-builder-software/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://rankite.com/blog/microsoft-forms-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://tinyform.com/post/tally-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://dev.to/devtoolpicks/best-typeform-alternatives-for-indie-hackers-in-2026-honest-picks-516f",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.softr.io/blog/jotform-vs-typeform",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "pain",
+            "url": "https://observantmind.com/competitor-teardown-typeform/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://formnx.com/details/blog/top-8-alternatives-to-googleforms/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.formgrid.com/blog/google-forms-vs-typeform",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.203540",
+        "droppedBeforeShipping": 4
+      }
+    },
+    {
+      "site": "raycast.com",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 3,
+          "not_on_page": 2,
+          "broken": 1,
+          "unreachable": 5,
+          "checkable": 6,
+          "verifiedRate": 0.5
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.alfredapp.com/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://academy.techpresso.co/is-raycast-worth-it/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.obdev.at/products/launchbar/index.html",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://flow-launcher.com/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://learn.microsoft.com/en-us/windows/powertoys/run",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/raycast/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/raycast/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/raycast/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/raycast/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/raycast/reviews",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://friendica.rogueproject.org/search?q=Raycast",
+            "verdict": "not_on_page"
+          }
+        ],
+        "costUsd": "0.190542"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 9,
+          "verified": 6,
+          "not_on_page": 1,
+          "broken": 0,
+          "unreachable": 2,
+          "checkable": 7,
+          "verifiedRate": 0.857
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://tolodora.com/alternatives/raycast-alternatives",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.digitaltoolpad.com/blog/raycast-alternative",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://clapsnap.viberank.co.in/blog/best-mac-app-launchers-2026",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://openalternative.co/alternatives/raycast",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://mjtsai.com/blog/2026/02/18/searching-for-apps-with-spotlight/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=42826681",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://talk.tidbits.com/t/spotlight-much-worse-at-finding-files-in-macos-26-any-cure/34318",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://medium.com/@gagarindes/why-i-built-super-advanced-clipboard-a-smarter-way-to-work-in-windows-12a4ede31561",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://applemagazine.com/launchpad-removal-macos-26/",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.141173",
+        "droppedBeforeShipping": 5
+      }
+    },
+    {
+      "site": "loops.so",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 5,
+          "not_on_page": 1,
+          "broken": 0,
+          "unreachable": 5,
+          "checkable": 6,
+          "verifiedRate": 0.833
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://theautomationsguide.com/blog/2026-06-30-loops-vs-customerio-vs-brevo-best-email-platform-for-b2b-saa/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://marketingemailtools.com/compare/loops-vs-resend",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://theautomationsguide.com/blog/2026-06-30-loops-vs-customerio-vs-brevo-best-email-platform-for-b2b-saa/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://theautomationsguide.com/blog/2026-06-30-loops-vs-customerio-vs-brevo-best-email-platform-for-b2b-saa/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://theautomationsguide.com/blog/2026-06-30-loops-vs-customerio-vs-brevo-best-email-platform-for-b2b-saa/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=34837956",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/customer-io/reviews?filters%5Bnps_score%5D%5B%5D=2",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/customer-io/reviews?filters%5Bnps_score%5D%5B%5D=2",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=30359582",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://news.ycombinator.com/item?id=30359582",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://rapidevelopers.com/",
+            "verdict": "not_on_page"
+          }
+        ],
+        "costUsd": "0.225949"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 7,
+          "verified": 5,
+          "not_on_page": 1,
+          "broken": 0,
+          "unreachable": 1,
+          "checkable": 6,
+          "verifiedRate": 0.833
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/loops/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.sequenzy.com/alternatives/loops-alternatives",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://encharge.io/loops-alternatives/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://rankite.com/blog/resend-alternatives",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://theautomationsguide.com/blog/2026-06-30-loops-vs-customerio-vs-brevo-best-email-platform-for-b2b-saa/",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.copy.ai/go-to-market-tools/mailchimp-review",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.rapidevelopers.com/clone/mailchimp",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.180813",
+        "droppedBeforeShipping": 7
+      }
+    },
+    {
+      "site": "dub.co",
+      "baseline": {
+        "summary": {
+          "items": 11,
+          "verified": 1,
+          "not_on_page": 1,
+          "broken": 1,
+          "unreachable": 8,
+          "checkable": 3,
+          "verifiedRate": 0.333
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://dub.co/compare/bitly",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/compare/blink-vs-rebrandly",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/compare/blink-vs-rebrandly",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/partnerstack/pros-and-cons",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://news.ycombinator.com/item?id=39965477",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://spotsaas.com/product/bitly/reviews",
+            "verdict": "not_on_page"
+          },
+          {
+            "kind": "pain",
+            "url": "https://ie.trustpilot.com/review/bitly.com",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://viralmarketinglab.com/best-url-shorteners/",
+            "verdict": "broken"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/partnerstack/pros-and-cons",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.g2.com/products/rewardful/pros-and-cons",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://ie.trustpilot.com/review/www.rebrandly.com",
+            "verdict": "unreachable"
+          }
+        ],
+        "costUsd": "0.111664"
+      },
+      "harmonia": {
+        "summary": {
+          "items": 8,
+          "verified": 4,
+          "not_on_page": 0,
+          "broken": 0,
+          "unreachable": 4,
+          "checkable": 4,
+          "verifiedRate": 1.0
+        },
+        "items": [
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/dub/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.g2.com/products/dub/competitors/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://rekomi.com/compare/dub-partners",
+            "verdict": "verified"
+          },
+          {
+            "kind": "competitor",
+            "url": "https://www.producthunt.com/products/dub/alternatives",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.clipdrift.com/blog/best-free-url-shortener",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://lunyb.com/blog/bitly-review-2026-pros-cons-alternatives-mopp9mxi",
+            "verdict": "verified"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.scaleo.io/blog/affiliate-sale-not-tracking-properly-10-solutions-when-conversions-go-missing/",
+            "verdict": "unreachable"
+          },
+          {
+            "kind": "pain",
+            "url": "https://www.searchenginejournal.com/bitlys-new-data-says-seos-are-half-right-about-short-links/593983/",
+            "verdict": "verified"
+          }
+        ],
+        "costUsd": "0.328948",
+        "droppedBeforeShipping": 5
+      }
+    }
+  ],
+  "elapsedSeconds": 1188.7
+}

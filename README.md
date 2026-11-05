@@ -8,6 +8,7 @@ Entry to the **Meta Global AI Developer Hackathon** (Cerebral Valley), Startups 
 
   [![Harmonia demo video](https://i.ytimg.com/vi/Mfrmh9ZC62I/hqdefault.jpg)](https://www.youtube.com/watch?v=Mfrmh9ZC62I)
 - **Live proof, no login:** [harmonia-meta.vercel.app/proof](https://harmonia-meta.vercel.app/proof): seven recorded campaign runs with per-model cost ($0.13 to $0.28 each), the cal.com brand brief with its Meta response ids, the narrated video and its listen-back check, the injection-screen eval, and the agent roster. Same data as JSON at [`/api/proof`](https://harmonia-meta.vercel.app/api/proof).
+- **Grounding against a baseline:** same model (Muse Spark 1.3) and same Meta `web_search` on 10 startup sites; every cited link fetched independently and searched for its quote. **Harmonia: 93.2% of checkable quotes are on the cited page (55/59). Plain Muse Spark: 56.9% (33/58), with 18 broken links.** Harmonia dropped 44 unsupported items before shipping. Run cost $4.18. [`grounding-eval.json`](./evidence/grounding-eval.json), method in [`grounding_eval.py`](./agent/harmonia_agent/grounding_eval.py).
 - **Evidence files:** [`evidence/`](./evidence): replay bundles, the live model probe, the brand brief, the narrated video, the injection-screen eval and the agent-token authority check.
 
 | Meta model | Its job in Harmonia | Evidence |
