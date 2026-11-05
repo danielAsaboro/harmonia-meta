@@ -151,6 +151,100 @@ const screenEvalSchema = z.object({
 
 export type ScreenEval = z.infer<typeof screenEvalSchema>;
 
+// Website onboarding evidence: the committed cal.com brand brief run.
+const briefEvidenceSchema = z.object({
+  website: z.string().url(),
+  brief: z.object({
+    company: z.string(), positioning: z.string(),
+    audiences: z.array(z.object({ name: z.string(), pains: z.array(z.string()) }).passthrough()),
+    competitors: z.array(z.object({ name: z.string(), howWeDiffer: z.string() }).passthrough()),
+    pillars: z.array(z.object({ name: z.string() }).passthrough()),
+    voiceRules: z.array(z.string()),
+  }).passthrough(),
+  research: z.object({
+    painSignals: z.array(z.object({ url: z.string().url(), title: z.string(), supportedText: z.string() }).passthrough()),
+  }).passthrough(),
+  pages: z.array(z.object({ role: z.string(), url: z.string() }).passthrough()),
+  unverifiedResearchDropped: z.number().int(),
+  modelCalls: z.array(z.object({
+    step: z.string(), model: z.string(), responseId: z.string(), inputTokens: z.number(), outputTokens: z.number(), searchCalls: z.number(),
+  }).passthrough()),
+  elapsedSeconds: z.number(),
+}).passthrough();
+
+const briefReceiptSchema = z.object({
+  pricingVersion: z.string(),
+  calls: z.array(z.object({ step: z.string(), costUsd: z.number() })),
+  totalUsd: z.number(),
+});
+
+export type BrandBriefEvidence = z.infer<typeof briefEvidenceSchema> & { receipt: z.infer<typeof briefReceiptSchema> | null };
+
+export const BRAND_BRIEF_EVIDENCE = "onboarding/cal.com-2026-11-04.json";
+
+export async function loadBrandBrief(): Promise<Loaded<BrandBriefEvidence>> {
+  const raw = await readEvidence(BRAND_BRIEF_EVIDENCE);
+  if (raw === null) return { state: "missing", reason: "No website onboarding run has been committed yet." };
+  let json: unknown;
+  try { json = JSON.parse(raw); } catch { return { state: "unavailable", reason: "The committed brand brief is not valid JSON." }; }
+  const parsed = briefEvidenceSchema.safeParse(json);
+  if (!parsed.success) return { state: "unavailable", reason: "The committed brand brief does not match its schema." };
+  const receiptRaw = await readEvidence(BRAND_BRIEF_EVIDENCE.replace(/\.json$/, ".receipt.json"));
+  let receipt: z.infer<typeof briefReceiptSchema> | null = null;
+  if (receiptRaw !== null) {
+    try { const r = briefReceiptSchema.safeParse(JSON.parse(receiptRaw)); receipt = r.success ? r.data : null; } catch { receipt = null; }
+  }
+  return { state: "ok", value: { ...parsed.data, receipt } };
+}
+
+// Narrated video evidence: scenes by Muse Spark, frames by Muse Image, voice by
+// open-weight MMS-TTS, checked by Muse Voice Transcribe.
+const narratedVideoSchema = z.object({
+  scenes: z.number().int().positive(),
+  durationSec: z.number().positive(),
+  width: z.number().int(), height: z.number().int(),
+  voiceModel: z.string(), imageModel: z.string(),
+  narrationCheck: z.object({ model: z.string(), score: z.number(), passed: z.boolean() }).passthrough(),
+  plan: z.object({
+    title: z.string(),
+    scenes: z.array(z.object({ narration: z.string(), caption: z.string() }).passthrough()),
+  }).passthrough(),
+}).passthrough();
+
+export type NarratedVideoEvidence = z.infer<typeof narratedVideoSchema> & { videoUrl: string };
+
+export const NARRATED_VIDEO_URL = "/media/harmonia-narrated-demo.mp4";
+
+export async function loadNarratedVideo(): Promise<Loaded<NarratedVideoEvidence>> {
+  const raw = await readEvidence("media/harmonia-demo.json");
+  if (raw === null) return { state: "missing", reason: "No narrated video has been committed yet." };
+  let json: unknown;
+  try { json = JSON.parse(raw); } catch { return { state: "unavailable", reason: "The committed narrated video record is not valid JSON." }; }
+  const parsed = narratedVideoSchema.safeParse(json);
+  return parsed.success
+    ? { state: "ok", value: { ...parsed.data, videoUrl: NARRATED_VIDEO_URL } }
+    : { state: "unavailable", reason: "The committed narrated video record does not match its schema." };
+}
+
+/** Runs whose captures overlap in time ran at the same time; group them so /proof can say so. */
+export function concurrentGroups(runs: RunSummary[]): string[][] {
+  const spans = runs.map((run) => {
+    const start = new Date(run.capturedAt).getTime();
+    return { id: run.bundleId, start, end: start + run.durationMs };
+  }).sort((a, b) => a.start - b.start);
+  const groups: { ids: string[]; end: number }[] = [];
+  for (const span of spans) {
+    const last = groups.at(-1);
+    if (last && span.start < last.end) {
+      last.ids.push(span.id);
+      last.end = Math.max(last.end, span.end);
+    } else {
+      groups.push({ ids: [span.id], end: span.end });
+    }
+  }
+  return groups.filter((group) => group.ids.length > 1).map((group) => group.ids);
+}
+
 export async function loadScreenEval(): Promise<Loaded<ScreenEval>> {
   const raw = await readEvidence("source-screen-eval.json");
   if (raw === null) return { state: "missing", reason: "No source-screen eval has been committed yet." };

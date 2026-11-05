@@ -1,12 +1,16 @@
 # Harmonia
 
+[![Verify](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml/badge.svg)](https://github.com/danielAsaboro/harmonia-meta/actions/workflows/verify.yml)
+
+**Live proof:** [harmonia-meta.vercel.app/proof](https://harmonia-meta.vercel.app/proof) (no login): seven recorded campaign runs with per-model cost, the cal.com brand brief with Meta response ids, the narrated video and its listen-back check, the injection-screen eval, and the agent roster. JSON at [`/api/proof`](https://harmonia-meta.vercel.app/api/proof).
+
 **Harmonia is an asynchronous social media content agent for startups.** An operator can begin with ordinary language rather than internal product vocabulary. Harmonia reads the durable workspace context, identifies the intended outcome, checks connected platforms, asks only for genuinely blocking information, and creates the appropriate durable content job. Nimi extracts evidence, Ryan proposes a four-week strategy for human approval, Temi operationalizes approved briefs, Noni and Dara produce reviewed typed artifacts, and deterministic code authorizes and verifies exact effects.
 
 The dashboard and authenticated web chat are active operator surfaces. Telegram’s official Bot API integration routes ordinary allow-listed messages through the canonical chat router, configures its webhook through `setWebhook`, and retains the nonce-bound inline-button approval boundary. Those paths are covered locally but are not live-evidenced against a real bot, so Telegram is not yet claimed as a production-verified equivalent surface.
 
 The repository also implements governed resident autonomy: an hourly Heartbeat, post-outcome Micro-reflections, a budget-gated nightly Dream Cycle, a morning Wakeup Call with durable agendas, bounded experiments, conservative tuning, and rollback. Its schedules are disabled by default, not deployed, and not authenticated evidence. See [`docs/resident-autonomy.mdx`](./docs/resident-autonomy.mdx).
 
-> **Evidence status:** every model call goes to Meta Model API. Six live end-to-end runs (four from pasted text, two from video, three of them concurrent) are recorded in `evidence/replays/` and shown on `/proof`. They ran against local Firestore and Pub/Sub emulators; a hosted deployment has not been captured yet.
+> **Evidence status:** every model call goes to Meta Model API. Seven live end-to-end campaign runs (four from pasted text, three from video, three of them in parallel) are recorded in `evidence/replays/` and shown on [`/proof`](https://harmonia-meta.vercel.app/proof), along with the cal.com brand brief and the narrated video. The model calls in those runs were live; the job state (Firestore and Pub/Sub) ran on a local machine, so a run on hosted infrastructure has not been captured yet.
 
 To prove the calls with a key set, run one live request to every model Harmonia uses (Muse Spark, Muse Wonder, Muse Voice Transcribe, SAM 3.1, token counting, `/status`, plus Muse Spark Open when `BASETEN_API_KEY` is set). The report keeps only model ids, request ids, latency and usage:
 

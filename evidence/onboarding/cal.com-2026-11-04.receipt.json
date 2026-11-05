@@ -1,0 +1,23 @@
+{
+  "note": "Meta list-price reconstruction from the tokens and web searches recorded in cal.com-2026-11-04.json (not an invoice). Generated with agent/harmonia_agent/model_catalog.py.",
+  "pricingVersion": "2026-11-03",
+  "calls": [
+    {
+      "step": "read_site",
+      "costUsd": 0.032983
+    },
+    {
+      "step": "research_competitors",
+      "costUsd": 0.032789
+    },
+    {
+      "step": "research_customer_pain",
+      "costUsd": 0.028626
+    },
+    {
+      "step": "synthesize_brief",
+      "costUsd": 0.08356
+    }
+  ],
+  "totalUsd": 0.177958
+}
