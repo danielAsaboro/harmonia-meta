@@ -156,7 +156,7 @@ flowchart LR
 - **Google ADK** (Python, open source) organizes the specialist team in-process inside the worker; it calls Muse models through LiteLLM's OpenAI-compatible adapter.
 - **Google A2UI v0.9 wire protocol**, rendered with pinned `@a2ui/react` 0.10.2 and `@a2ui/web_core` 0.10.6 packages. Maya chooses a graph from Harmonia’s fixed campaign vocabulary; the web server resolves every draft, moment, action, asset, and receipt reference from authenticated persisted state before the official renderer sees it.
 - **Workspace memory** in Firestore carries exact-scope facts across jobs; Firestore/Pub/Sub remain the durable workflow engine.
-- **Cloud Run** hosts both services (web: Next.js standalone build; agent: Python container).
+- **Where it runs today:** the public site and `/proof` are on Vercel. The seven recorded runs called Meta Model API live, with job state in local Firestore and Pub/Sub emulators. `infra/` deploys both services to Cloud Run (web: Next.js standalone build; agent: Python container), but no hosted run has been recorded yet.
 - **Firestore** persists job state, stage events, approvals, receipts, verifications, and packets.
 - **Pub/Sub** drives every stage transition; transient failures nack for redelivery, permanent failures stay visible.
 - **Google ADK observability + OpenTelemetry** export metadata-only structured logs, standard agent/tool/token metrics, and W3C-correlated traces to Cloud Logging, Cloud Monitoring, and Cloud Trace. A tenant-scoped Firestore projection powers the paginated, filterable **Monitoring → Agent activity** view. The product does not collect prompts, responses, drafts, transcripts, or private chain-of-thought in telemetry.
